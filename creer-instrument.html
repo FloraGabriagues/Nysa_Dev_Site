@@ -1,0 +1,2656 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-tx>Créer un instrument | Nysa</title>
+<!-- Traduction FR / EN : textes et moteur dans i18n.js -->
+<script src="i18n.js"></script>
+<!-- Polices hébergées avec le site (dossier fonts/) : aucun appel à Google. -->
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2048%2048%22%3E%3Ccircle%20cx%3D%2224.00%22%20cy%3D%2213.70%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2232.92%22%20cy%3D%2218.85%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2232.92%22%20cy%3D%2229.15%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2224.00%22%20cy%3D%2234.30%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2215.08%22%20cy%3D%2229.15%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2215.08%22%20cy%3D%2218.85%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2224%22%20cy%3D%2224%22%20r%3D%225.3%22%20fill%3D%22%23FFB86B%22/%3E%3C/svg%3E">
+<style>
+:root{
+  --void:#090E13; --panel:#131E27; --panel-2:#1A2833;
+  --line:#2E4152; --line-soft:#22323F;
+  --paper:#C4D6D4; --muted:#9BADBD; --muted-2:#8497AA;
+  --photon:#F5AC57; --pixel:#5FDCD0; --alert:#F0776D; --ok:#7FD88F;
+  --display:"Montserrat","IBM Plex Sans",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--void);color:var(--paper);font-family:var(--body);
+  font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1100px;margin:0 auto;padding:0 26px 90px}
+
+header{padding:20px 0;border-bottom:1px solid var(--line-soft);margin-bottom:22px}
+.back{font-family:var(--mono);font-size:12px;color:var(--muted);text-decoration:none;
+  letter-spacing:.04em}
+.back:hover{color:var(--pixel)}
+
+.filebtn{appearance:none;cursor:pointer;width:100%;background:var(--photon);
+  border:1px solid var(--photon);color:#2A1B08;border-radius:4px;
+  padding:13px 14px;font-family:var(--body);font-size:14px;font-weight:500;text-align:left;
+  display:flex;align-items:center;gap:10px;transition:background .14s,border-color .14s;
+  margin-bottom:20px}
+.filebtn:hover{background:#FFBE72;border-color:#FFBE72}
+.filebtn input[type=file]{display:none}
+.filebtn.ghost{background:transparent;color:var(--photon);border:1px solid var(--photon)}
+.filebtn.ghost:hover{background:rgba(245,172,87,.12);border-color:var(--photon)}
+.filebtn[hidden]{display:none}
+.sidefield{margin-bottom:16px}
+
+.sidefield label{display:block;font-family:var(--mono);font-size:12px;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.sidefield input,.sidefield select{width:100%;background:var(--panel-2);color:var(--paper);
+  border:1px solid var(--line);border-radius:3px;padding:9px 10px;font-family:var(--body);
+  font-size:14px}
+.sidefield input::placeholder{color:var(--muted-2)}
+
+
+.progresswrap{margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--line-soft)}
+.progresswrap .row{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;
+  color:var(--muted);margin-bottom:7px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.07em}
+.progresswrap .row span:last-child{font-size:13px;letter-spacing:0;text-transform:none;color:var(--pixel)}
+/* 05/10/2026 — depuis que la page charge ses vraies polices, ce titre passait
+   sur deux lignes et « 0 % » se coupait en deux. Lettres resserrées, et le
+   pourcentage ne se coupe plus. */
+.progresswrap .row{gap:10px;letter-spacing:0;font-size:12px}
+/* 11/10/2026 : le titre (lettres larges de la police mono) dépassait sur le pourcentage dans la colonne étroite.
+   Il peut maintenant passer sur deux lignes ; le pourcentage reste d'un bloc, à droite, en haut de la ligne. */
+.progresswrap .row{align-items:flex-start}
+.progresswrap .row span:first-child{min-width:0;white-space:normal;line-height:1.35}
+.progresswrap .row span:last-child{line-height:1.35}
+.progresswrap .row span:last-child{white-space:nowrap;flex:none}
+.progresswrap .track{height:5px;background:var(--line-soft);border-radius:3px;overflow:hidden}
+.progresswrap .fill{height:100%;background:var(--pixel);transition:width .25s ease}
+
+.layout{display:grid;grid-template-columns:280px 1fr;gap:22px;align-items:start}
+@media(max-width:800px){.layout{grid-template-columns:1fr}}
+
+.leftcol{display:flex;flex-direction:column;gap:20px;min-width:0;
+  position:sticky;top:20px;align-self:start;max-height:calc(100vh - 40px);overflow-y:auto}
+/* 22/10/2026 : en fenêtre étroite (une seule colonne), la colonne de gauche n'est plus collée ni plafonnée en
+   hauteur : elle reprend sa hauteur naturelle, sinon son contenu débordait sur le schéma et le panneau au défilement.
+   Placé après .leftcol pour l'emporter sur lui. */
+@media(max-width:800px){.leftcol{position:static;max-height:none;overflow-y:visible}}
+.chain{display:flex;flex-direction:column;gap:0;background:var(--panel);
+  border:1px solid var(--line-soft);border-radius:8px;padding:20px}
+.configrow{display:flex;flex-direction:column}
+.configrow .sidefield{margin-bottom:16px}
+.configrow .filebtn{width:100%}
+.chainlistcard{background:var(--panel);border:1px solid var(--line-soft);border-radius:8px;padding:20px}
+.subhead{font-family:var(--mono);font-size:12px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 14px;display:flex;align-items:center;gap:10px}
+.subhead .dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--photon)}
+.chain-arrow{display:flex;justify-content:center;color:var(--muted-2);font-size:16px;padding:2px 0}
+.ctx-node{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:4px;
+  border:1px solid var(--line-soft);opacity:.5}
+.ctx-node .dot{width:8px;height:8px;border-radius:50%;background:var(--muted-2);flex:none}
+.ctx-node .lab{font-size:13.5px;font-weight:500}
+.ctx-node .sub{font-family:var(--mono);font-size:12px;color:var(--muted-2)}
+
+.schemawrap{margin-bottom:14px;overflow-x:auto}
+.schemawrap svg{display:block;min-width:520px;width:100%;height:auto;max-height:110px}
+.rightcol{display:flex;flex-direction:column;min-width:0}
+.schema-label{font-family:var(--mono);font-size:12px;fill:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.schema-block{cursor:pointer;transition:opacity .18s,filter .18s}
+.schema-block{opacity:.72}
+.schema-block:hover{opacity:.92}
+.schema-block.active{opacity:1}
+.schema-iconframe{stroke:var(--line);fill:var(--panel-2);transition:stroke .18s,stroke-width .18s}
+.schema-block.active .schema-iconframe{stroke:var(--pixel);stroke-width:2}
+.schema-block .schema-glow{opacity:.5;transition:opacity .18s}
+.schema-block.active .schema-glow{opacity:1}
+.schema-blocklabel{font-family:var(--body);font-size:13px;fill:var(--paper);font-weight:500}
+
+.instgroup{background:transparent}
+.instgroup .grouphead{font-family:var(--mono);font-size:12px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 10px;display:flex;align-items:center;gap:7px}
+.instgroup .grouphead .dot{width:7px;height:7px;border-radius:50%;background:var(--pixel)}
+
+.blocklist{border:1px solid var(--line-soft);border-radius:6px;overflow:hidden}
+.blockbtn{width:100%;display:flex;align-items:center;justify-content:space-between;
+  gap:10px;padding:13px 14px;background:transparent;border:0;
+  border-bottom:1px solid var(--line-soft);color:var(--paper);cursor:pointer;
+  font-family:var(--body);font-size:14px;text-align:left;
+  border-left:2px solid transparent;
+  opacity:.68;transition:opacity .15s,border-color .15s,background .15s}
+.blocklist .blockbtn:last-child{border-bottom:0}
+.blockbtn:hover{opacity:.9}
+.blockbtn.active{opacity:1;border-left-color:var(--pixel);background:rgba(95,220,208,.06);color:var(--pixel)}
+.blockbtn .lab{font-weight:500}
+.status{font-family:var(--mono);font-size:13px;color:var(--muted-2);width:16px;text-align:center;flex:none}
+.status.ok{color:var(--ok)}
+.status.warn{color:var(--photon)}
+
+.panel{background:var(--panel);border:1px solid var(--line-soft);border-radius:6px;
+  padding:16px 20px}
+.panel h2{font-family:var(--display);font-weight:600;font-size:16.5px;margin:0 0 4px;letter-spacing:0}
+.panel .desc{font-size:13px;color:var(--muted);margin:0 0 16px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+.field .row{display:flex;gap:10px;align-items:center;min-width:0}
+.field input[type=number],.field input[type=text]{flex:1;min-width:0;background:var(--panel-2);
+  border:1px solid var(--line);border-radius:3px;color:var(--paper);padding:9px 11px;
+  font-family:var(--mono);font-size:14px}
+.field input::placeholder{color:var(--muted-2);font-family:var(--body);font-style:italic}
+.field .unit{font-family:var(--mono);font-size:12px;color:var(--muted-2);min-width:34px}
+.field input:focus{outline:none;border-color:var(--pixel)}
+.field input:disabled{opacity:.45;cursor:not-allowed}
+.field .lockhint{font-size:12px;color:var(--muted-2);margin:6px 0 0}
+/* 04/10/2026 — choix « Valeur constante / Courbe » pour la transmission et le rendement quantique */
+.field .modeseg{display:inline-flex;border:1px solid var(--line);border-radius:4px;overflow:hidden;margin-bottom:8px}
+.field .modeseg button{appearance:none;cursor:pointer;background:transparent;border:none;color:var(--muted);
+  font-family:var(--body);font-size:12.5px;padding:5px 12px}
+.field .modeseg button + button{border-left:1px solid var(--line)}
+.field .modeseg button.on{background:var(--panel-2);color:var(--pixel)}
+/* 04/10/2026 — valeur hors de l'intervalle autorisé (fractions 0-1) */
+.field input.invalid,.qespectral input.invalid{border-color:var(--alert)}
+.rangehint{font-size:12px;color:var(--alert);margin:6px 0 0}
+/* 04/10/2026 — valeur possible mais inhabituelle : alerte orange, non bloquante */
+.field input.odd,.qespectral input.odd{border-color:var(--photon)}
+.oddhint{font-size:12px;color:var(--photon);margin:6px 0 0}
+/* valeurs déduites affichées sous le schéma de pupille */
+.geo-derived{flex:none;margin:10px 0 0;font-family:var(--mono);font-size:12px;line-height:1.5;color:var(--muted)}
+.geo-derived b{font-weight:400;color:var(--paper)}
+/* 03/10/2026 — aides de saisie, sélecteur de mode électronique, paramètres avancés */
+.field .labrow{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.field .labrow label{margin-bottom:0}
+.field .helpbtn{appearance:none;cursor:pointer;background:transparent;border:1px solid var(--line);
+  color:var(--muted);border-radius:50%;width:18px;height:18px;font-size:12px;line-height:1;padding:0}
+.field .helpbtn:hover{border-color:var(--pixel);color:var(--pixel)}
+.field .fieldhelp{font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.45}
+.field .helpbtn[aria-expanded="true"]{border-color:var(--pixel);color:var(--pixel)}
+/* bulle d'aide (07/10/2026), même rendu que dans la page Simulations. Elle laisse passer les clics. */
+.bubble{position:fixed;z-index:80;pointer-events:none;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:12px 14px;
+  box-shadow:0 12px 36px rgba(0,0,0,.5);font-size:12.5px;line-height:1.5;color:var(--muted)}
+.bubble strong{display:block;color:var(--paper);font-weight:500;font-size:13px;margin-bottom:6px}
+.bubble p{margin:0 0 7px}
+.bubble p:last-child{margin-bottom:0}
+.field select{width:100%;background:var(--panel-2);color:var(--paper);border:1px solid var(--line);
+  border-radius:4px;padding:8px 10px;font-size:14px}
+details.advanced{border-top:1px solid var(--line-soft);margin-top:6px;padding-top:12px}
+details.advanced summary{cursor:pointer;font-size:13px;color:var(--muted);margin-bottom:12px}
+details.advanced summary .count{font-family:var(--mono);font-size:12px;color:var(--muted-2);margin-left:6px}
+/* 04/10/2026 — bloc Détecteur allégé : champs courts côte à côte, mention du type à côté du titre */
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 22px;align-items:start}
+@media(max-width:720px){.grid2{grid-template-columns:1fr}}
+.typebadge{font-family:var(--mono);font-size:12px;font-weight:400;color:var(--muted);
+  border:1px solid var(--line);border-radius:3px;padding:2px 7px;margin-left:10px;vertical-align:middle}
+.panel-actions{display:flex;justify-content:space-between;gap:10px;margin-top:20px;
+  padding-top:16px;border-top:1px solid var(--line-soft)}
+.panel-actions .rightbtns{display:flex;gap:10px;margin-left:auto}
+.btn{appearance:none;cursor:pointer;border-radius:4px;padding:10px 18px;
+  font-family:var(--body);font-size:14px;font-weight:500;border:1px solid var(--line)}
+.btn.primary{background:var(--pixel);color:#052824;border-color:var(--pixel)}
+.btn.ghost{background:transparent;color:var(--paper)}
+.btn.next{background:transparent;color:var(--pixel);border-color:var(--pixel)}
+
+.savehint{font-family:var(--mono);font-size:12px;color:var(--muted-2);margin-top:10px;
+  min-height:16px}
+
+.wfecases{border:1px solid var(--line-soft);border-radius:6px;padding:12px 14px;margin-bottom:14px}
+.wfecases .wfehead{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.wfecases .wfehead label{font-size:13px;color:var(--muted);margin:0}
+.wfecases .wfeaddbtns{display:flex;gap:8px}
+.wfecases .wfesub{font-size:12px;color:var(--muted-2);margin:0 0 10px}
+.wfecases .addcasebtn{appearance:none;cursor:pointer;background:transparent;border:1px solid var(--line);
+  color:var(--pixel);border-radius:3px;padding:5px 10px;font-family:var(--mono);font-size:12px}
+.wfecases .addcasebtn:hover{border-color:var(--pixel)}
+.wfecases .caserow{display:flex;align-items:center;gap:10px;padding:8px 0;flex-wrap:wrap;
+  border-top:1px solid var(--line-soft)}
+.wfecases .caserow .cname{flex:1;font-size:13.5px}
+.wfecases .caserow .cfile{font-family:var(--mono);font-size:12px;color:var(--muted-2)}
+.wfecases .caserow .calign{background:var(--panel-2);color:var(--paper);border:1px solid var(--line);
+  border-radius:3px;padding:4px 6px;font-family:var(--body);font-size:12px;flex:none}
+.wfecases .caserow .cdel{appearance:none;cursor:pointer;background:transparent;border:none;
+  color:var(--muted-2);font-size:15px;padding:2px 6px}
+.wfecases .caserow .cdel:hover{color:var(--alert)}
+.wfecases .empty{font-size:12px;color:var(--muted-2);padding:8px 0 2px}
+
+.geo-dim{font-family:var(--mono);font-size:18px;fill:var(--muted)}
+.optique-grid{display:flex;gap:22px;align-items:stretch;margin-bottom:14px}
+.optique-geo-col{flex:1;min-width:0;border:1px solid var(--line-soft);border-radius:6px;
+  padding:14px 14px 10px;background:var(--panel-2);display:flex;flex-direction:column}
+#opticsGeoSvg,#electronicsGeoSvg{flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
+.geo-viewlabel{display:flex;align-items:center;gap:7px;margin-top:6px;flex:none;
+  font-family:var(--mono);font-size:12px;color:var(--muted-2)}
+.geo-viewlabel svg{flex:none}
+/* Une seule colonne pour les champs (revenu en arrière le 18/09/2026 — le
+   2-colonnes cassait la mise en page) ; le plan (geo-col) s'étire pour
+   matcher cette hauteur, sans hauteur fixe/overflow:hidden qui coupait les
+   axes et "Vue de face". */
+.optique-fields-col{flex:1;min-width:0}
+.optique-fields-col .field{margin-bottom:14px}
+@media(max-width:720px){.optique-grid{flex-direction:column}}
+
+.qespectral .qerow{display:flex;align-items:center;gap:8px;padding:6px 0;
+  border-top:1px solid var(--line-soft)}
+.qespectral .qewl,.qespectral .qeval{flex:1;min-width:0;background:var(--panel-2);color:var(--paper);
+  border:1px solid var(--line);border-radius:3px;padding:6px 8px;font-family:var(--mono);font-size:12.5px}
+.qespectral .qedel{appearance:none;cursor:pointer;background:transparent;border:none;
+  color:var(--muted-2);font-size:15px;padding:2px 6px;flex:none}
+.qespectral .qedel:hover{color:var(--alert)}
+/* 04/10/2026 — courbes spectrales en trois colonnes : λ, valeur, tracé */
+.qespectral .spec-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:stretch}
+/* avec peu de points, le tracé est plus haut que les lignes : on centre alors les lignes sur lui */
+.qespectral .spec-rows{display:flex;flex-direction:column;justify-content:center}
+.qespectral .wfehead label{font-size:14.5px;color:var(--paper)}
+.qespectral .wfesub{font-size:13px;line-height:1.5;color:var(--muted)}
+.qespectral .spec-head{display:flex;gap:8px;padding:0 0 6px;font-family:var(--mono);font-size:13px;color:var(--muted)}
+.qespectral .spec-head span{flex:1;min-width:0}
+.qespectral .spec-head .gap{flex:none;width:27px}
+/* tracé centré en hauteur sur les lignes de points (padding-top = hauteur de la ligne d'en-têtes) */
+.qespectral .spec-chart{border-left:1px solid var(--line-soft);padding:26px 0 0 18px;
+  display:flex;flex-direction:column;justify-content:center}
+@media(max-width:720px){.qespectral .spec-cols{grid-template-columns:1fr}
+  .qespectral .spec-chart{border-left:none;padding-left:0}}
+
+.zdetail{margin-bottom:0}
+.zpickrow{display:flex;gap:10px;margin-bottom:10px}
+.zpickrow select{flex:1;min-width:0;background:var(--panel-2);color:var(--paper);
+  border:1px solid var(--line);border-radius:3px;padding:6px 8px;font-family:var(--body);font-size:12.5px}
+.zmapwrap{display:flex;gap:16px;align-items:center;padding-top:8px;border-top:1px solid var(--line-soft)}
+.zcanvas{flex:none;border-radius:50%;border:1px solid var(--line-soft);image-rendering:pixelated}
+.zmapstats{font-family:var(--mono);font-size:12.5px;color:var(--muted);line-height:1.9}
+.zmapstats b{color:var(--paper)}
+.zterms{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;
+  margin-top:12px;padding-top:10px;border-top:1px solid var(--line-soft)}
+.zterm{display:flex;justify-content:space-between;gap:8px;background:var(--panel-2);
+  border:1px solid var(--line-soft);border-radius:4px;padding:5px 8px;font-size:12px}
+.zterm .zk{color:var(--muted)}
+.zterm .zv{font-family:var(--mono);color:var(--pixel)}
+/* 16/10/2026 : mode invité (instrument d'exemple en lecture seule) */
+.guestlock{opacity:.5;cursor:not-allowed}
+.guestlock:hover{transform:none}
+input:disabled,select:disabled{opacity:.6;cursor:not-allowed}
+.g-tip{position:fixed;z-index:200;max-width:260px;padding:8px 11px;border-radius:6px;background:var(--panel-2);border:1px solid var(--pixel);color:var(--paper);font-size:12.5px;line-height:1.4;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.g-tip[hidden]{display:none}
+.g-overlay{position:fixed;inset:0;z-index:150;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(5,10,14,.72);backdrop-filter:blur(3px)}
+.g-overlay.open{display:flex}
+.g-modal{width:100%;max-width:440px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;box-shadow:0 18px 50px rgba(0,0,0,.5)}
+.g-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line)}
+.g-head h2{margin:0;font-size:16px;color:var(--paper)}
+.g-close{background:none;border:0;color:var(--muted);font-size:16px;cursor:pointer;padding:4px 8px}
+.g-close:hover{color:var(--paper)}
+.g-body{margin:0;padding:18px 20px 6px;font-size:14px;line-height:1.55;color:var(--paper)}
+.g-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;padding:14px 20px 20px}
+.g-btn{display:inline-block;font:inherit;font-size:13px;padding:9px 14px;border-radius:5px;border:1px solid var(--line);background:none;color:var(--paper);cursor:pointer;text-decoration:none}
+.g-btn.primary{background:var(--photon);border-color:var(--photon);color:#1a1208;font-weight:600}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.helplink{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--paper);text-decoration:none;
+  border:1px solid var(--line);border-radius:5px;padding:7px 12px;transition:border-color .14s,color .14s}
+.helplink svg{width:15px;height:15px;flex:none;color:var(--pixel)}
+.helplink:hover{border-color:var(--pixel);color:var(--pixel)}
+</style>
+</head>
+<body>
+<!-- Bandeau « version bêta » : se désactive dans beta.js (BETA_ACTIVE = false) -->
+<script src="beta.js"></script>
+<div class="wrap">
+
+  <header>
+    <a class="back" href="espace-personnel.html" data-tx>← Mes objets</a>
+    <!-- 05/10/2026 — accompagnement proposé à la demande (fenêtre dans aide.js).
+         Placé dans l'en-tête : en bas de la colonne de gauche, il fallait
+         faire défiler pour le voir. -->
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <a class="helplink" href="mailto:contact@nysa-imaging.com" data-nysa-help="instrument">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.2 2.4c-.9.3-1.2.9-1.2 1.8"/><circle cx="12" cy="16.6" r=".6" fill="currentColor"/></svg>
+      <span data-i18n="help.instrument.title">Besoin d'aide pour configurer votre instrument&nbsp;?</span></a>
+      <span data-lang-switch></span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <div class="leftcol">
+      <div class="chain instgroup" id="chain">
+        <div class="progresswrap">
+          <div class="row"><span data-tx>Configuration de l'instrument</span><span id="pctLabel">0 %</span></div>
+          <div class="track"><div class="fill" id="pctFill" style="width:0%"></div></div>
+        </div>
+        <p class="subhead"><span class="dot"></span><span data-tx>Configuration</span></p>
+        <div class="configrow">
+          <div class="sidefield">
+            <label for="instName" data-tx>Nom de l'instrument</label>
+            <input type="text" id="instName" placeholder="Mon instrument" data-tx-ph>
+          </div>
+          <button class="filebtn" id="btnFile" type="button"><span data-tx>Charger une configuration</span>
+            <input type="file" id="fileInput" accept="application/json">
+          </button>
+          <!-- 04/10/2026 — visible dès qu'au moins un champ est saisi (cf. updateProgress) -->
+          <button class="filebtn ghost" id="btnExport" type="button" hidden data-tx>Exporter la configuration</button>
+        </div>
+      </div>
+      <div class="chainlistcard instgroup" id="chainList"></div>
+    </div>
+    <div class="rightcol">
+      <div class="schemawrap" id="schemaWrap"></div>
+      <div class="panel" id="fieldPanel"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 16/10/2026 : fenêtre d'invitation du mode invité -->
+<div class="g-overlay" id="guestOverlay">
+  <div class="g-modal" role="dialog" aria-modal="true" aria-labelledby="guestTitle">
+    <div class="g-head">
+      <h2 id="guestTitle" data-i18n="guest.invite.title">Créez votre compte gratuit</h2>
+      <button class="g-close" id="guestCloseBtn" type="button" aria-label="Fermer" data-i18n-aria="common.close">✕</button>
+    </div>
+    <p class="g-body" data-i18n="guest.invite.text">Avec un compte, vous créez vos propres instruments, lancez vos simulations et retrouvez vos résultats. C'est gratuit pendant la bêta.</p>
+    <div class="g-actions">
+      <button class="g-btn" id="guestLaterBtn" type="button" data-i18n="guest.invite.later">Plus tard</button>
+      <a class="g-btn primary" id="guestGoBtn" href="login.html?signup=1" data-i18n="guest.invite.go">Créer un compte gratuit</a>
+    </div>
+  </div>
+</div>
+<div class="g-tip" id="guestTip" role="tooltip" hidden></div>
+
+<!-- Bibliothèque Supabase hébergée avec le site (dossier vendor/), version figée. -->
+<script src="vendor/supabase.js"></script>
+<script src="supabase-client.js"></script>
+<!-- Instrument d'exemple, affiché en lecture seule en mode invité -->
+<script src="instrument-exemple.js"></script>
+<script>
+var SCHEMA = [
+  {id:"paysage", kind:"ctx", label:"Paysage L", sub:"scène source"},
+  {id:"atmosphere", kind:"ctx", label:"Atmosphère", sub:"modèle atmosphérique"},
+  {id:"instrument", kind:"group", label:"Instrument", blocks:[
+    {id:"optique", label:"Optique", fields:[
+      {k:"I", label:"iFoV", unit:"µrad", placeholder:"obligatoire",
+       help:"Angle sous lequel un pixel voit la scène : pas pixel divisé par la focale. Exemple : 5 µm / 2.5 m = 2 µrad."},
+      {k:"D", label:"Diamètre de pupille", unit:"m", placeholder:"obligatoire",
+       help:"Diamètre utile du miroir primaire dans le cas d'un télescope de type Cassegrain, Ritchey-Chrétien ou Korsch. Il fixe la limite de diffraction et le flux collecté, proportionnel à son carré."},
+      {k:"E", label:"Obscuration centrale", unit:"m", placeholder:"0 (défaut)",
+       help:"Diamètre de l'ombre du miroir secondaire, baffle compris, en mètres et non en ratio. Laisser vide pour un télescope sans obstruction."},
+      // NSUP/ESUP : confirmés le 17/09/2026 (paramFile.Telescope.n_supports/
+      // support_width, cf. module_MTF.py) — envoyés au payload de
+      // simulation comme PX/QE/ADC (cf. simulations.html).
+      {k:"NSUP", label:"Nombre de supports", unit:"", placeholder:"0 (défaut)",
+       help:"Nombre de bras qui tiennent le miroir secondaire."},
+      {k:"ESUP", label:"Épaisseur des supports", unit:"m", placeholder:"0 (défaut)",
+       help:"Largeur d'un bras vue de face. Obligatoire dès qu'un nombre de supports est saisi."},
+      {k:"T", label:"Transmission optique", unit:"0 à 1", placeholder:"1 (défaut)", min:0, max:1,
+       help:"Produit des réflectivités et transmissions de tous les éléments optiques. Exemple : quatre miroirs à 0,95 donnent 0,81. Ne pas y inclure le filtre de bande ni le rendement du détecteur."}
+    ]},
+    {id:"detecteur", label:"Détecteur", fields:[
+      // 04/10/2026 — un seul type possible en V1 : affiché comme simple
+      // mention à côté du titre du bloc (mention:true), plus comme un champ.
+      // optional:true : ne compte pas dans l'avancement (avant, ce champ
+      // jamais « rempli » empêchait le bloc d'atteindre la coche).
+      {k:"DET_TYPE", label:"Type de détecteur", type:"select", options:["CMOS"], mention:true, optional:true},
+      // QE en fraction (τ, 0–1) et non en % — confirmé le 17/09/2026 par
+      // radiometry.py : electrons = photons * QE_band, QE_band vient d'une
+      // interpolation sur paramFile.Detector.QE_spectral.values, jamais
+      // divisée par 100. Même convention que T (transmission optique).
+      {k:"PX", label:"Largeur pixel", unit:"µm", placeholder:"obligatoire",
+       help:"Pas entre deux pixels voisins, ligne « pixel pitch » ou « pixel size » des datasheets."},
+      {k:"QE", label:"Rendement quantique", unit:"0 à 1", placeholder:"1 (défaut)", min:0, max:1,
+       help:"Probabilité qu'un photon arrivant sur le pixel donne un électron. Saisir 0,65 pour 65 %."},
+      // 12/10/2026 : transmission du filtre de bande, jusque-là fixée à 0,76 par le modèle serveur
+      // sans être demandée. Défaut 1 (pas de filtre, ou déjà compté dans le rendement quantique).
+      {k:"T_filter", label:"Transmission du filtre", unit:"0 à 1", placeholder:"1 (défaut)", min:0, max:1,
+       help:"Transmission du filtre de bande (filtre spectral ou mosaïque de filtres devant le détecteur). Saisir 1 en l'absence de filtre, ou si elle est déjà comptée dans le rendement quantique."},
+      {k:"P",  label:"PRNU", unit:"%", placeholder:"0 (défaut)",
+       help:"Dispersion de la réponse d'un pixel à l'autre, en % RMS. Une valeur crête à crête est plusieurs fois plus grande et ne doit pas être saisie telle quelle."},
+      {k:"K",  label:"Courant d'obscurité", unit:"e⁻/s", placeholder:"0 (défaut)",
+       help:"Électrons générés sans lumière, par pixel et par seconde, à la température de fonctionnement. Depuis des nA/cm² : multiplier par la surface du pixel et diviser par la charge de l'électron."},
+      // DSNU (03/10/2026) : clés explicites, identiques à celles du paramFile
+      // (Detector.dsnu_1288 / dsnu_T_ref, cf. module_SNR.build_fixed_pattern).
+      {k:"dsnu_1288", label:"DSNU (EMVA 1288)", unit:"e⁻", placeholder:"0 (défaut)", optional:true, advanced:true,
+       help:"Dispersion du signal d'obscurité d'un pixel à l'autre, en électrons RMS, mesurée selon l'EMVA 1288. Laisser 0 si la datasheet ne la donne pas."},
+      {k:"dsnu_T_ref", label:"Temps de référence DSNU", unit:"s", placeholder:"0 (défaut)", requiredIf:"dsnu_1288", advanced:true,
+       help:"Temps d'exposition utilisé pour mesurer la DSNU. Obligatoire dès que la DSNU est non nulle : sans lui, la valeur ne peut pas être ramenée au temps d'intégration."}
+    ]},
+    {id:"electronique", label:"Électronique", fields:[
+      {k:"ADC", label:"Résolution ADC", unit:"bits", placeholder:"obligatoire",
+       help:"Nombre de bits du convertisseur, donc 2^bits codes (4 096 pour 12 bits). Profondeur d'une lecture, avant sommation des étages TDI."},
+      {k:"FW", label:"Full well", unit:"e⁻", placeholder:"obligatoire",
+       help:"Charge maximale d'un pixel, ligne « full well capacity » ou « saturation capacity ». Capacité d'un étage, pas la capacité cumulée après TDI."},
+      {k:"R",  label:"Bruit de lecture", unit:"e⁻", placeholder:"0 (défaut)",
+       help:"Bruit ajouté à chaque lecture, en électrons RMS. Avec un TDI numérique il s'ajoute à chaque étage."},
+      // Électronique (03/10/2026) — obligatoire : un des trois modes doit
+      // être choisi, plus de repli silencieux. Clés explicites, identiques
+      // à celles lues par module_SNR.resolve_electronics.
+      {k:"electronics_mode", label:"Mode de saisie de l'électronique", type:"select", options:[
+        {v:"", label:"Choisir…"},
+        {v:"detailed", label:"Détaillé (facteur de conversion + plage ADC)"},
+        {v:"datasheet", label:"Datasheet (gain global en DN/e⁻)"},
+        {v:"full_scale", label:"Pleine échelle ADC = full well"}],
+       help:"À choisir selon ce que donne la datasheet. Sans aucune donnée électronique, « Pleine échelle ADC = full well » suppose l'ADC réglé pour que sa pleine échelle corresponde au puits plein : seuls le full well et le nombre de bits comptent."},
+      {k:"CVF_uV_per_e", label:"Facteur de conversion", unit:"µV/e⁻", placeholder:"obligatoire", modes:["detailed"],
+       help:"Tension produite par électron, ligne « conversion gain » des datasheets. Ne pas saisir l'inverse (e⁻/V)."},
+      {k:"G_PGA", label:"Gain de l'amplificateur (PGA)", unit:"", placeholder:"1 (défaut)", modes:["detailed"], optional:true,
+       help:"Gain en tension appliqué avant l'ADC. Laisser 1 en l'absence d'amplificateur programmable."},
+      {k:"V_range", label:"Plage d'entrée de l'ADC", unit:"V", placeholder:"obligatoire", modes:["detailed"],
+       help:"Tension convertie par l'ADC, de 0 à cette valeur. Vérification : full well × facteur de conversion × gain doit être proche de cette plage ; au-delà, l'ADC sature avant le puits."},
+      {k:"CWF", label:"Gain global", unit:"DN/e⁻", placeholder:"obligatoire", modes:["datasheet"],
+       help:"Nombre de DN par électron. Si la datasheet donne des e⁻/DN, saisir l'inverse."},
+      {k:"DN0", label:"Niveau noir", unit:"DN", placeholder:"0 (défaut)", optional:true, advanced:true,
+       help:"Offset électronique ajouté à chaque étage, distinct du courant d'obscurité. Doit rester inférieur à 2^bits − 1."},
+      {k:"bits_TDI", label:"Accumulateur TDI", unit:"bits", placeholder:"sans perte (défaut)", optional:true, advanced:true,
+       help:"Profondeur du registre qui somme les étages, 32 bits au plus. Vide : dimensionné pour ne jamais saturer, dans la limite de 32 bits. Sinon au moins égal à la résolution ADC."}
+    ]},
+    {id:"wfe", label:"Performance WFE", fields:[
+      {k:"W", label:"WFE RMS", unit:"nm", placeholder:"0 (défaut)",
+       help:"Écart RMS entre le front d'onde réel et le front d'onde parfait, en nanomètres. Repère : λ/14, soit environ 39 nm à 550 nm, pour une optique limitée par la diffraction."}
+    ]}
+  ]},
+  {id:"image", kind:"ctx", label:"Image I", sub:"produit brut, n bits"},
+  {id:"restitution", kind:"ctx", label:"Restitution", sub:"traitement final"}
+];
+
+var state = { active:"optique", values:{}, instrumentId:null };
+// Retour automatique vers simulations.html après enregistrement, si on
+// vient de là faute d'instrument existant (cf. renderInstruments dans
+// simulations.html, échange du 18/09/2026) — capturé une fois au
+// chargement, avant que saveToSupabase() ne réécrive l'URL avec ?id=.
+var returnTarget = new URLSearchParams(window.location.search).get("return");
+
+// persist() ne fait plus rien : l'état vit uniquement en mémoire
+// (state.values) pendant l'édition — la vraie sauvegarde (Supabase)
+// n'a lieu qu'au clic explicite sur "Enregistrer l'instrument"
+// (cf. saveToSupabase()), pas à chaque frappe comme avec l'ancien
+// brouillon localStorage. Le nom (STORAGE_KEY/NAME_KEY) a disparu avec
+// le même changement.
+function persist(){}
+
+/**
+ * Charge un instrument existant depuis Supabase si l'URL contient
+ * ?id=<uuid> (lien "Ouvrir" depuis espace-personnel.html) ; sinon,
+ * repart d'un formulaire vide (création).
+ */
+var IS_GUEST = (typeof isGuest === "function") && isGuest();
+async function loadInstrument(){
+  var params = new URLSearchParams(window.location.search);
+  var id = params.get("id");
+  if(!id) return;
+
+  // 16/10/2026 : invité = instrument d'exemple local, aucun appel à Supabase.
+  if(IS_GUEST){
+    if(typeof NYSA_EXAMPLE_INSTRUMENT !== "undefined"){
+      state.instrumentId = null;
+      state.values = JSON.parse(JSON.stringify(NYSA_EXAMPLE_INSTRUMENT.config));
+      document.getElementById("instName").value = NYSA_EXAMPLE_INSTRUMENT.name[nysaLang()] || NYSA_EXAMPLE_INSTRUMENT.name.en;
+    }
+    return;
+  }
+
+  var { data, error } = await supabaseClient
+    .from("instruments")
+    .select("*")
+    .eq("id", id)
+    .is("deleted_at", null) // suppression douce (04/10/2026) : un instrument supprimé ne s'ouvre plus
+    .single();
+
+  if(error || !data){
+    console.error("Erreur chargement instrument :", error);
+    return; // id invalide/inaccessible — on reste sur un formulaire vide plutôt que planter
+  }
+
+  state.instrumentId = data.id;
+  state.values = data.config || {};
+  document.getElementById("instName").value = data.name || "";
+}
+
+// 03/10/2026 — un champ peut être masqué selon le mode d'électronique
+// (f.modes), facultatif (f.optional), ou obligatoire seulement si un autre
+// champ est non nul (f.requiredIf). Seuls les champs visibles et non
+// facultatifs comptent dans l'avancement.
+function isFilled(k){
+  var v = state.values[k];
+  return v !== undefined && v !== null && v !== "";
+}
+// 04/10/2026 — une courbe spectrale saisie (au moins 2 points valides, le
+// même seuil que pour l'envoi dans simulations.html) remplace la valeur
+// scalaire correspondante : le champ scalaire est alors grisé, et ne
+// compte plus dans l'avancement.
+// 04/10/2026 — transmission et rendement quantique sont des fractions :
+// une valeur hors de [0, 1] est signalée en rouge, n'entre ni dans le tracé
+// ni dans la courbe envoyée, et bloque l'enregistrement.
+function inUnitRange(v){
+  return v !== "" && v !== undefined && v !== null && !isNaN(v) && Number(v) >= 0 && Number(v) <= 1;
+}
+// ===================== Règles de saisie par champ (04/10/2026) =====================
+// UNE table pour toutes les contraintes, à ajuster ici :
+//   integer   : nombre entier (le point décimal est refusé à la frappe)
+//   signed    : signe moins autorisé en tête (WFE uniquement)
+//   positive  : strictement positif (0 refusé, en rouge, bloque l'enregistrement)
+//   enabledIf : champ saisissable seulement si cet autre champ est > 0
+//   plausible : [min, max] de la plage habituelle. En dehors, alerte ORANGE
+//               « valeur inhabituelle », qui n'empêche pas d'enregistrer.
+//               Un min de 0 signifie « pas de borne basse ».
+// Les bornes de plausibilité sont des ordres de grandeur pour l'observation
+// de la Terre dans le visible ; elles ne sont pas des limites du modèle.
+// Les signes moins, lettres et espaces sont refusés à la frappe pour tous
+// les champs numériques, et la virgule est changée en point (cf.
+// l'écouteur « input » posé sur panelEl).
+var FIELD_RULES = {
+  I:            {positive:true, plausible:[0.2, 50]},       // µrad
+  D:            {positive:true, plausible:[0.05, 3]},       // m
+  E:            {},                                         // m — contrôles particuliers ci-dessous (E < D)
+  NSUP:         {integer:true, enabledIf:"E", plausible:[0, 6]},
+  ESUP:         {enabledIf:"E", plausible:[0, 0.1]},        // m
+  T:            {plausible:[0.2, 1]},
+  PX:           {positive:true, plausible:[1, 30]},         // µm
+  QE:           {plausible:[0.1, 1]},
+  T_filter:     {plausible:[0.2, 1]},
+  P:            {plausible:[0, 5]},                         // %
+  K:            {plausible:[0, 10000]},                     // e⁻/s
+  dsnu_1288:    {plausible:[0, 1000]},                      // e⁻
+  dsnu_T_ref:   {positive:true, plausible:[0.0001, 10]},    // s
+  ADC:          {integer:true, positive:true, plausible:[8, 16]},   // bits
+  FW:           {positive:true, plausible:[1000, 1000000]}, // e⁻
+  R:            {plausible:[0, 200]},                       // e⁻
+  CVF_uV_per_e: {positive:true, plausible:[1, 300]},        // µV/e⁻
+  G_PGA:        {positive:true, plausible:[0.1, 64]},
+  V_range:      {positive:true, plausible:[0.1, 5]},        // V
+  CWF:          {positive:true, plausible:[0.001, 10]},     // DN/e⁻
+  DN0:          {integer:true},                             // DN
+  bits_TDI:     {integer:true, plausible:[0, 32]},          // bits
+  W:            {signed:true, plausible:[0, 200]}           // nm — signe moins autorisé
+};
+// Plage habituelle des longueurs d'onde d'une courbe spectrale (nm) : en
+// dehors, alerte orange (erreur d'unité probable, µm au lieu de nm).
+var CURVE_WL_PLAUSIBLE = [300, 1100];
+function fieldRule(f){ return FIELD_RULES[f.k] || {}; }
+// Champ non saisissable tant que le champ dont il dépend est vide ou nul
+// (les supports n'existent pas sans obscuration centrale).
+function fieldDisabled(f){
+  var dep = fieldRule(f).enabledIf;
+  return !!dep && !(Number(state.values[dep]) > 0);
+}
+// Erreur BLOQUANTE (rouge) : message, ou "" si la valeur est acceptable.
+function hardMessage(f){
+  if(f.type === "select" || fieldDisabled(f)) return "";
+  // Épaisseur des supports : obligatoire et non nulle dès qu'un nombre de
+  // supports est saisi (sinon les supports n'auraient aucun effet).
+  if(f.k === "ESUP" && Number(state.values.NSUP) > 0 && !(Number(state.values.ESUP) > 0)){
+    return tx("Obligatoire dès qu'un nombre de supports est saisi.");
+  }
+  if(!isFilled(f.k)) return "";
+  var r = fieldRule(f), v = Number(state.values[f.k]);
+  if(isNaN(v)) return tx("Nombre attendu.");
+  if(f.min !== undefined && (v < f.min || v > f.max)) return tx("Fraction attendue, entre {min} et {max} (0.62 pour 62 %).", { min: f.min, max: f.max });
+  if(r.positive && !(v > 0)) return tx("Valeur strictement positive attendue.");
+  if(f.k === "E" && isFilled("D") && v >= Number(state.values.D)) return tx("L'obscuration doit rester inférieure au diamètre de pupille.");
+  if(f.k === "ADC" && v > 16) return tx("16 bits au plus.");
+  if(f.k === "bits_TDI" && v > 32) return tx("32 bits au plus.");
+  if(f.k === "DN0" && isFilled("ADC") && v >= Math.pow(2, Number(state.values.ADC)) - 1) return tx("Doit rester inférieur à 2^bits − 1.");
+  if(f.k === "bits_TDI" && isFilled("ADC") && v < Number(state.values.ADC)) return tx("Au moins égal à la résolution ADC.");
+  return "";
+}
+// Alerte NON bloquante (orange) : valeur possible mais inhabituelle.
+function softMessage(f){
+  if(f.type === "select" || !isFilled(f.k) || fieldDisabled(f) || hardMessage(f)) return "";
+  var r = fieldRule(f), v = Number(state.values[f.k]), u = f.unit && f.unit !== "0 à 1" ? " " + f.unit : "";
+  if(f.k === "E" && isFilled("D") && v > 0.5 * Number(state.values.D)) return tx("Valeur inhabituelle : obscuration supérieure à la moitié du diamètre.");
+  if(!r.plausible) return "";
+  if(r.signed) v = Math.abs(v);
+  var lo = r.plausible[0], hi = r.plausible[1];
+  if(v > hi) return lo > 0 ? tx("Valeur inhabituelle : en général entre {lo} et {hi}{u}.", { lo: lo, hi: hi, u: u }) : tx("Valeur inhabituelle : en général jusqu'à {hi}{u}.", { hi: hi, u: u });
+  if(lo > 0 && v < lo) return tx("Valeur inhabituelle : en général entre {lo} et {hi}{u}.", { lo: lo, hi: hi, u: u });
+  return "";
+}
+function fieldOutOfRange(f){ return !!hardMessage(f); }
+// Met à jour, sans redessiner le panneau, l'état de tous les champs du bloc :
+// grisé, bordure rouge/orange et messages. Appelé à chaque frappe, car un
+// champ peut dépendre d'un autre (obscuration et diamètre, niveau noir et
+// résolution ADC, supports et obscuration).
+// Altitude de référence pour le pas au sol indicatif affiché sous l'iFoV
+// (valeur par défaut de la page Simulations).
+var GSD_REF_ALTITUDE_KM = 500;
+function fmt3(x){ return String(Number(Number(x).toPrecision(3))); }
+// Lignes d'information du bloc Optique (04/10/2026) :
+//  - sous l'iFoV, le pas au sol correspondant à l'altitude de référence ;
+//  - sous le schéma, la focale équivalente (pas pixel / iFoV) et
+//    l'ouverture (focale / diamètre), pour repérer une erreur d'unité.
+//    Le pas pixel vient du bloc Détecteur.
+function syncOpticsDerived(){
+  var I = Number(state.values.I), D = Number(state.values.D), PX = Number(state.values.PX);
+  var gsdEl = document.getElementById("gsd-I");
+  if(gsdEl){
+    var okI = isFilled("I") && I > 0;
+    gsdEl.hidden = !okI;
+    if(okI) gsdEl.textContent = tx("À {km} km d'altitude : pas au sol de {gsd} m.", { km: GSD_REF_ALTITUDE_KM, gsd: fmt3(I * 1e-6 * GSD_REF_ALTITUDE_KM * 1000) });
+  }
+  var dEl = document.getElementById("opticsDerived");
+  if(dEl){
+    if(!(isFilled("I") && I > 0) || !(isFilled("PX") && PX > 0)){
+      dEl.innerHTML = ""; // rien tant que l'iFoV ou la largeur pixel manque
+    } else {
+      var f = PX / I; // µm / µrad = m
+      dEl.innerHTML = tx("Focale équivalente") + " <b>" + fmt3(f) + " m</b>" +
+        (isFilled("D") && D > 0 ? " · " + tx("ouverture") + " <b>f/" + fmt3(f / D) + "</b>" : "");
+    }
+  }
+}
+function syncBlockHints(block){
+  if(block.id === "optique") syncOpticsDerived();
+  block.fields.forEach(function(f){
+    var input = document.getElementById("f-"+f.k);
+    if(!input || f.type === "select") return;
+    var off = fieldDisabled(f), hard = hardMessage(f), soft = softMessage(f);
+    input.disabled = off;
+    input.classList.toggle("invalid", !!hard);
+    input.classList.toggle("odd", !!soft);
+    var hEl = document.getElementById("range-"+f.k), sEl = document.getElementById("odd-"+f.k), dEl = document.getElementById("en-"+f.k);
+    if(hEl){ hEl.textContent = hard; hEl.hidden = !hard; }
+    if(sEl){ sEl.textContent = soft; sEl.hidden = !soft; }
+    if(dEl) dEl.hidden = !off;
+  });
+}
+// État d'une courbe spectrale (04/10/2026). Une longueur d'onde ne peut
+// figurer qu'une fois : la première ligne qui la porte est gardée, les
+// suivantes sont marquées en double (dup) et ignorées. range = valeurs hors
+// de [0, 1]. valid = points retenus pour le tracé et pour l'envoi.
+function curveStatus(arr, valKey){
+  var seen = {}, dup = {}, range = {}, odd = {}, valid = [];
+  (arr || []).forEach(function(p, i){
+    var wlOk = p.wl !== "" && !isNaN(p.wl);
+    if(wlOk && (Number(p.wl) < CURVE_WL_PLAUSIBLE[0] || Number(p.wl) > CURVE_WL_PLAUSIBLE[1])) odd[i] = true;
+    if(wlOk){
+      var k = String(Number(p.wl));
+      if(seen[k]) dup[i] = true; else seen[k] = true;
+    }
+    if(p[valKey] !== "" && !inUnitRange(p[valKey])) range[i] = true;
+    if(wlOk && !dup[i] && inUnitRange(p[valKey])) valid.push({ wl: Number(p.wl), qe: Number(p[valKey]) });
+  });
+  return { dup: dup, range: range, odd: odd, valid: valid };
+}
+function curveHintText(st){
+  var parts = [];
+  if(Object.keys(st.dup).length) parts.push(tx("Longueur d'onde déjà saisie : la ligne en double est ignorée."));
+  if(Object.keys(st.range).length) parts.push(tx("Valeur hors de 0 à 1 : ce point est ignoré."));
+  return parts.join(" ");
+}
+function curveOddText(st){
+  return Object.keys(st.odd).length
+    ? tx("Longueur d'onde inhabituelle : en général entre {a} et {b} nm (vérifier l'unité).", { a: CURVE_WL_PLAUSIBLE[0], b: CURVE_WL_PLAUSIBLE[1] })
+    : "";
+}
+// Libellés des saisies à corriger (champs scalaires et points de courbe).
+function invalidEntries(){
+  var out = [];
+  instrumentNode.blocks.forEach(function(b){
+    b.fields.forEach(function(f){
+      if(fieldOutOfRange(f) && !spectralActive(f.k)) out.push(tx(f.label));
+      var lock = SPECTRAL_LOCKS[f.k];
+      if(lock && spectralActive(f.k)){
+        var st = curveStatus(state.values[lock.arr], lock.key);
+        if(Object.keys(st.range).length) out.push(tx("courbe spectrale ({label}) : valeur hors de 0 à 1", { label: tx(f.label).toLowerCase() }));
+        if(Object.keys(st.dup).length) out.push(tx("courbe spectrale ({label}) : longueur d'onde en double", { label: tx(f.label).toLowerCase() }));
+      }
+    });
+  });
+  return out;
+}
+// 04/10/2026 (soir) — la transmission et le rendement quantique se
+// saisissent selon UN mode à la fois, choisi par l'utilisateur :
+//   "constant" : une seule valeur, envoyée comme une courbe PLATE (deux
+//                points à la même valeur, cf. simulations.html) ;
+//   "curve"    : la courbe saisie point par point.
+// Le mode est stocké dans state.values[lock.mode]. Pour un instrument créé
+// avant ce choix (pas de mode enregistré), il est déduit : "curve" si une
+// courbe d'au moins 2 points valides existe, "constant" sinon.
+var SPECTRAL_LOCKS = {
+  T:  {arr:"tSpectral",  key:"t",  mode:"T_mode"},
+  QE: {arr:"qeSpectral", key:"qe", mode:"QE_mode"}
+};
+function spectralMode(fieldKey){
+  var lock = SPECTRAL_LOCKS[fieldKey];
+  if(!lock) return null;
+  var m = state.values[lock.mode];
+  if(m === "constant" || m === "curve") return m;
+  return curveStatus(state.values[lock.arr], lock.key).valid.length >= 2 ? "curve" : "constant";
+}
+function spectralActive(fieldKey){ return spectralMode(fieldKey) === "curve"; }
+// Un champ en mode courbe est « rempli » quand la courbe a au moins 2 points valides.
+function fieldFilled(f){
+  var lock = SPECTRAL_LOCKS[f.k];
+  if(lock && spectralActive(f.k)) return curveStatus(state.values[lock.arr], lock.key).valid.length >= 2;
+  return isFilled(f.k);
+}
+// Met à jour l'état grisé du champ scalaire sans redessiner le panneau
+// (appelé à chaque frappe dans la courbe, pour garder le focus).
+function syncScalarLock(fieldKey){
+  // Depuis le choix de mode, il n'y a plus de champ scalaire à griser :
+  // la frappe dans la courbe met seulement à jour l'avancement.
+  updateProgress();
+  renderChain();
+}
+// Marque en rouge les valeurs hors de [0, 1] et les longueurs d'onde en double, et affiche le message.
+function syncCurveRange(wlSelector, valSelector, idxAttr, arrKey, valKey, hintId){
+  var st = curveStatus(state.values[arrKey], valKey);
+  panelEl.querySelectorAll(valSelector).forEach(function(el){
+    el.classList.toggle("invalid", !!st.range[el.getAttribute(idxAttr)]);
+  });
+  panelEl.querySelectorAll(wlSelector).forEach(function(el){
+    el.classList.toggle("invalid", !!st.dup[el.getAttribute(idxAttr)]);
+    el.classList.toggle("odd", !st.dup[el.getAttribute(idxAttr)] && !!st.odd[el.getAttribute(idxAttr)]);
+  });
+  var hint = document.getElementById(hintId);
+  if(hint){ var txt = curveHintText(st); hint.textContent = txt; hint.hidden = !txt; }
+  var oddEl = document.getElementById(hintId.replace("RangeHint", "OddHint"));
+  if(oddEl){ var otxt = curveOddText(st); oddEl.textContent = otxt; oddEl.hidden = !otxt; }
+}
+// Touche Entrée dans une ligne de courbe : passe au champ vide de la ligne,
+// ou ajoute un point si la ligne est complète (clic sur « + Ajouter un point »).
+function wireSpectralEnter(selector, idxAttr, wlClass, valClass, addBtnId){
+  panelEl.querySelectorAll(selector).forEach(function(input){
+    input.addEventListener("keydown", function(e){
+      if(e.key !== "Enter") return;
+      e.preventDefault();
+      var i = input.getAttribute(idxAttr);
+      var wlEl = panelEl.querySelector("."+wlClass+"["+idxAttr+"='"+i+"']");
+      var valEl = panelEl.querySelector("."+valClass+"["+idxAttr+"='"+i+"']");
+      if(wlEl.value === "" || wlEl.classList.contains("invalid")){ wlEl.focus(); wlEl.select && wlEl.select(); return; }
+      if(valEl.value === ""){ valEl.focus(); return; }
+      document.getElementById(addBtnId).click();
+    });
+  });
+}
+
+function fieldVisible(f){
+  return !f.modes || f.modes.indexOf(state.values.electronics_mode) >= 0;
+}
+// 04/10/2026 — UNE définition de « champ obligatoire », partagée par
+// l'avancement (barre, coches des blocs) et par le statut de brouillon :
+//   - champs marqués « obligatoire » (iFoV, diamètre, largeur pixel,
+//     résolution ADC, full well, champs du mode d'électronique affiché) ;
+//   - le mode d'électronique ;
+//   - l'épaisseur des supports dès qu'un nombre de supports est saisi ;
+//   - le temps de référence dès qu'une DSNU est saisie ;
+//   - la courbe (2 points valides) quand le mode « Courbe » est choisi.
+// Les champs qui ont une valeur par défaut ne comptent plus : un
+// instrument sans obscuration atteint 100 % sans rien saisir dans ce champ.
+function fieldRequired(f){
+  if(!fieldVisible(f) || fieldDisabled(f)) return false;
+  if(SPECTRAL_LOCKS[f.k] && spectralActive(f.k)) return true;
+  if(f.k === "ESUP") return Number(state.values.NSUP) > 0;
+  return f.placeholder === "obligatoire" || f.k === "electronics_mode"
+    || (!!f.requiredIf && Number(state.values[f.requiredIf]) > 0);
+}
+function fieldCounts(f){ return fieldRequired(f); }
+// Champs manquants pour pouvoir enregistrer : électronique complète
+// (résolution ADC, full well, mode et champs du mode) et temps de
+// référence si une DSNU est saisie. Retourne la liste des libellés.
+// 04/10/2026 (brouillons) — ces manques n'empêchent plus d'enregistrer :
+// l'instrument est alors enregistré comme BROUILLON (config._draft = true),
+// tagué dans les listes et non sélectionnable pour une simulation tant
+// qu'il n'est pas complet. Sont exigés pour un instrument complet : tous
+// les champs marqués « obligatoire » (iFoV, diamètre, largeur pixel,
+// résolution ADC, full well, champs du mode d'électronique), le mode
+// d'électronique, le temps de référence si une DSNU est saisie, et au
+// moins 2 points valides pour une courbe en mode « Courbe ».
+function missingRequired(){
+  var missing = [];
+  instrumentNode.blocks.forEach(function(b){
+    b.fields.forEach(function(f){
+      if(!fieldRequired(f) || fieldFilled(f)) return;
+      missing.push(SPECTRAL_LOCKS[f.k] && spectralActive(f.k) ? "courbe spectrale (" + f.label.toLowerCase() + ")" : f.label);
+    });
+  });
+  return missing;
+}
+
+function blockStatus(block){
+  var filled = 0, counted = 0;
+  block.fields.forEach(function(f){
+    if(!fieldCounts(f)) return;
+    counted++;
+    if(fieldFilled(f)) filled++;
+  });
+  // Bloc sans champ obligatoire (ex. Performance WFE) : coché dès qu'il
+  // contient une saisie. Sinon : coché quand tous les obligatoires sont
+  // remplis, vide quand rien n'est saisi, en cours entre les deux.
+  var anyEntry = block.fields.some(function(f){ return isFilled(f.k); });
+  if(counted === 0) return anyEntry ? "ok" : "empty";
+  if(filled === counted) return "ok";
+  return (filled === 0 && !anyEntry) ? "empty" : "warn";
+}
+
+function overallPct(){
+  var total = 0, done = 0;
+  SCHEMA.forEach(function(n){
+    if(n.kind !== "group") return;
+    n.blocks.forEach(function(b){
+      b.fields.forEach(function(f){
+        if(!fieldCounts(f)) return;
+        total++;
+        if(fieldFilled(f)) done++;
+      });
+    });
+  });
+  return total ? Math.round(100 * done / total) : 0;
+}
+
+function statusMark(s){
+  if(s === "ok") return "<span class='status ok'>✓</span>";
+  if(s === "warn") return "<span class='status warn'>•</span>";
+  return "<span class='status'>-</span>";
+}
+
+var chainEl = document.getElementById("chainList");
+var panelEl = document.getElementById("fieldPanel");
+// 04/10/2026 — filtre de frappe pour tous les champs numériques (attribut
+// data-num) : la virgule devient un point, tout ce qui n'est ni chiffre ni
+// point est retiré (donc pas de signe moins ni de lettres), un seul point
+// est gardé, et aucun pour les entiers (data-int). Posé en phase de capture
+// pour passer AVANT les écouteurs des champs, qui lisent la valeur nettoyée.
+panelEl.addEventListener("input", function(e){
+  var el = e.target;
+  if(!el.matches || !el.matches("input[data-num]")) return;
+  var raw = el.value, pos = el.selectionStart;
+  var v = raw.replace(/,/g, ".").replace(/[^0-9.]/g, "");
+  var neg = el.hasAttribute("data-neg") && /^\s*-/.test(raw); // un seul signe moins, en tête
+  if(el.hasAttribute("data-int")){
+    v = v.replace(/\./g, "");
+  } else {
+    var dot = v.indexOf(".");
+    if(dot >= 0) v = v.slice(0, dot + 1) + v.slice(dot + 1).replace(/\./g, "");
+  }
+  if(neg) v = "-" + v;
+  if(v !== raw){
+    el.value = v;
+    try{ var p = Math.max(0, pos - (raw.length - v.length)); el.setSelectionRange(p, p); }catch(_){}
+  }
+}, true);
+var schemaEl = document.getElementById("schemaWrap");
+var instrumentNode = SCHEMA.filter(function(n){ return n.kind === "group"; })[0];
+
+function selectBlock(id){
+  state.active = id;
+  renderSchema(); renderChain(); renderPanel();
+}
+
+function renderChain(){
+  chainEl.innerHTML = "";
+  var list = document.createElement("div");
+  list.className = "blocklist";
+  instrumentNode.blocks.forEach(function(b, i){
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "blockbtn" + (b.id === state.active ? " active" : "");
+    btn.innerHTML = "<span class='lab'>"+(i+1)+". "+tx(b.label)+"</span>"+statusMark(blockStatus(b));
+    btn.addEventListener("click", function(){ selectBlock(b.id); });
+    list.appendChild(btn);
+  });
+  chainEl.appendChild(list);
+}
+
+// Panneau "Instrument" épuré — 4 icônes glassy (empilement de lentilles,
+// détecteur, puce électronique, onde déformée pour la performance WFE)
+// reliées par des flèches. Icône WFE ajoutée le 18/09/2026 — viewBox
+// élargi (820→1050) pour caser les 4 sans les tasser. Les 4 blocs restent
+// cliquables/configurables.
+function renderSchema(){
+  var act = state.active;
+  function cls(id){ return "schema-block" + (id === act ? " active" : ""); }
+  schemaEl.innerHTML =
+  "<svg viewBox='0 0 1050 121' xmlns='http://www.w3.org/2000/svg'>"+
+  "<defs>"+
+    "<radialGradient id='lensGrad' cx='35%' cy='30%' r='75%'>"+
+      "<stop offset='0%' stop-color='#BFF3ED'/>"+
+      "<stop offset='45%' stop-color='var(--pixel)'/>"+
+      "<stop offset='100%' stop-color='#0F3B3F'/>"+
+    "</radialGradient>"+
+    "<linearGradient id='chipGrad' x1='0' y1='0' x2='1' y2='1'>"+
+      "<stop offset='0%' stop-color='var(--pixel)'/>"+
+      "<stop offset='100%' stop-color='#8A6CF2'/>"+
+    "</linearGradient>"+
+    "<linearGradient id='icGrad' x1='0' y1='0' x2='1' y2='1'>"+
+      "<stop offset='0%' stop-color='#3A5A78'/>"+
+      "<stop offset='100%' stop-color='#1B2A3A'/>"+
+    "</linearGradient>"+
+    "<filter id='softGlow' x='-60%' y='-60%' width='220%' height='220%'>"+
+      "<feGaussianBlur stdDeviation='6' result='blur'/>"+
+      "<feMerge><feMergeNode in='blur'/><feMergeNode in='SourceGraphic'/></feMerge>"+
+    "</filter>"+
+  "</defs>"+
+
+  "<rect x='2' y='5' width='1046' height='111' rx='12' fill='var(--panel)' stroke='var(--line-soft)'/>"+
+
+  // ---- Optique : empilement de lentilles, flottant (pas de cadre) ----
+  // 4 icônes centrées à 206/419/631/844 (répartition égale sur la largeur
+  // utile, marges identiques à avant).
+  "<g class='"+cls("optique")+"' onclick=\"selectBlock('optique')\">"+
+    "<g class='schema-glow' filter='url(#softGlow)'>"+
+      "<ellipse cx='184' cy='53' rx='17' ry='34' fill='url(#lensGrad)' opacity='.45'/>"+
+      "<ellipse cx='206' cy='53' rx='17' ry='34' fill='url(#lensGrad)' opacity='.7'/>"+
+      "<ellipse cx='228' cy='53' rx='17' ry='34' fill='url(#lensGrad)'/>"+
+    "</g>"+
+    "<ellipse cx='184' cy='53' rx='17' ry='34' fill='none' stroke='var(--pixel)' stroke-opacity='.5'/>"+
+    "<ellipse cx='206' cy='53' rx='17' ry='34' fill='none' stroke='var(--pixel)' stroke-opacity='.7'/>"+
+    "<ellipse cx='228' cy='53' rx='17' ry='34' fill='none' stroke='var(--pixel)'/>"+
+    "<text x='206' y='101' text-anchor='middle' class='schema-blocklabel'>"+tx("Optique")+"</text>"+
+  "</g>"+
+
+  "<path d='M297,53 h30 m-9,-9 l9,9 -9,9' fill='none' stroke='var(--pixel)' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/>"+
+
+  // ---- Détecteur : cadre + carré dégradé — centre à x=419 ----
+  "<g class='"+cls("detecteur")+"' onclick=\"selectBlock('detecteur')\">"+
+    "<rect class='schema-iconframe' x='379' y='19' width='80' height='68' rx='14'/>"+
+    "<rect class='schema-glow' x='395' y='33' width='48' height='40' rx='6' fill='url(#chipGrad)' filter='url(#softGlow)'/>"+
+    "<text x='419' y='101' text-anchor='middle' class='schema-blocklabel'>"+tx("Détecteur")+"</text>"+
+  "</g>"+
+
+  "<path d='M510,53 h30 m-9,-9 l9,9 -9,9' fill='none' stroke='var(--pixel)' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/>"+
+
+  // ---- Électronique : cadre + puce avec broches — centre à x=631 ----
+  "<g class='"+cls("electronique")+"' onclick=\"selectBlock('electronique')\">"+
+    "<rect class='schema-iconframe' x='591' y='19' width='80' height='68' rx='14'/>"+
+    "<g class='schema-glow' filter='url(#softGlow)'>"+
+      "<rect x='613' y='38' width='36' height='30' rx='4' fill='url(#icGrad)' stroke='var(--pixel)' stroke-opacity='.6'/>"+
+    "</g>"+
+    "<g stroke='var(--muted-2)' stroke-width='1.5'>"+
+      "<line x1='621' y1='38' x2='621' y2='31'/><line x1='631' y1='38' x2='631' y2='31'/>"+
+      "<line x1='641' y1='38' x2='641' y2='31'/>"+
+      "<line x1='621' y1='68' x2='621' y2='75'/><line x1='631' y1='68' x2='631' y2='75'/>"+
+      "<line x1='641' y1='68' x2='641' y2='75'/>"+
+      "<line x1='613' y1='46' x2='605' y2='46'/><line x1='613' y1='53' x2='605' y2='53'/>"+
+      "<line x1='613' y1='60' x2='605' y2='60'/>"+
+      "<line x1='649' y1='46' x2='657' y2='46'/><line x1='649' y1='53' x2='657' y2='53'/>"+
+      "<line x1='649' y1='60' x2='657' y2='60'/>"+
+    "</g>"+
+    "<text x='631' y='101' text-anchor='middle' class='schema-blocklabel'>"+tx("Électronique")+"</text>"+
+  "</g>"+
+
+  "<path d='M723,53 h30 m-9,-9 l9,9 -9,9' fill='none' stroke='var(--pixel)' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/>"+
+
+  // ---- Performance WFE : cadre + onde déformée — centre à x=844 ----
+  "<g class='"+cls("wfe")+"' onclick=\"selectBlock('wfe')\">"+
+    "<rect class='schema-iconframe' x='804' y='19' width='80' height='68' rx='14'/>"+
+    "<g class='schema-glow' filter='url(#softGlow)'>"+
+      "<path d='M814,53 Q826,33 844,53 T874,53' fill='none' stroke='var(--pixel)' stroke-width='3' stroke-linecap='round'/>"+
+    "</g>"+
+    "<text x='844' y='101' text-anchor='middle' class='schema-blocklabel'>WFE</text>"+
+  "</g>"+
+  "</svg>";
+}
+
+function currentBlock(){
+  var found = null;
+  SCHEMA.forEach(function(n){
+    if(n.kind !== "group") return;
+    n.blocks.forEach(function(b){ if(b.id === state.active) found = b; });
+  });
+  return found;
+}
+
+// ===================== Bulles d'aide (07/10/2026) =====================
+// Un clic sur un bouton « ? » (classe helpbtn) ouvre une bulle placée près du bouton, avec le nom du champ en
+// titre. Elle se ferme avec Échap, un clic ailleurs ou un nouveau clic sur le bouton ; elle suit son bouton quand
+// on défile ; elle se ferme si le bouton disparaît (le panneau est redessiné quand on change de bloc ou de mode).
+var bubbleEl = null, bubbleBtn = null;
+function closeBubble(){
+  if(!bubbleEl) return;
+  bubbleEl.remove(); bubbleEl = null;
+  if(bubbleBtn){ bubbleBtn.setAttribute("aria-expanded", "false"); bubbleBtn.removeAttribute("aria-describedby"); bubbleBtn = null; }
+}
+function placeBubble(){
+  if(!bubbleEl || !bubbleBtn) return;
+  if(!document.body.contains(bubbleBtn)){ closeBubble(); return; }
+  var r = bubbleBtn.getBoundingClientRect();
+  if(r.bottom < 0 || r.top > window.innerHeight){ closeBubble(); return; }
+  var w = Math.min(320, window.innerWidth - 24);
+  bubbleEl.style.width = w + "px";
+  var hh = bubbleEl.getBoundingClientRect().height, left, top;
+  var ar = (bubbleBtn.closest(".field, .fmcbox") || bubbleBtn).getBoundingClientRect();     // le champ que la bulle décrit
+  if(ar.left - w - 12 >= 12){
+    // assez de place à gauche du champ : la bulle s'y place, à hauteur du bouton, sans cacher le champ
+    left = ar.left - w - 12;
+    top = Math.max(12, Math.min(r.top + r.height / 2 - hh / 2, window.innerHeight - hh - 12));
+  } else {
+    // sinon sous le bouton, ou au-dessus s'il n'y a pas la place dessous
+    left = Math.max(12, Math.min(r.left + r.width / 2 - w / 2, window.innerWidth - w - 12));
+    top = r.bottom + 8;
+    if(top + hh > window.innerHeight - 12 && r.top - 8 - hh > 12) top = r.top - 8 - hh;
+  }
+  bubbleEl.style.left = left + "px"; bubbleEl.style.top = top + "px";
+}
+function openBubble(btn){
+  closeBubble();
+  var el = document.createElement("div");
+  el.className = "bubble"; el.id = "bubbleNote"; el.setAttribute("role", "note");
+  var title = btn.getAttribute("data-bubble-title");
+  if(title){ var h = document.createElement("strong"); h.textContent = title; el.appendChild(h); }
+  (btn.getAttribute("data-bubble-text") || "").split("\n").forEach(function(line){
+    var para = document.createElement("p"); para.textContent = line; el.appendChild(para);   // textContent : pas d'injection de balise
+  });
+  document.body.appendChild(el);
+  bubbleEl = el; bubbleBtn = btn;
+  placeBubble();
+  btn.setAttribute("aria-expanded", "true"); btn.setAttribute("aria-describedby", "bubbleNote");
+}
+document.addEventListener("click", function(e){
+  var btn = e.target.closest && e.target.closest(".helpbtn");
+  if(btn){ e.preventDefault(); if(bubbleBtn === btn) closeBubble(); else openBubble(btn); return; }
+  if(bubbleEl) closeBubble();
+});
+document.addEventListener("keydown", function(e){ if(e.key === "Escape") closeBubble(); });
+window.addEventListener("resize", placeBubble);
+window.addEventListener("scroll", placeBubble, true);
+
+function renderPanel(){
+  var block = currentBlock();
+  if(!block){ panelEl.innerHTML = ""; return; }
+  var mention = block.fields.filter(function(f){ return f.mention; })
+    .map(function(f){ return "<span class='typebadge' title='"+txa(f.label)+"'>"+f.options[0]+"</span>"; }).join("");
+  var head = "<h2 style='margin-bottom:16px'>"+tx(block.label)+mention+"</h2>";
+  var fieldsHtml = "";
+  var advancedHtml = "";
+  var advancedFilled = false;
+  block.fields.forEach(function(f){
+    if(!fieldVisible(f) || f.mention) return;
+    var v = state.values[f.k] !== undefined ? state.values[f.k] : (f.k === "DET_TYPE" ? "CMOS" : "");
+    var valueAttr = v !== "" ? " value='"+escH(v)+"'" : "";
+    // ESUP : obligatoire seulement si des supports sont renseignés
+    // (NSUP > 0) — sinon 0 par défaut, comme NSUP lui-même.
+    var placeholder = f.placeholder;
+    if(f.k === "ESUP") placeholder = (Number(state.values.NSUP) > 0) ? "obligatoire" : "0 (défaut)";
+    if(f.requiredIf) placeholder = (Number(state.values[f.requiredIf]) > 0) ? "obligatoire" : "0 (défaut)";
+    var placeholderAttr = placeholder ? " placeholder='"+txa(placeholder)+"'" : "";   // affiché traduit ; la valeur de référence reste en français
+    var control = f.type === "select"
+      ? "<select id='f-"+f.k+"'>" + f.options.map(function(opt){
+          // option = chaîne simple, ou {v, label} quand le libellé diffère de la valeur
+          var ov = (typeof opt === "object") ? opt.v : opt;
+          var ol = (typeof opt === "object") ? tx(opt.label) : txq(opt);
+          return "<option value='"+ov+"'"+(String(v) === String(ov) ? " selected" : "")+">"+ol+"</option>"; }).join("") + "</select>"
+      : "<input type='text' inputmode='"+(fieldRule(f).integer ? "numeric" : "decimal")+"' autocomplete='off' data-num"+
+          (fieldRule(f).integer ? " data-int" : "")+(fieldRule(f).signed ? " data-neg" : "")+" id='f-"+f.k+"'"+valueAttr+placeholderAttr+">";
+    // 07/10/2026 : l'aide s'ouvre dans une bulle (comme dans la page Simulations) au lieu de déplier un
+    // paragraphe sous le champ. Titre et texte sont portés par le bouton ; txa() les protège pour l'attribut.
+    var helpBtn = f.help ? "<button type='button' class='helpbtn' data-help='"+f.k+"' data-bubble-title='"+txa(f.label)+"' data-bubble-text='"+txa(f.help)+"' aria-expanded='false' aria-label='"+txa("Aide")+"'>?</button>" : "";
+    var helpTxt = "";
+    // Champ obligatoire seulement si un autre est non nul (ex. temps de
+    // référence DSNU) : rendu mais masqué tant que cet autre champ est vide
+    // ou nul, et révélé à la frappe sans redessiner le panneau.
+    var hiddenAttr = (f.requiredIf && !(Number(state.values[f.requiredIf]) > 0)) ? " hidden" : "";
+    if(f.advanced && isFilled(f.k)) advancedFilled = true;
+    // Transmission / rendement quantique : sélecteur « Valeur constante /
+    // Courbe ». En mode courbe, le champ à une valeur n'est pas affiché du
+    // tout ; la courbe se saisit dans la section sous le schéma.
+    var curveMode = SPECTRAL_LOCKS[f.k] ? spectralMode(f.k) : null;
+    var modeSeg = curveMode
+      ? "<div><div class='modeseg' data-mode-for='"+f.k+"'>"+
+          "<button type='button' data-m='constant'"+(curveMode === "constant" ? " class='on'" : "")+">"+tx("Valeur constante")+"</button>"+
+          "<button type='button' data-m='curve'"+(curveMode === "curve" ? " class='on'" : "")+">"+tx("Courbe")+"</button></div></div>"
+      : "";
+    var inputRow = curveMode === "curve"
+      ? "<p class='lockhint' style='margin-top:0'>"+tx("Courbe à saisir dans la section sous le schéma.")+"</p>"
+      : (f.type === "select" ? control : "<div class='row'>"+control+"<span class='unit'>"+txq(f.unit || "")+"</span></div>")+
+        (f.type === "select" ? "" :
+          "<p class='rangehint' id='range-"+f.k+"' hidden></p>"+
+          "<p class='oddhint' id='odd-"+f.k+"' hidden></p>"+
+          (fieldRule(f).enabledIf ? "<p class='lockhint' id='en-"+f.k+"' hidden>"+tx("Disponible avec une obscuration centrale.")+"</p>" : ""));
+    var oneField = "<div class='field' id='w-"+f.k+"'"+hiddenAttr+"><div class='labrow'><label for='f-"+f.k+"'>"+tx(f.label)+"</label>"+helpBtn+"</div>"+
+      modeSeg+inputRow+
+      (f.k === "I" ? "<p class='lockhint' id='gsd-I' hidden></p>" : "")+
+      helpTxt+
+      "</div>";
+    if(f.advanced) advancedHtml += oneField; else fieldsHtml += oneField;
+    // Le WFE RMS scalaire ci-dessus reste le mode simplifié (utilisé si
+    // aucun cas WFE n'est sélectionné au lancement de la simulation).
+    // Juste après, on permet d'associer des cas WFE nommés (ex. "Cas
+    // chaud", "Cas froid") avec leurs coefficients de Zernike complets,
+    // chargés par fichier — choisis au lancement, dans Conditions
+    // d'acquisition (cf. simulations.html), pas ici.
+    if(f.k === "W") fieldsHtml += renderWfeCasesHtml();
+    // QE spectral (optionnel) : courbe QE(λ) saisie point par point, en
+    // plus du QE scalaire ci-dessus (mode simplifié, utilisé si aucune
+    // courbe n'est saisie). Juste un aperçu visuel côté site — voir
+    // renderQeChart pour ce qui est actuellement tracé.
+  });
+  // Sections repliées (04/10/2026) : ouvertes d'office si elles contiennent
+  // déjà une valeur, pour ne jamais cacher une saisie existante.
+  var advancedDetails = advancedHtml
+    ? "<details class='advanced'"+(advancedFilled ? " open" : "")+"><summary>"+tx("Paramètres avancés")+"</summary><div class='grid2'>"+advancedHtml+"</div></details>"
+    : "";
+  var belowHtml = "";
+  if(block.id === "detecteur"){
+    // Détecteur : la courbe QE spectrale et les paramètres avancés passent
+    // sous le schéma, en pleine largeur, repliés par défaut.
+    // 04/10/2026 — les paramètres avancés passent avant la courbe QE.
+    belowHtml = advancedDetails+(spectralActive("QE")
+      ? "<details class='advanced' id='qeDetails' open><summary>"+tx("Courbe spectrale du rendement")+"</summary>"+
+        renderQeSpectralHtml()+"</details>"
+      : "");
+  } else if(block.id === "optique"){
+    // Optique : courbe de transmission spectrale, même présentation que la
+    // courbe QE du bloc Détecteur.
+    belowHtml = spectralActive("T")
+      ? "<details class='advanced' id='tDetails' open><summary>"+tx("Courbe spectrale de la transmission")+"</summary>"+
+        renderTSpectralHtml()+"</details>"
+      : "";
+    fieldsHtml += advancedDetails;
+  } else {
+    fieldsHtml += advancedDetails;
+  }
+  // Blocs Optique et Détecteur : mise en page 2 colonnes (schéma à
+  // gauche, champs à droite) — Détecteur ajouté le 18/09/2026, reprend
+  // exactement la forme du bloc Optique avec son propre schéma en coupe.
+  // Les autres blocs gardent la disposition simple, verticale.
+  var html = head;
+  if(block.id === "optique" || block.id === "detecteur" || block.id === "electronique"){
+    var svgId = block.id === "optique" ? "opticsGeoSvg" : (block.id === "detecteur" ? "detectorGeoSvg" : "electronicsGeoSvg");
+    var viewLabel = tx(block.id === "optique" ? "Vue de face" : (block.id === "detecteur" ? "Vue de côté" : "Courbe de transfert"));
+    html += "<div class='optique-grid'>"+
+      "<div class='optique-geo-col'>"+
+        "<div id='"+svgId+"'></div>"+
+        "<div class='geo-viewlabel'>"+
+          "<svg width='13' height='13' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.6'><circle cx='12' cy='12' r='9'/><circle cx='12' cy='12' r='1.5' fill='currentColor'/><line x1='12' y1='1' x2='12' y2='5'/><line x1='12' y1='19' x2='12' y2='23'/><line x1='1' y1='12' x2='5' y2='12'/><line x1='19' y1='12' x2='23' y2='12'/></svg>"+
+          viewLabel+
+        "</div>"+
+        (block.id === "optique" ? "<p class='geo-derived' id='opticsDerived'></p>" : "")+
+      "</div>"+
+      "<div class='optique-fields-col'>"+fieldsHtml+"</div>"+
+    "</div>"+belowHtml;
+  } else {
+    html += fieldsHtml;
+  }
+  panelEl.innerHTML = html;
+  panelEl.querySelectorAll(".modeseg button").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var k = btn.parentNode.getAttribute("data-mode-for"), lock = SPECTRAL_LOCKS[k];
+      state.values[lock.mode] = btn.getAttribute("data-m");
+      // Passage en mode courbe sans aucun point : une première ligne vide,
+      // pour pouvoir saisir tout de suite.
+      if(state.values[lock.mode] === "curve" && !(state.values[lock.arr] || []).length){
+        var first = { wl: "" }; first[lock.key] = "";
+        state.values[lock.arr] = [first];
+      }
+      persist(); updateProgress(); renderChain(); renderPanel();
+      var firstWl = panelEl.querySelector(".qewl");
+      if(state.values[lock.mode] === "curve" && firstWl) firstWl.focus();
+    });
+  });
+  block.fields.forEach(function(f){
+    if(!document.getElementById("f-"+f.k)) return; // champ masqué par le mode d'électronique
+    document.getElementById("f-"+f.k).addEventListener("input", function(e){
+      state.values[f.k] = e.target.value;
+      persist();
+      updateProgress();
+      renderChain(); // met à jour le statut ✓/!/○ du bloc en cours de saisie
+      if(block.id === "optique") renderOpticsGeometry(); // aperçu géométrique en direct
+      if(block.id === "detecteur") renderDetectorGeometry();
+      if(block.id === "electronique") renderElectronicsGeometry();
+      // NSUP change : le placeholder d'ESUP ("obligatoire" ou "0 (défaut)")
+      // en dépend — mis à jour directement sur l'input existant plutôt
+      // qu'avec un renderPanel() complet, pour ne pas perdre le focus en
+      // cours de frappe sur NSUP.
+      if(f.k === "NSUP"){
+        var esupEl = document.getElementById("f-ESUP");
+        if(esupEl) esupEl.placeholder = tx((Number(state.values.NSUP) > 0) ? "obligatoire" : "0 (défaut)");
+      }
+      syncBlockHints(block); // grisé, rouge, orange : pour tout le bloc
+      // Même principe pour le temps de référence, obligatoire dès que la DSNU est non nulle.
+      if(f.k === "dsnu_1288"){
+        var trefEl = document.getElementById("f-dsnu_T_ref");
+        if(trefEl) trefEl.placeholder = tx((Number(state.values.dsnu_1288) > 0) ? "obligatoire" : "0 (défaut)");
+        var trefWrap = document.getElementById("w-dsnu_T_ref");
+        if(trefWrap) trefWrap.hidden = !(Number(state.values.dsnu_1288) > 0);
+      }
+      // renderChain() reconstruit les boutons : on garde le focus sur le bon champ
+      var el = document.getElementById("f-"+f.k);
+      if(el && e.target.tagName === "INPUT") { el.focus(); var pos = e.target.value.length; el.setSelectionRange && el.setSelectionRange(pos,pos); }
+    });
+    if(f.type === "select") document.getElementById("f-"+f.k).addEventListener("change", function(e){
+      state.values[f.k] = e.target.value;
+      persist();
+      updateProgress();
+      renderChain();
+      // Changer de mode d'électronique change les champs affichés.
+      if(f.k === "electronics_mode") renderPanel();
+    });
+  });
+  if(block.id === "optique") { renderOpticsGeometry(); wireTSpectralUI(); }
+  if(block.id === "detecteur") { renderDetectorGeometry(); wireQeSpectralUI(); }
+  if(block.id === "electronique") renderElectronicsGeometry();
+  if(block.id === "wfe") wireWfeCasesUI();
+  syncBlockHints(block);
+  var actions = document.createElement("div");
+  actions.className = "panel-actions";
+  // Bouton "Suivant" : avance au bloc suivant de la chaîne (Optique →
+  // Détecteur → Électronique → Performance WFE) — absent sur le dernier
+  // bloc, rien après.
+  var blockIdx = instrumentNode.blocks.indexOf(block);
+  var nextBlock = instrumentNode.blocks[blockIdx + 1];
+  var nextBtnHtml = nextBlock
+    ? "<button class='btn next' type='button' id='btnNext'>"+tx("Suivant : {label}", { label: tx(nextBlock.label) })+"</button>"
+    : "";
+  actions.innerHTML = "<button class='btn ghost' type='button' id='btnReset'>"+tx("Réinitialiser ce bloc")+"</button>"+
+    "<div class='rightbtns'>"+nextBtnHtml+
+    "<button class='btn primary' type='button' id='btnSave'>"+tx("Enregistrer l'instrument")+"</button></div>";
+  panelEl.appendChild(actions);
+  document.getElementById("btnReset").addEventListener("click", function(){
+    block.fields.forEach(function(f){
+      delete state.values[f.k];
+      // 04/10/2026 — la courbe spectrale liée au champ est effacée aussi,
+      // sinon le champ scalaire resterait grisé après la réinitialisation.
+      if(SPECTRAL_LOCKS[f.k]){ delete state.values[SPECTRAL_LOCKS[f.k].arr]; delete state.values[SPECTRAL_LOCKS[f.k].mode]; }
+    });
+    persist(); updateProgress(); renderChain(); renderPanel();
+  });
+  if(nextBlock){
+    document.getElementById("btnNext").addEventListener("click", function(){ selectBlock(nextBlock.id); });
+  }
+  document.getElementById("btnSave").addEventListener("click", saveToSupabase);
+}
+
+// ===================== Cas WFE nommés (RMS simple ou CSV Zernike détaillé) =====================
+// Stockés dans state.values.wfeCases, deux formes possibles (mode:"rms"
+// ou mode:"file") — échange du 19/09/2026 : chaque cas est SOIT une
+// simple valeur RMS (nm), SOIT un fichier détaillé, pas les deux :
+//   RMS  : {id, name, mode:"rms", rms}
+//   file : {id, name, mode:"file", filename, csv:"<contenu brut>",
+//           rowCount, align, convention}
+// Un instrument peut porter plusieurs cas (thermique chaud/froid, etc.) ;
+// c'est au lancement de la simulation que l'un d'eux est choisi (ou aucun,
+// auquel cas le WFE RMS scalaire ci-dessus + le mode d'aberration simplifié
+// s'appliquent, synthétisés automatiquement côté serveur — cf. W/Z). Un
+// cas RMS revient à ce même mode simplifié mais avec SA valeur propre
+// (cf. simulations.html : sélectionner un cas RMS au lancement remplace
+// juste W par sa valeur, le mode d'aberration choisi à l'écran s'applique
+// toujours par-dessus).
+//
+// Format CSV attendu pour un cas "file" — même format que
+// module_MTF.load_zernike_csv côté backend : séparateur ";", décimales
+// ",", colonnes Detector_ID;Band;Column;Z1;Z2;...;Z37 (une ligne par
+// colonne détecteur/bande). Le fichier est transmis TEL QUEL (texte brut)
+// au serveur.
+//
+// "align" (cf. échange du 16/09/2026) : la largeur détecteur réelle d'une
+// simulation dépend de l'altitude choisie (Conditions d'acquisition), donc
+// peut ne pas correspondre à la plage de colonnes du CSV source (souvent
+// plus large — swath réel). align dit au serveur QUELLE portion du CSV
+// garder : "center" (centre champ), "left" (bord gauche) ou "right" (bord
+// droit) — le serveur recadre et renumérote en conséquence avant la
+// simulation (cf. simulation_pipeline.py, _remap_perfo_csv).
+var WFE_ALIGN_LABELS = { center: "Centre champ", left: "Bord gauche", right: "Bord droit" };
+// Convention d'indexation Zernike — donnée par cas "file", pas supposée
+// fixe (échange du 18/09/2026 : différents outils/sources exportent
+// Z1..Z37 dans des ordres différents). Relayée jusqu'au backend
+// (paramFile.Telescope.WFE_convention, requis par module_MTF.py dès
+// qu'un perfoCsv est fourni — cf. simulations.html) ET utilisée pour
+// l'aperçu ci-dessous (carte du front d'onde, noms des modes).
+var WFE_CONVENTION_LABELS = { osa: "OSA/ANSI", noll: "Noll", fringe: "Fringe" };
+function renderWfeCasesHtml(){
+  var cases = state.values.wfeCases || [];
+  var rows = cases.map(function(c){
+    if(c.mode === "rms"){
+      return "<div class='caserow' data-case-id='"+escH(c.id)+"'>"+
+        "<span class='cname'>"+escH(c.name)+"</span>"+
+        "<span class='cfile'>RMS "+escH(c.rms)+" nm</span>"+
+        "<button type='button' class='cdel' data-del-case='"+escH(c.id)+"' aria-label='"+txa("Supprimer ce cas")+"'>×</button>"+
+      "</div>";
+    }
+    var alignOpts = ["center", "left", "right"].map(function(a){
+      return "<option value='"+a+"'"+(c.align === a ? " selected" : "")+">"+tx(WFE_ALIGN_LABELS[a])+"</option>";
+    }).join("");
+    var convOpts = ["osa", "noll", "fringe"].map(function(v){
+      return "<option value='"+v+"'"+((c.convention||"osa") === v ? " selected" : "")+">"+WFE_CONVENTION_LABELS[v]+"</option>";
+    }).join("");
+    return "<div class='caserow' data-case-id='"+escH(c.id)+"'>"+
+      "<span class='cname'>"+escH(c.name)+"</span>"+
+      "<span class='cfile'>"+(c.rowCount != null ? tx("{n} lignes · {file}", { n: escH(c.rowCount), file: escH(c.filename) }) : "-")+"</span>"+
+      "<select class='calign' data-conv-case='"+escH(c.id)+"' title='"+txa("Convention Zernike")+"'>"+convOpts+"</select>"+
+      "<select class='calign' data-align-case='"+c.id+"'>"+alignOpts+"</select>"+
+      "<button type='button' class='cdel' data-del-case='"+escH(c.id)+"' aria-label='"+txa("Supprimer ce cas")+"'>×</button>"+
+    "</div>";
+  }).join("");
+  return "<div class='wfecases'>"+
+    "<div class='wfehead'><label>"+tx("Cas WFE (thermique, etc.)")+"</label>"+
+    "<div class='wfeaddbtns'>"+
+      "<button type='button' class='addcasebtn' id='btnAddWfeRms'>"+tx("+ Cas RMS")+"</button>"+
+      "<button type='button' class='addcasebtn' id='btnAddWfeFile'>"+tx("+ Cas fichier")+"</button>"+
+    "</div></div>"+
+    (cases.length ? rows : "<p class='empty'>"+tx("Aucun cas WFE défini.")+"</p>")+
+    "<input type='file' id='wfeCaseFileInput' accept='.csv,text/csv' style='display:none'>"+
+  "</div>"+
+  renderZernikeDetailHtml(cases);
+}
+
+// ===================== Détail Zernike par colonne =====================
+// Le CSV d'un cas WFE (cf. ci-dessus) est une ligne par couple
+// (Detector_ID, Band, Column) — chaque ligne porte 37 coefficients de
+// Zernike (Z1..Z37). Ajouté le 18/09/2026 : parse le CSV côté site pour
+// afficher, pour une colonne choisie, le détail de ses 37 coefficients et
+// leur somme — jusqu'ici le CSV n'était que transmis brut, jamais
+// affiché.
+function parsePerfoCsvRows(text){
+  if(!text) return [];
+  var lines = text.split(/\r?\n/).filter(function(l){ return l.trim(); });
+  if(lines.length < 2) return [];
+  var header = lines[0].split(";").map(function(h){ return h.trim(); });
+  var detIdx = header.indexOf("Detector_ID"), bandIdx = header.indexOf("Band"), colIdx = header.indexOf("Column");
+  var zIdx = [];
+  for(var i = 1; i <= 37; i++) zIdx.push(header.indexOf("Z"+i));
+  var rows = [];
+  for(var r = 1; r < lines.length; r++){
+    var cells = lines[r].split(";");
+    if(cells.length < header.length) continue;
+    var z = zIdx.map(function(idx){
+      if(idx < 0 || idx >= cells.length) return 0;
+      var v = parseFloat((cells[idx] || "").trim().replace(",", "."));
+      return isNaN(v) ? 0 : v;
+    });
+    rows.push({
+      detector: detIdx >= 0 ? (cells[detIdx] || "").trim() : "",
+      band: bandIdx >= 0 ? (cells[bandIdx] || "").trim() : "",
+      column: colIdx >= 0 ? (cells[colIdx] || "").trim() : String(r),
+      z: z
+    });
+  }
+  return rows;
+}
+
+function renderZernikeDetailHtml(cases){
+  var fileCases = cases.filter(function(c){ return c.mode === "file"; });
+  return "<div class='wfecases zdetail'>"+
+    "<div class='wfehead'><label>"+tx("Détail Zernike")+"</label></div>"+
+    "<p class='wfesub'>"+tx("Front d'onde combiné (fausses couleurs) d'une colonne donnée, pour un cas WFE fichier chargé ci-dessus.")+"</p>"+
+    (fileCases.length
+      ? "<div class='zpickrow'>"+
+          "<select id='zernCaseSel'>"+fileCases.map(function(c){ return "<option value='"+escH(c.id)+"'>"+escH(c.name)+"</option>"; }).join("")+"</select>"+
+          "<select id='zernColSel'></select>"+
+        "</div>"+
+        "<div id='zernOut'></div>"
+      : "<p class='empty'>"+tx("Chargez un cas WFE « fichier » ci-dessus pour voir le détail (un cas RMS n'a pas de coefficients détaillés).")+"</p>")+
+  "</div>";
+}
+
+// ---- Maths Zernike (base orthonormée), convention paramétrable ----
+// Donnée par cas WFE (cf. select "convention" dans renderWfeCasesHtml),
+// pas supposée fixe pour tout le monde — deux conventions supportées :
+// OSA/ANSI (Z1..Z37 du fichier = indices OSA 0..36) et Noll (Z1..Z37 =
+// indices Noll 1..37 directement). Chacune donne un (n,m) — donc une
+// forme de carte et des noms de modes — DIFFÉRENTS pour les mêmes valeurs
+// brutes. N'affecte que cet aperçu, jamais le CSV envoyé au serveur.
+var ZERNIKE_NAMES_OSA = {
+  1:"piston", 2:"tilt (Y)", 3:"tilt (X)", 4:"astigmatisme oblique",
+  5:"défocalisation", 6:"astigmatisme", 7:"trefoil oblique", 8:"coma (Y)",
+  9:"coma (X)", 10:"trefoil", 11:"tétrafoil oblique", 12:"astigmatisme secondaire",
+  13:"sphérique", 14:"astigmatisme secondaire", 15:"tétrafoil"
+};
+var ZERNIKE_NAMES_NOLL = {
+  1:"piston", 2:"tilt (X)", 3:"tilt (Y)", 4:"défocalisation",
+  5:"astigmatisme oblique", 6:"astigmatisme", 7:"coma (Y)", 8:"coma (X)",
+  9:"trefoil oblique", 10:"trefoil", 11:"sphérique", 12:"astigmatisme secondaire",
+  13:"astigmatisme secondaire", 14:"tétrafoil", 15:"tétrafoil"
+};
+// Vérifiée point par point (piston, tilt X/Y, defocus, astigmatismes,
+// coma X/Y, sphérique en position 9, trefoil X/Y en 10/11 — la
+// particularité connue de Fringe qui place le sphérique AVANT le trefoil,
+// contrairement à OSA/Noll) avant intégration.
+var ZERNIKE_NAMES_FRINGE = {
+  1:"piston", 2:"tilt (X)", 3:"tilt (Y)", 4:"défocalisation",
+  5:"astigmatisme", 6:"astigmatisme oblique", 7:"coma (X)", 8:"coma (Y)",
+  9:"sphérique", 10:"trefoil", 11:"trefoil oblique", 12:"astigmatisme secondaire",
+  13:"astigmatisme secondaire", 14:"coma secondaire", 15:"coma secondaire"
+};
+function zernikeName(k, convention){
+  var table = convention === "noll" ? ZERNIKE_NAMES_NOLL
+    : convention === "fringe" ? ZERNIKE_NAMES_FRINGE
+    : ZERNIKE_NAMES_OSA;
+  return table[k] || null;
+}
+function zFactorial(n){ var r = 1; for(var i = 2; i <= n; i++) r *= i; return r; }
+function zOsaNM(j){ // j : indice OSA 0-indexé
+  var n = Math.ceil((-3 + Math.sqrt(9 + 8*j)) / 2);
+  var m = 2*j - n*(n+2);
+  return { n: n, m: m };
+}
+// Vérifié point par point contre les modes connus (j=1..8 : piston, tip,
+// tilt, defocus, astigmatismes, coma Y/X — tous corrects) avant intégration.
+function zNollNM(j){ // j : indice Noll 1-indexé
+  var n = 0, j1 = j - 1;
+  while(j1 > n){ n++; j1 -= n; }
+  var m = Math.pow(-1, j) * ((n % 2) + 2 * Math.floor((j1 + ((n+1) % 2)) / 2));
+  return { n: n, m: m };
+}
+// Convention Fringe (Univ. Arizona) — groupée par p=(n+|m|)/2, chaque
+// groupe p comptant 2p+1 termes (cumul = (p+1)²), ordonnés à l'intérieur
+// du groupe par |m| DÉCROISSANT (+m puis -m), m=0 en dernier. Vérifiée
+// point par point (piston..trefoil, sphérique en position 9) avant
+// intégration.
+function zFringeNM(k){ // k : indice Fringe 1-indexé
+  var p = 0;
+  while((p+1)*(p+1) < k) p++;
+  var pos = k - p*p, m;
+  if(pos === 2*p+1){ m = 0; }
+  else {
+    var idx = pos - 1, absM = p - Math.floor(idx/2);
+    m = (idx % 2 === 0 ? 1 : -1) * absM;
+  }
+  return { n: 2*p - Math.abs(m), m: m };
+}
+function zNM(k, convention){ // k : indice 1-indexé tel que dans le fichier (Zk)
+  if(convention === "noll") return zNollNM(k);
+  if(convention === "fringe") return zFringeNM(k);
+  return zOsaNM(k-1);
+}
+function zRadial(n, m, rho){
+  m = Math.abs(m);
+  var sum = 0;
+  for(var k = 0; k <= (n-m)/2; k++){
+    var c = (k % 2 === 0 ? 1 : -1) * zFactorial(n-k) /
+      (zFactorial(k) * zFactorial((n+m)/2-k) * zFactorial((n-m)/2-k));
+    sum += c * Math.pow(rho, n-2*k);
+  }
+  return sum;
+}
+function zValue(k, convention, rho, theta){ // k : indice 1-indexé du fichier (Zk), base orthonormée
+  var nm = zNM(k, convention), n = nm.n, m = nm.m;
+  var R = zRadial(n, m, rho);
+  var norm = m === 0 ? Math.sqrt(n+1) : Math.sqrt(2*(n+1));
+  if(m > 0) return norm * R * Math.cos(m*theta);
+  if(m < 0) return norm * R * Math.sin(-m*theta);
+  return norm * R;
+}
+function zJetColor(t){
+  var stops = [[10,20,110],[10,80,220],[40,200,220],[230,230,60],[220,60,30],[130,10,10]];
+  var pos = Math.max(0, Math.min(1, t)) * (stops.length-1);
+  var i = Math.min(stops.length-2, Math.floor(pos));
+  var f = pos - i, c0 = stops[i], c1 = stops[i+1];
+  return [c0[0]+(c1[0]-c0[0])*f, c0[1]+(c1[1]-c0[1])*f, c0[2]+(c1[2]-c0[2])*f];
+}
+// Trace la carte du front d'onde combiné (somme pondérée des 37 modes) sur
+// un canvas carré, masqué au disque unité. Retourne {pv, rms} — RMS calculé
+// analytiquement (base orthonormée ⇒ RMS = norme des coefficients, piston
+// exclu, indépendant de la convention), P-V lu sur la grille échantillonnée
+// (pas de formule fermée) — la FORME de la carte, elle, dépend de convention.
+function drawWavefrontMap(canvas, coeffs, convention){
+  var size = canvas.width;
+  var ctx = canvas.getContext("2d");
+  var img = ctx.createImageData(size, size);
+  var R = size/2 - 1, cx = size/2, cy = size/2;
+  var vals = new Float32Array(size*size);
+  var vmin = Infinity, vmax = -Infinity;
+  for(var y = 0; y < size; y++){
+    for(var x = 0; x < size; x++){
+      var dx = (x-cx)/R, dy = (y-cy)/R, rho = Math.sqrt(dx*dx+dy*dy);
+      var idx = y*size+x;
+      if(rho > 1){ vals[idx] = NaN; continue; }
+      var theta = Math.atan2(dy, dx), w = 0;
+      for(var k = 1; k <= coeffs.length; k++){
+        if(coeffs[k-1]) w += coeffs[k-1] * zValue(k, convention, rho, theta);
+      }
+      vals[idx] = w;
+      if(w < vmin) vmin = w;
+      if(w > vmax) vmax = w;
+    }
+  }
+  var span = (vmax - vmin) || 1;
+  for(var i = 0; i < size*size; i++){
+    var v = vals[i], p = i*4;
+    if(isNaN(v)){ img.data[p+3] = 0; continue; }
+    var c = zJetColor((v-vmin)/span);
+    img.data[p] = c[0]; img.data[p+1] = c[1]; img.data[p+2] = c[2]; img.data[p+3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+
+  var rmsSum = 0;
+  for(var k2 = 1; k2 < coeffs.length; k2++) rmsSum += coeffs[k2]*coeffs[k2]; // exclut le piston (indice 0)
+  return { pv: vmax - vmin, rms: Math.sqrt(rmsSum) };
+}
+
+function renderZernikeDetail(){
+  var caseSel = document.getElementById("zernCaseSel");
+  var colSel = document.getElementById("zernColSel");
+  var out = document.getElementById("zernOut");
+  if(!caseSel) return; // aucun cas WFE — rien à afficher
+
+  var cases = state.values.wfeCases || [];
+  var selectedCase = cases.find(function(c){ return c.id === caseSel.value; }) || cases[0];
+  if(!selectedCase){ out.innerHTML = ""; return; }
+
+  var rows = parsePerfoCsvRows(selectedCase.csv);
+  var prevCol = colSel.value;
+  colSel.innerHTML = rows.map(function(r, i){
+    return "<option value='"+i+"'>"+(r.band ? tx("Bande {b} · ", { b: tBand(r.band) }) : "")+tx("Colonne {c}", { c: escH(r.column) })+"</option>";
+  }).join("") || "<option value=''>-</option>";
+  if(rows.some(function(r, i){ return String(i) === prevCol; })) colSel.value = prevCol;
+
+  var idx = Number(colSel.value) || 0;
+  var row = rows[idx];
+  if(!row){
+    out.innerHTML = "<p class='empty'>"+tx("CSV illisible ou vide.")+"</p>";
+    return;
+  }
+  var convention = selectedCase.convention || "osa";
+
+  // Les 5 modes dominants (hors piston), pour l'affichage façon "termes
+  // nommés" — comme sur la référence partagée (spherical+defocus, etc.),
+  // sans essayer de reproduire sa décomposition en 2 sous-cartes (choix
+  // illustratif propre à cet exemple, pas un calcul déterministe).
+  var ranked = row.z.map(function(v, i){ return { k: i+1, v: v }; })
+    .filter(function(e){ return e.k !== 1; })
+    .sort(function(a, b){ return Math.abs(b.v) - Math.abs(a.v); })
+    .slice(0, 5);
+  var termsHtml = ranked.map(function(e){
+    var nm = zernikeName(e.k, convention);
+    var name = nm ? " ("+tx(nm)+")" : "";
+    return "<div class='zterm'><span class='zk'>Z"+e.k+name+"</span><span class='zv'>"+e.v.toFixed(4)+"</span></div>";
+  }).join("");
+
+  out.innerHTML =
+    "<div class='zmapwrap'>"+
+      "<canvas id='zernCanvas' width='150' height='150' class='zcanvas'></canvas>"+
+      "<div class='zmapstats' id='zmapStats'></div>"+
+    "</div>"+
+    "<div class='zterms'>"+termsHtml+"</div>";
+
+  var canvas = document.getElementById("zernCanvas");
+  var stats = drawWavefrontMap(canvas, row.z, convention);
+  document.getElementById("zmapStats").innerHTML =
+    tx("P-V : ")+"<b>"+stats.pv.toFixed(3)+" nm</b><br>"+tx("RMS : ")+"<b>"+stats.rms.toFixed(3)+" nm</b>";
+}
+
+// Validation légère — on ne parse pas vraiment le CSV (le serveur le fait
+// avec pandas/le vrai séparateur), on vérifie juste que l'en-tête a la
+// bonne forme pour attraper un fichier évidemment mauvais avant l'envoi.
+function validateWfeCsv(text){
+  var firstLine = (text.split(/\r?\n/)[0] || "").trim();
+  var cols = firstLine.split(";").map(function(c){ return c.trim(); });
+  var hasCore = cols.indexOf("Detector_ID") >= 0 && cols.indexOf("Band") >= 0 && cols.indexOf("Column") >= 0;
+  var hasZ = cols.indexOf("Z1") >= 0;
+  if(!hasCore || !hasZ) return null;
+  var rowCount = text.split(/\r?\n/).filter(function(l){ return l.trim(); }).length - 1;
+  return { rowCount: Math.max(rowCount, 0) };
+}
+
+function wireWfeCasesUI(){
+  var addRmsBtn = document.getElementById("btnAddWfeRms");
+  var addFileBtn = document.getElementById("btnAddWfeFile");
+  var fileInput = document.getElementById("wfeCaseFileInput");
+  if(!addRmsBtn || !addFileBtn || !fileInput) return;
+
+  addRmsBtn.addEventListener("click", function(){
+    var name = prompt(tx("Nom du cas WFE (ex. « Cas chaud », « Cas froid en orbite ») :"));
+    if(name === null || !name.trim()) return;
+    var rmsStr = prompt(tx("WFE RMS pour ce cas (nm) :"));
+    if(rmsStr === null) return;
+    // 04/10/2026 — chiffres uniquement, avec un point ou une virgule
+    // décimale et un signe moins en tête autorisé ; rien d'autre.
+    var rmsClean = String(rmsStr).trim().replace(",", ".");
+    if(!/^-?\d+(\.\d+)?$/.test(rmsClean)){ alert(tx("Valeur invalide : un nombre est attendu (chiffres, signe moins autorisé).")); return; }
+    var rms = Number(rmsClean);
+    if(!state.values.wfeCases) state.values.wfeCases = [];
+    state.values.wfeCases.push({
+      id: (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())),
+      name: name.trim(),
+      mode: "rms",
+      rms: rms
+    });
+    persist();
+    renderPanel();
+  });
+
+  var pendingName = null;
+
+  addFileBtn.addEventListener("click", function(){
+    var name = prompt(tx("Nom du cas WFE (ex. « Cas chaud », « Cas froid en orbite ») :"));
+    if(name === null || !name.trim()) return;
+    pendingName = name.trim();
+    fileInput.value = "";
+    fileInput.click();
+  });
+
+  fileInput.addEventListener("change", function(e){
+    var file = e.target.files[0];
+    if(!file || !pendingName) return;
+    var reader = new FileReader();
+    reader.onload = function(){
+      var meta = validateWfeCsv(reader.result);
+      if(!meta){
+        alert(tx("Fichier illisible : CSV attendu au format « Detector_ID;Band;Column;Z1;...;Z37 » (séparateur point-virgule)."));
+        return;
+      }
+      if(!state.values.wfeCases) state.values.wfeCases = [];
+      state.values.wfeCases.push({
+        id: (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())),
+        name: pendingName,
+        mode: "file",
+        filename: file.name,
+        csv: reader.result,
+        rowCount: meta.rowCount,
+        align: "center",
+        convention: "osa"
+      });
+      pendingName = null;
+      persist();
+      renderPanel();
+    };
+    reader.readAsText(file);
+  });
+
+  panelEl.querySelectorAll("[data-align-case]").forEach(function(sel){
+    sel.addEventListener("change", function(){
+      var id = sel.dataset.alignCase;
+      var c = (state.values.wfeCases || []).find(function(x){ return x.id === id; });
+      if(c){ c.align = sel.value; persist(); }
+      // pas de renderPanel() ici : re-générer tout le panneau ferait perdre
+      // le focus du <select> qu'on vient d'utiliser, pour un changement qui
+      // n'affecte aucun autre affichage visible dans cette vue.
+    });
+  });
+
+  panelEl.querySelectorAll("[data-conv-case]").forEach(function(sel){
+    sel.addEventListener("change", function(){
+      var id = sel.dataset.convCase;
+      var c = (state.values.wfeCases || []).find(function(x){ return x.id === id; });
+      if(c){ c.convention = sel.value; persist(); renderZernikeDetail(); }
+    });
+  });
+
+  panelEl.querySelectorAll("[data-del-case]").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var id = btn.dataset.delCase;
+      state.values.wfeCases = (state.values.wfeCases || []).filter(function(c){ return c.id !== id; });
+      persist();
+      renderPanel();
+    });
+  });
+
+  var zernCaseSel = document.getElementById("zernCaseSel");
+  var zernColSel = document.getElementById("zernColSel");
+  if(zernCaseSel && zernColSel){
+    renderZernikeDetail();
+    zernCaseSel.addEventListener("change", renderZernikeDetail);
+    zernColSel.addEventListener("change", renderZernikeDetail);
+  }
+}
+
+// ===================== Aperçu géométrique du plan pupille =====================
+// Cercle extérieur = diamètre de pupille (D), cercle intérieur = obscuration
+// centrale (E, même convention que les presets existants : un diamètre, pas
+// un rayon — cf. presets.js, ex. Pléiades Neo D:0.91/E:0.3185), traits
+// radiaux = supports du secondaire (NSUP compte, ESUP épaisseur), tracés à
+// l'échelle réelle des données (épaisseur des supports proportionnelle à D,
+// comme un vrai tracé matplotlib/MATLAB). Mis à jour en direct à chaque
+// frappe sur D/E/NSUP/ESUP (cf. l'appel dans le listener "input" de
+// renderPanel). Grille décorative en fond (appréciée telle quelle) +
+// cotes de plan CAD (D, d, supports) pour les valeurs — pas d'axes X/Y
+// gradués, retirés le 18/09/2026 ("les axes ne sont pas bien").
+function renderOpticsGeometry(){
+  var host = document.getElementById("opticsGeoSvg");
+  if(!host) return;
+  var D = Number(state.values.D) || 0;
+  var E = Number(state.values.E) || 0;
+  var n = Math.max(0, Math.round(Number(state.values.NSUP) || 0));
+  if(!(Number(state.values.E) > 0)) n = 0; // pas de supports sans obscuration centrale
+  var t = Number(state.values.ESUP) || 0;
+
+  var cx = 210, cy = 155, R = 105; // rayon à l'écran (px) représentant D
+  var rObsc = D > 0 ? R * Math.min(E / D, 0.92) : 0;
+  var strokeW = D > 0 && t > 0 ? Math.max(1.2, (t / D) * R) : 1.5;
+
+  // ---- Grille décorative (texture de fond, non graduée) ----
+  var gridStep = 40;
+  var grid = "<g stroke='var(--line-soft)' stroke-width='1'>";
+  for(var gx = 20; gx <= 420; gx += gridStep) grid += "<line x1='"+gx+"' y1='0' x2='"+gx+"' y2='310'/>";
+  for(var gy = 15; gy <= 295; gy += gridStep) grid += "<line x1='0' y1='"+gy+"' x2='440' y2='"+gy+"'/>";
+  grid += "</g>";
+
+  var struts = "";
+  for(var i = 0; i < n; i++){
+    var angle = (2 * Math.PI * i) / n - Math.PI / 2;
+    // 03/10/2026 — les supports ne doivent pas sortir de la pupille : avant,
+    // les bouts arrondis dépassaient du cercle d'une demi-épaisseur. Le
+    // trait part du centre (caché par l'obscuration), dépasse le bord, et
+    // le groupe est découpé par le cercle de pupille (clip-path ci-dessous).
+    var x2 = cx + (R + strokeW) * Math.cos(angle), y2 = cy + (R + strokeW) * Math.sin(angle);
+    struts += "<line x1='"+cx+"' y1='"+cy+"' x2='"+x2.toFixed(1)+"' y2='"+y2.toFixed(1)+
+      "' stroke='var(--muted)' stroke-width='"+strokeW.toFixed(1)+"'/>";
+  }
+  struts = "<g clip-path='url(#pupilClip)'>"+struts+"</g>";
+
+  // ---- Cotation du diamètre D, ligne horizontale sous le cercle ----
+  var dimY = cy + R + 34;
+  var xL = cx - R, xR = cx + R;
+  var dimD =
+    "<g stroke='var(--muted-2)' stroke-width='1'>"+
+      "<line x1='"+xL+"' y1='"+(cy+4)+"' x2='"+xL+"' y2='"+dimY+"'/>"+
+      "<line x1='"+xR+"' y1='"+(cy+4)+"' x2='"+xR+"' y2='"+dimY+"'/>"+
+      "<line x1='"+xL+"' y1='"+dimY+"' x2='"+xR+"' y2='"+dimY+"'/>"+
+    "</g>"+
+    "<path d='M"+xL+","+dimY+" l8,-3.5 v7 z' fill='var(--muted-2)'/>"+
+    "<path d='M"+xR+","+dimY+" l-8,-3.5 v7 z' fill='var(--muted-2)'/>"+
+    "<text x='"+cx+"' y='"+(dimY-7)+"' text-anchor='middle' class='geo-dim'>D = "+(D || "-")+" m</text>";
+
+  // ---- Appel de cote pour l'obscuration centrale, en diagonale ----
+  var obscLabel = "";
+  if(rObsc > 0){
+    var a1 = -40 * Math.PI / 180;
+    var lx1 = cx + rObsc * Math.cos(a1), ly1 = cy + rObsc * Math.sin(a1);
+    var lx2 = cx + R + 20, ly2 = cy - R + 6;
+    // Texte posé au-dessus du trait horizontal et aligné à droite : avec la
+    // taille de cote agrandie, il ne tient plus à la suite du trait.
+    obscLabel =
+      "<circle cx='"+lx1.toFixed(1)+"' cy='"+ly1.toFixed(1)+"' r='2' fill='var(--muted-2)'/>"+
+      "<path d='M"+lx1.toFixed(1)+","+ly1.toFixed(1)+" L"+lx2+","+ly2+" H432' fill='none' stroke='var(--muted-2)' stroke-width='1'/>"+
+      "<text x='432' y='"+(ly2-7)+"' text-anchor='end' class='geo-dim'>d = "+(E || 0)+" m</text>";
+  }
+
+  // ---- Appel de cote pour les supports, vers le haut à gauche ----
+  // 04/10/2026 — le trait part maintenant du milieu du support vertical
+  // du haut (le premier tracé, à -90°, présent dès que n > 0), donc il
+  // pointe toujours sur un support quels que soient n, l'épaisseur et
+  // l'obscuration. Avant, il visait un point fixe de la pupille (145°),
+  // qui ne tombait sur un support que par hasard. Le texte est en haut à
+  // gauche, symétrique de la cote d'obscuration : en bas à gauche, avec
+  // la taille agrandie, il chevauchait le trait de rappel de la cote D.
+  var supLabel = "";
+  if(n > 0){
+    var supText = n+" × "+(t || 0)+" m";
+    var mx1 = cx, my1 = cy - (rObsc + R) / 2;
+    var mx2 = Math.min(cx - 24, 8 + supText.length * 10.8 + 6), my2 = cy - R + 6;
+    supLabel =
+      "<path d='M"+mx1.toFixed(1)+","+my1.toFixed(1)+" L"+mx2.toFixed(1)+","+my2+" H8' fill='none' stroke='var(--muted-2)' stroke-width='1'/>"+
+      "<circle cx='"+mx1.toFixed(1)+"' cy='"+my1.toFixed(1)+"' r='2.5' fill='var(--void)'/>"+
+      "<text x='8' y='"+(my2-7)+"' class='geo-dim'>"+supText+"</text>";
+  }
+
+  host.innerHTML =
+    "<svg viewBox='0 0 440 310' preserveAspectRatio='xMidYMid meet' style='width:100%;height:100%;display:block'>"+
+      "<rect x='0' y='0' width='440' height='310' fill='var(--void)'/>"+
+      grid+
+      "<defs><clipPath id='pupilClip'><circle cx='"+cx+"' cy='"+cy+"' r='"+R+"'/></clipPath></defs>"+
+      "<circle cx='"+cx+"' cy='"+cy+"' r='"+R+"' fill='var(--void)'/>"+
+      struts+
+      (rObsc > 0 ? "<circle cx='"+cx+"' cy='"+cy+"' r='"+rObsc.toFixed(1)+"' fill='var(--panel)' stroke='var(--line)' stroke-width='1.2'/>" : "")+
+      "<circle cx='"+cx+"' cy='"+cy+"' r='"+R+"' fill='none' stroke='var(--pixel)' stroke-width='1.6'/>"+
+      dimD + obscLabel + supLabel +
+    "</svg>";
+}
+
+// ===================== Aperçu géométrique du détecteur (coupe, vue de côté) =====================
+// Ajouté le 18/09/2026 — même esprit que renderOpticsGeometry (grille
+// décorative + cote CAD), mais en coupe : rangée de pixels posée sur un
+// substrat, lumière incidente en haut, cote sur la largeur de pixel (PX,
+// µm — pas en mètres comme l'optique). Purement visuel : PX est le seul
+// paramètre réellement utilisé ici, R/P/K/FW/QE ne changent rien au dessin
+// (ce ne sont pas des grandeurs géométriques).
+// ===================== Courbe de transfert de l'électronique (04/10/2026) =====================
+// Schéma du bloc Électronique : électrons en abscisse, DN en ordonnée, pour
+// UN étage TDI. Chaque paramètre du bloc y a sa place :
+//   pente              = gain de conversion (1 / LSB_e), quel que soit le mode
+//   plafond horizontal = pleine échelle de l'ADC, 2^bits - 1
+//   limite verticale   = full well
+//   départ de la droite= niveau noir DN0
+// Le pas de quantification LSB_e (e⁻/DN) reprend les trois formules de
+// module_SNR.resolve_electronics :
+//   détaillé      : (1e6 / CVF) · (V_range / 2^bits) / G_PGA
+//   datasheet     : 1 / CWF
+//   pleine échelle: full_well / (2^bits - 1)
+// Le schéma fait aussi le contrôle de cohérence : si la droite touche le
+// plafond avant le full well, l'ADC sature en premier ; si elle atteint le
+// full well sous le plafond, une partie des codes n'est jamais utilisée.
+// Au-dessus, une ligne de légende rappelle la chaîne du mode choisi.
+// Purement visuel : rien n'est écrit dans state.values.
+function electronicsLsb(){
+  var v = state.values;
+  function num(k){ return (v[k] === undefined || v[k] === null || v[k] === "") ? NaN : Number(v[k]); }
+  var bits = num("ADC"), fw = num("FW");
+  if(!(bits >= 1 && bits <= 32)) return null;
+  var lsb = NaN;
+  if(v.electronics_mode === "detailed"){
+    var g = isNaN(num("G_PGA")) ? 1 : num("G_PGA");
+    lsb = (1e6 / num("CVF_uV_per_e")) * (num("V_range") / Math.pow(2, bits)) / g;
+  } else if(v.electronics_mode === "datasheet"){
+    lsb = 1 / num("CWF");
+  } else if(v.electronics_mode === "full_scale"){
+    lsb = fw / (Math.pow(2, bits) - 1);
+  }
+  return (isFinite(lsb) && lsb > 0) ? lsb : null;
+}
+function renderElectronicsGeometry(){
+  var host = document.getElementById("electronicsGeoSvg");
+  if(!host) return;
+  var v = state.values;
+  function num(k){ return (v[k] === undefined || v[k] === null || v[k] === "") ? NaN : Number(v[k]); }
+  function fmt(x){
+    if(!isFinite(x)) return "-";
+    var a = Math.abs(x);
+    if(a >= 1000) return String(Math.round(x)).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    if(a >= 100) return String(Math.round(x));
+    return String(Number(x.toPrecision(3)));
+  }
+  var W = 440, H = 330;
+  var bits = num("ADC"), fw = num("FW"), rn = num("R");
+  var dn0 = isNaN(num("DN0")) ? 0 : num("DN0");
+  var mode = v.electronics_mode || "";
+  var lsb = electronicsLsb();
+
+  // ---- Grille décorative (même texture que les autres schémas) ----
+  var grid = "<g stroke='var(--line-soft)' stroke-width='1'>";
+  for(var gx = 20; gx <= 420; gx += 40) grid += "<line x1='"+gx+"' y1='0' x2='"+gx+"' y2='"+H+"'/>";
+  for(var gy = 15; gy <= H; gy += 40) grid += "<line x1='0' y1='"+gy+"' x2='"+W+"' y2='"+gy+"'/>";
+  grid += "</g>";
+
+  // ---- Ligne de légende : la chaîne du mode choisi ----
+  function box(x, w, label, lit){
+    return "<rect x='"+x+"' y='10' width='"+w+"' height='26' rx='4' fill='var(--panel-2)' stroke='"+(lit ? "var(--pixel)" : "var(--line)")+"' stroke-width='1.2'/>"+
+      "<text x='"+(x + w/2)+"' y='28' text-anchor='middle' font-family='var(--mono)' font-size='13' fill='"+(lit ? "var(--paper)" : "var(--muted-2)")+"'>"+label+"</text>";
+  }
+  function arrow(x){ return "<path d='M"+x+",23 h12 m-4,-4 l4,4 -4,4' fill='none' stroke='var(--muted-2)' stroke-width='1.2'/>"; }
+  var chain = box(14, 46, "e⁻", true) + arrow(64);
+  if(mode === "detailed"){
+    chain += box(80, 78, "CVF", true) + arrow(162) + box(178, 78, "PGA", true) + arrow(260) + box(276, 78, "ADC", true);
+  } else if(mode === "datasheet"){
+    chain += box(80, 274, tx("gain global CWF"), true);
+  } else if(mode === "full_scale"){
+    chain += box(80, 274, tx("pleine échelle = full well"), true);
+  } else {
+    chain += box(80, 274, tx("mode à choisir"), false);
+  }
+  chain += arrow(358) + box(374, 52, "DN", true);
+
+  // ---- Cadre du graphe ----
+  var x0 = 62, x1 = 418, yTop = 78, yBot = 244;
+  var frame =
+    "<line x1='"+x0+"' y1='"+yBot+"' x2='"+x1+"' y2='"+yBot+"' stroke='var(--line)' stroke-width='1.2'/>"+
+    "<line x1='"+x0+"' y1='"+(yTop-14)+"' x2='"+x0+"' y2='"+yBot+"' stroke='var(--line)' stroke-width='1.2'/>"+
+    "<text x='"+(x0-8)+"' y='"+(yTop-18)+"' text-anchor='end' font-family='var(--mono)' font-size='13' fill='var(--muted)'>DN</text>"+
+    "<text x='"+x1+"' y='"+(yBot+30)+"' text-anchor='end' font-family='var(--mono)' font-size='13' fill='var(--muted)'>e⁻</text>"+
+    "<text x='"+(x0-8)+"' y='"+(yBot+4)+"' text-anchor='end' font-family='var(--mono)' font-size='12' fill='var(--muted-2)'>0</text>";
+
+  var body = "", line1 = "", line2 = "", line2Color = "var(--muted)";
+  if(!(bits >= 1 && bits <= 32) || !(fw > 0) || !lsb){
+    // Pas assez d'informations pour tracer : on dit ce qui manque.
+    var need = [];
+    if(!(bits >= 1 && bits <= 32)) need.push(tx("la résolution ADC"));
+    if(!(fw > 0)) need.push(tx("le full well"));
+    if(!mode) need.push(tx("le mode"));
+    else if(!lsb && bits >= 1 && fw > 0) need.push(tx("les champs du mode"));
+    line1 = tx("Pour tracer la courbe, renseigner");
+    line2 = need.join(", ") + ".";
+  } else {
+    var dnMax = Math.pow(2, bits) - 1;
+    var eAdc = Math.max(0, (dnMax - dn0) * lsb);        // électrons auxquels l'ADC sature
+    var xMax = fw * 1.18, yMax = dnMax * 1.14;
+    function X(e){ return x0 + (e / xMax) * (x1 - x0); }
+    function Y(d){ return yBot - (d / yMax) * (yBot - yTop + 14); }
+    var eKnee = Math.min(fw, eAdc);
+    var dnAtFw = Math.min(dnMax, dn0 + fw / lsb);        // DN d'un étage au full well
+    // Plafond de l'ADC et limite du full well
+    body +=
+      "<line x1='"+x0+"' y1='"+Y(dnMax).toFixed(1)+"' x2='"+x1+"' y2='"+Y(dnMax).toFixed(1)+"' stroke='var(--photon)' stroke-width='1.2' stroke-dasharray='5 4'/>"+
+      "<text x='"+x1+"' y='"+(Y(dnMax)-6).toFixed(1)+"' text-anchor='end' font-family='var(--mono)' font-size='12' fill='var(--photon)'>"+tx("pleine échelle ADC")+"</text>"+
+      "<text x='"+(x0-8)+"' y='"+(Y(dnMax)+4).toFixed(1)+"' text-anchor='end' font-family='var(--mono)' font-size='12' fill='var(--muted-2)'>"+fmt(dnMax)+"</text>"+
+      "<line x1='"+X(fw).toFixed(1)+"' y1='"+(yTop-14)+"' x2='"+X(fw).toFixed(1)+"' y2='"+yBot+"' stroke='var(--muted)' stroke-width='1.2' stroke-dasharray='5 4'/>"+
+      "<text x='"+X(fw).toFixed(1)+"' y='"+(yBot+15)+"' text-anchor='middle' font-family='var(--mono)' font-size='12' fill='var(--muted-2)'>"+fmt(fw)+"</text>"+
+      "<text x='"+(X(fw)-6).toFixed(1)+"' y='"+(yBot-8)+"' text-anchor='end' font-family='var(--mono)' font-size='12' fill='var(--muted)'>full well</text>";
+    // Droite de transfert : montée, palier éventuel au plafond, puis pixel saturé
+    var path = "M"+X(0).toFixed(1)+","+Y(Math.min(dn0, dnMax)).toFixed(1)+
+               " L"+X(eKnee).toFixed(1)+","+Y(Math.min(dnMax, dn0 + eKnee / lsb)).toFixed(1);
+    if(eAdc < fw) path += " L"+X(fw).toFixed(1)+","+Y(dnMax).toFixed(1);
+    body +=
+      "<path d='"+path+"' fill='none' stroke='var(--pixel)' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/>"+
+      "<line x1='"+X(fw).toFixed(1)+"' y1='"+Y(dnAtFw).toFixed(1)+"' x2='"+x1+"' y2='"+Y(dnAtFw).toFixed(1)+"' stroke='var(--pixel)' stroke-width='1.6' stroke-dasharray='2 5' opacity='.7'/>"+
+      "<circle cx='"+X(eKnee).toFixed(1)+"' cy='"+Y(Math.min(dnMax, dn0 + eKnee / lsb)).toFixed(1)+"' r='3.5' fill='var(--pixel)'/>";
+    if(dn0 > 0){
+      body += "<text x='"+(x0+8)+"' y='"+(Y(Math.min(dn0, dnMax))-7).toFixed(1)+"' font-family='var(--mono)' font-size='12' fill='var(--muted)'>DN0 = "+fmt(dn0)+"</text>";
+    }
+    // Lecture chiffrée
+    line1 = "1 DN = " + fmt(lsb) + " e⁻";
+    if(rn > 0) line1 += "  ·  " + tx("bruit de lecture = {x} DN", { x: fmt(rn / lsb) });
+    var ratio = eAdc / fw;
+    if(Math.abs(ratio - 1) < 0.02){
+      line2 = tx("Pleine échelle ADC au full well."); line2Color = "var(--ok)";
+    } else if(ratio < 1){
+      line2 = tx("L'ADC sature à {e} e⁻, {p} % du full well.", { e: fmt(eAdc), p: Math.round(ratio * 100) }); line2Color = "var(--alert)";
+    } else {
+      line2 = tx("Full well atteint à {dn} DN, {p} % des codes.", { dn: fmt(dnAtFw), p: Math.round(dnAtFw / dnMax * 100) }); line2Color = "var(--photon)";
+    }
+  }
+  var foot =
+    "<text x='"+(W/2)+"' y='"+(H-32)+"' text-anchor='middle' font-family='var(--mono)' font-size='14' fill='var(--paper)'>"+line1+"</text>"+
+    "<text x='"+(W/2)+"' y='"+(H-11)+"' text-anchor='middle' font-family='var(--mono)' font-size='14' fill='"+line2Color+"'>"+line2+"</text>";
+
+  host.innerHTML =
+    "<svg viewBox='0 0 "+W+" "+H+"' preserveAspectRatio='xMidYMid meet' style='width:100%;height:100%;display:block'>"+
+      "<rect x='0' y='0' width='"+W+"' height='"+H+"' fill='var(--void)'/>"+
+      grid + chain + frame + body + foot +
+    "</svg>";
+}
+
+function renderDetectorGeometry(){
+  var host = document.getElementById("detectorGeoSvg");
+  if(!host) return;
+  var PX = Number(state.values.PX) || 0;
+
+  var cx = 220, pxSize = 36, nPix = 6;
+  var rowW = pxSize * nPix, xStart = cx - rowW / 2;
+  var subTop = 180, subH = 36, pixTop = subTop - 32;
+
+  // ---- Grille décorative (même texture que le plan pupille) ----
+  var gridStep = 40;
+  var grid = "<g stroke='var(--line-soft)' stroke-width='1'>";
+  for(var gx = 20; gx <= 420; gx += gridStep) grid += "<line x1='"+gx+"' y1='0' x2='"+gx+"' y2='310'/>";
+  for(var gy = 15; gy <= 295; gy += gridStep) grid += "<line x1='0' y1='"+gy+"' x2='440' y2='"+gy+"'/>";
+  grid += "</g>";
+
+  // ---- Substrat ----
+  var substrate = "<rect x='"+(xStart-4)+"' y='"+subTop+"' width='"+(rowW+8)+"' height='"+subH+"' rx='3' "+
+    "fill='var(--panel-2)' stroke='var(--line)' stroke-width='1.2'/>";
+
+  // ---- Pixels (carrés jointifs sur le substrat) ----
+  var pixels = "";
+  for(var i = 0; i < nPix; i++){
+    var px = xStart + i * pxSize;
+    pixels += "<rect x='"+px+"' y='"+pixTop+"' width='"+pxSize+"' height='32' "+
+      "fill='url(#chipGrad2)' fill-opacity='.5' stroke='var(--pixel)' stroke-opacity='.6' stroke-width='1'/>";
+  }
+
+  // ---- Lumière incidente (flèches vers le bas) ----
+  var light = "<g stroke='var(--photon)' stroke-width='1.6' stroke-linecap='round'>";
+  for(var lx = xStart + pxSize*0.5; lx <= xStart + rowW; lx += pxSize){
+    light += "<line x1='"+lx+"' y1='108' x2='"+lx+"' y2='"+(pixTop-6)+"'/>"+
+      "<path d='M"+lx+","+(pixTop-6)+" l-4,-7 h8 z' fill='var(--photon)' stroke='none'/>";
+  }
+  light += "</g>"+
+    "<text x='"+cx+"' y='98' text-anchor='middle' class='geo-dim'>"+tx("Lumière incidente")+"</text>";
+
+  // ---- Cotation de la largeur d'un pixel (le 4e, à peu près centré) ----
+  var dimIdx = Math.floor(nPix / 2);
+  var dxL = xStart + dimIdx * pxSize, dxR = dxL + pxSize;
+  var dimY = subTop + subH + 34;
+  var dimPx =
+    "<g stroke='var(--muted-2)' stroke-width='1'>"+
+      "<line x1='"+dxL+"' y1='"+(subTop+subH+4)+"' x2='"+dxL+"' y2='"+dimY+"'/>"+
+      "<line x1='"+dxR+"' y1='"+(subTop+subH+4)+"' x2='"+dxR+"' y2='"+dimY+"'/>"+
+      "<line x1='"+dxL+"' y1='"+dimY+"' x2='"+dxR+"' y2='"+dimY+"'/>"+
+    "</g>"+
+    "<path d='M"+dxL+","+dimY+" l8,-3.5 v7 z' fill='var(--muted-2)'/>"+
+    "<path d='M"+dxR+","+dimY+" l-8,-3.5 v7 z' fill='var(--muted-2)'/>"+
+    "<text x='"+((dxL+dxR)/2)+"' y='"+(dimY+22)+"' text-anchor='middle' class='geo-dim'>PX = "+(PX || "-")+" µm</text>";
+
+  host.innerHTML =
+    "<svg viewBox='0 0 440 310' preserveAspectRatio='xMidYMid meet' style='width:100%;height:100%;display:block'>"+
+      "<defs><linearGradient id='chipGrad2' x1='0' y1='0' x2='1' y2='1'>"+
+        "<stop offset='0%' stop-color='var(--pixel)'/><stop offset='100%' stop-color='#8A6CF2'/>"+
+      "</linearGradient></defs>"+
+      "<rect x='0' y='0' width='440' height='310' fill='var(--void)'/>"+
+      grid+
+      light+
+      substrate+
+      pixels+
+      dimPx+
+    "</svg>";
+}
+
+// ===================== QE spectral (courbe QE(λ) point par point) =====================
+// Stockée dans state.values.qeSpectral : [{wl, qe}, ...] (wl en nm, qe en
+// FRACTION 0-1 — confirmé le 17/09/2026 via radiometry.py, cf. commentaire
+// sur le champ QE scalaire ci-dessus). Optionnelle — coexiste avec le QE
+// scalaire ci-dessus (mode simplifié, utilisé si la courbe est vide).
+// Envoyée au lancement de la simulation (cf. simulations.html, payload.qeSpectral)
+// sous la forme paramFile.Detector.QE_spectral = {wavelength_nm:[...], values:[...]}
+// attendue par radiometry._integrate_radiance_to_electrons — remplace alors
+// la version synthétisée à plat depuis le QE scalaire.
+// ===================== Transmission optique spectrale (04/10/2026) =====================
+// Même principe que la courbe QE ci-dessous : state.values.tSpectral =
+// [{wl, t}, ...] (wl en nm, t en fraction 0-1). Optionnelle — avec au moins
+// 2 points valides, elle remplace la transmission scalaire à l'envoi (cf.
+// simulations.html, payload.tSpectral) et devient
+// paramFile.Telescope.T_opt_spectral = {wavelength_nm:[...], values:[...]}
+// (cf. paramfile_builder.py). Hors de la plage saisie, le backend garde la
+// valeur du point le plus proche (np.interp dans radiometry.py).
+function renderTSpectralHtml(){
+  var pts = state.values.tSpectral || [];
+  var st = curveStatus(pts, "t");
+  var rows = pts.map(function(p, i){
+    return "<div class='qerow'>"+
+      "<input type='text' inputmode='decimal' autocomplete='off' data-num class='qewl tswl"+(st.dup[i] ? " invalid" : (st.odd[i] ? " odd" : ""))+"' data-t-idx='"+i+"' value='"+escH(p.wl)+"' placeholder='λ (nm)'>"+
+      "<input type='text' inputmode='decimal' autocomplete='off' data-num class='qeval tsval"+(p.t !== "" && !inUnitRange(p.t) ? " invalid" : "")+"' data-t-idx='"+i+"' value='"+escH(p.t)+"' min='0' max='1' placeholder='Transmission (0-1)'>"+
+      "<button type='button' class='qedel' data-t-del='"+i+"' aria-label='"+txa("Supprimer ce point")+"'>×</button>"+
+    "</div>";
+  }).join("");
+  return "<div class='wfecases qespectral'>"+
+    "<div class='wfehead'><label>"+tx("Points de la courbe")+"</label>"+
+    "<button type='button' class='addcasebtn' id='btnAddTPoint'>"+tx("+ Ajouter un point")+"</button></div>"+
+    "<p class='wfesub'>"+tx("Un point par longueur d'onde, transmission en fraction (0-1, pas en %). La courbe doit couvrir les bandes : en dehors, la valeur du point le plus proche est gardée.")+"</p>"+
+    "<div class='spec-cols'>"+
+      "<div class='spec-rows'><div class='spec-head'><span>λ (nm)</span><span>Transmission (0-1)</span><span class='gap'></span></div>"+
+        "<div id='tRows'>"+(pts.length ? rows : "<p class='empty'>"+tx("Aucun point défini.")+"</p>")+"</div>"+
+        "<p class='rangehint' id='tRangeHint'"+(curveHintText(st) ? "" : " hidden")+">"+curveHintText(st)+"</p>"+
+        "<p class='oddhint' id='tOddHint'"+(curveOddText(st) ? "" : " hidden")+">"+curveOddText(st)+"</p></div>"+
+      "<div class='spec-chart' id='tChart'></div>"+
+    "</div>"+
+  "</div>";
+}
+
+function wireTSpectralUI(){
+  if(!document.getElementById("btnAddTPoint")) return; // mode « Valeur constante »
+  renderTChart();
+  document.getElementById("btnAddTPoint").addEventListener("click", function(){
+    if(!state.values.tSpectral) state.values.tSpectral = [];
+    state.values.tSpectral.push({ wl: "", t: "" });
+    persist();
+    renderPanel();
+    var rows = document.querySelectorAll(".tswl");
+    if(rows.length) rows[rows.length-1].focus();
+  });
+  panelEl.querySelectorAll(".tswl, .tsval").forEach(function(input){
+    input.addEventListener("input", function(){
+      var i = Number(input.dataset.tIdx);
+      state.values.tSpectral[i][input.classList.contains("tswl") ? "wl" : "t"] = input.value;
+      persist();
+      syncCurveRange(".tswl", ".tsval", "data-t-idx", "tSpectral", "t", "tRangeHint");
+      renderTChart(); // pas de renderPanel() : on garde le focus pendant la frappe
+      syncScalarLock("T");
+    });
+  });
+  wireSpectralEnter(".tswl, .tsval", "data-t-idx", "tswl", "tsval", "btnAddTPoint");
+  panelEl.querySelectorAll("[data-t-del]").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      state.values.tSpectral.splice(Number(btn.dataset.tDel), 1);
+      persist();
+      renderPanel();
+    });
+  });
+}
+
+function renderQeSpectralHtml(){
+  var pts = state.values.qeSpectral || [];
+  var st = curveStatus(pts, "qe");
+  var rows = pts.map(function(p, i){
+    return "<div class='qerow' data-qe-idx='"+i+"'>"+
+      "<input type='text' inputmode='decimal' autocomplete='off' data-num class='qewl"+(st.dup[i] ? " invalid" : (st.odd[i] ? " odd" : ""))+"' data-qe-idx='"+i+"' value='"+escH(p.wl)+"' placeholder='λ (nm)'>"+
+      "<input type='text' inputmode='decimal' autocomplete='off' data-num class='qeval"+(p.qe !== "" && !inUnitRange(p.qe) ? " invalid" : "")+"' data-qe-idx='"+i+"' value='"+escH(p.qe)+"' min='0' max='1' placeholder='QE (0-1)'>"+
+      "<button type='button' class='qedel' data-qe-del='"+i+"' aria-label='"+txa("Supprimer ce point")+"'>×</button>"+
+    "</div>";
+  }).join("");
+  return "<div class='wfecases qespectral'>"+
+    "<div class='wfehead'><label>"+tx("Points de la courbe")+"</label>"+
+    "<button type='button' class='addcasebtn' id='btnAddQePoint'>"+tx("+ Ajouter un point")+"</button></div>"+
+    "<p class='wfesub'>"+tx("Un point par longueur d'onde, QE en fraction (0-1, pas en %).")+"</p>"+
+    "<div class='spec-cols'>"+
+      "<div class='spec-rows'><div class='spec-head'><span>λ (nm)</span><span>QE (0-1)</span><span class='gap'></span></div>"+
+        "<div id='qeRows'>"+(pts.length ? rows : "<p class='empty'>"+tx("Aucun point défini.")+"</p>")+"</div>"+
+        "<p class='rangehint' id='qeRangeHint'"+(curveHintText(st) ? "" : " hidden")+">"+curveHintText(st)+"</p>"+
+        "<p class='oddhint' id='qeOddHint'"+(curveOddText(st) ? "" : " hidden")+">"+curveOddText(st)+"</p></div>"+
+      "<div class='spec-chart' id='qeChart'></div>"+
+    "</div>"+
+  "</div>";
+}
+
+function wavelengthToColor(wl){
+  var r=0,g=0,b=0;
+  if(wl < 440){ r=-(wl-440)/(440-380); g=0; b=1; }
+  else if(wl < 490){ r=0; g=(wl-440)/(490-440); b=1; }
+  else if(wl < 510){ r=0; g=1; b=-(wl-510)/(510-490); }
+  else if(wl < 580){ r=(wl-510)/(580-510); g=1; b=0; }
+  else if(wl < 645){ r=1; g=-(wl-645)/(645-580); b=0; }
+  else if(wl < 780){ r=1; g=0; b=0; }
+  else { r=0.72; g=0; b=0; }
+  var factor = wl < 420 ? 0.8 : (wl > 700 ? 0.9 : 1);
+  return "rgb("+Math.round(r*255*factor)+","+Math.round(g*255*factor)+","+Math.round(b*255*factor)+")";
+}
+
+// 04/10/2026 — le tracé est commun à la courbe QE (bloc Détecteur) et à la
+// courbe de transmission optique (bloc Optique) : mêmes axes, même rendu.
+function renderQeChart(){ renderSpectralChart("qeChart", state.values.qeSpectral, "qe", "qeSpectralGradient"); }
+function renderTChart(){ renderSpectralChart("tChart", state.values.tSpectral, "t", "tSpectralGradient"); }
+function renderSpectralChart(hostId, rawPts, valKey, gradId){
+  var host = document.getElementById(hostId);
+  if(!host) return;
+  var pts = curveStatus(rawPts, valKey).valid
+    .sort(function(a,b){ return a.wl - b.wl; });
+  if(pts.length < 2){
+    host.innerHTML = "<p class='empty'>"+tx("Au moins 2 points valides pour afficher la courbe.")+"</p>";
+    return;
+  }
+  // 04/10/2026 — tracé dans la troisième colonne, plus étroite : cadre
+  // plus carré (300×210 au lieu de 400×140) et étiquettes agrandies.
+  var W = 300, H = 210, padL = 30, padR = 12, padT = 16, padB = 30;
+  var wlMin = pts[0].wl, wlMax = pts[pts.length-1].wl;
+  // 04/10/2026 — ordonnées de 0 à 1 au moins (grandeurs en fraction), pour
+  // que le repère 1 soit toujours visible ; l'axe ne s'étend au-delà que si
+  // une valeur saisie dépasse 1.
+  var qeMin = Math.min(0, Math.min.apply(null, pts.map(function(p){ return p.qe; })));
+  var qeMax = Math.max(1, Math.max.apply(null, pts.map(function(p){ return p.qe; })));
+  var wlSpan = (wlMax - wlMin) || 1, qeSpan = (qeMax - qeMin) || 1;
+  function x(wl){ return padL + (wl - wlMin) / wlSpan * (W - padL - padR); }
+  function y(qe){ return H - padB - (qe - qeMin) / qeSpan * (H - padT - padB); }
+  var pathD = pts.map(function(p, i){ return (i===0?"M":"L") + x(p.wl).toFixed(1) + "," + y(p.qe).toFixed(1); }).join(" ");
+  var stops = pts.map(function(p){
+    var offset = ((p.wl - wlMin) / wlSpan * 100).toFixed(2);
+    return "<stop offset='"+offset+"%' stop-color='"+wavelengthToColor(p.wl)+"'/>";
+  }).join("");
+  var dots = pts.map(function(p){
+    return "<circle cx='"+x(p.wl).toFixed(1)+"' cy='"+y(p.qe).toFixed(1)+"' r='3' fill='"+wavelengthToColor(p.wl)+"'/>";
+  }).join("");
+  // Graduations des ordonnées tous les 0,2 (04/10/2026), avec une ligne de
+  // repère pointillée par graduation ; l'axe des abscisses tient lieu de 0.
+  var yTicks = "";
+  [0, 0.2, 0.4, 0.6, 0.8, 1].forEach(function(v){
+    if(v > 0) yTicks += "<line x1='"+(padL-4)+"' y1='"+y(v).toFixed(1)+"' x2='"+(W-padR)+"' y2='"+y(v).toFixed(1)+"' stroke='var(--line-soft)' stroke-dasharray='3 4'/>";
+    yTicks += "<text x='"+(padL-7)+"' y='"+(y(v)+3.5).toFixed(1)+"' text-anchor='end' font-family='var(--mono)' font-size='10' fill='var(--muted-2)'>"+v+"</text>";
+  });
+  host.innerHTML =
+    "<svg viewBox='0 0 "+W+" "+H+"' style='width:100%;height:auto;display:block'>"+
+      "<defs><linearGradient id='"+gradId+"' x1='"+padL+"' y1='0' x2='"+(W-padR)+"' y2='0' gradientUnits='userSpaceOnUse'>"+stops+"</linearGradient></defs>"+
+      "<line x1='"+padL+"' y1='"+(H-padB)+"' x2='"+(W-padR)+"' y2='"+(H-padB)+"' stroke='var(--line-soft)'/>"+
+      "<line x1='"+padL+"' y1='"+padT+"' x2='"+padL+"' y2='"+(H-padB)+"' stroke='var(--line-soft)'/>"+
+      yTicks+
+      "<text x='"+padL+"' y='"+(H-12)+"' font-family='var(--mono)' font-size='10' fill='var(--muted-2)'>"+wlMin+" nm</text>"+
+      "<text x='"+(W-padR)+"' y='"+(H-12)+"' text-anchor='end' font-family='var(--mono)' font-size='10' fill='var(--muted-2)'>"+wlMax+" nm</text>"+
+      "<path d='"+pathD+"' fill='none' stroke='url(#"+gradId+")' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/>"+
+      dots+
+    "</svg>";
+}
+function wireQeSpectralUI(){
+  if(!document.getElementById("btnAddQePoint")) return; // mode « Valeur constante »
+  renderQeChart();
+
+  document.getElementById("btnAddQePoint").addEventListener("click", function(){
+    if(!state.values.qeSpectral) state.values.qeSpectral = [];
+    state.values.qeSpectral.push({ wl: "", qe: "" });
+    persist();
+    renderPanel();
+    var rows = document.querySelectorAll(".qewl");
+    if(rows.length) rows[rows.length-1].focus();
+  });
+
+  panelEl.querySelectorAll(".qewl, .qeval").forEach(function(input){
+    input.addEventListener("input", function(){
+      var i = Number(input.dataset.qeIdx);
+      var key = input.classList.contains("qewl") ? "wl" : "qe";
+      state.values.qeSpectral[i][key] = input.value;
+      persist();
+      syncCurveRange("input.qewl", ".qeval", "data-qe-idx", "qeSpectral", "qe", "qeRangeHint");
+      renderQeChart(); // pas de renderPanel() ici : on garde le focus sur le champ en cours de saisie
+      syncScalarLock("QE");
+    });
+  });
+  wireSpectralEnter(".qewl, .qeval", "data-qe-idx", "qewl", "qeval", "btnAddQePoint");
+
+  panelEl.querySelectorAll("[data-qe-del]").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var i = Number(btn.dataset.qeDel);
+      state.values.qeSpectral.splice(i, 1);
+      persist();
+      renderPanel();
+    });
+  });
+}
+
+/**
+ * Sauvegarde réelle dans Supabase — insertion si c'est un nouvel
+ * instrument (state.instrumentId encore vide), mise à jour sinon.
+ * Le nom est requis : impossible de sauvegarder un instrument sans nom
+ * (il deviendrait illisible dans la liste "Mes instruments").
+ *
+ * Limite de 20 instruments par compte — appliquée côté base (trigger
+ * Postgres "check_instrument_limit" sur la table "instruments", pas ici)
+ * pour ne pas pouvoir être contournée en modifiant juste le front. Rien à
+ * faire ici pour ça, sauf afficher le message d'erreur qui en revient
+ * (cf. plus bas). Migration SQL nécessaire si le trigger n'existe pas
+ * encore :
+ *
+ *   create or replace function check_instrument_limit()
+ *   returns trigger as $$
+ *   begin
+ *     if (select count(*) from instruments where account_id = new.account_id) >= 20 then
+ *       raise exception 'Limite de 20 instruments atteinte. Supprimez-en un pour en créer un nouveau.';
+ *     end if;
+ *     return new;
+ *   end;
+ *   $$ language plpgsql;
+ *
+ *   drop trigger if exists trg_check_instrument_limit on instruments;
+ *   create trigger trg_check_instrument_limit
+ *     before insert on instruments
+ *     for each row execute function check_instrument_limit();
+ *
+ * Nom unique par compte (12/10/2026) : à vérifier d'abord qu'il n'y a pas de doublon existant
+ *   select account_id, lower(trim(name)) as n, count(*) from instruments where deleted_at is null
+ *     group by 1, 2 having count(*) > 1;
+ * puis, si la requête ne renvoie rien (les instruments supprimés, deleted_at non vide, sont ignorés) :
+ *   create unique index if not exists instruments_account_name_uniq
+ *     on instruments (account_id, lower(trim(name)))
+ *     where deleted_at is null;
+ */
+async function saveToSupabase(){
+  var btn = document.getElementById("btnSave");
+  var name = document.getElementById("instName").value.trim();
+
+  var oldHint = panelEl.querySelector(".savehint");
+  if(oldHint) oldHint.remove();
+
+  if(!name){
+    var errHint = document.createElement("p");
+    errHint.className = "savehint";
+    errHint.style.color = "var(--alert)";
+    errHint.textContent = tx("Donnez un nom à l'instrument avant de l'enregistrer.");
+    panelEl.appendChild(errHint);
+    document.getElementById("instName").focus();
+    return;
+  }
+
+  var invalid = invalidEntries();
+  if(invalid.length){
+    var invHint = document.createElement("p");
+    invHint.className = "savehint";
+    invHint.style.color = "var(--alert)";
+    invHint.textContent = tx("À corriger avant d'enregistrer : {list}.", { list: invalid.join(" ; ") });
+    panelEl.appendChild(invHint);
+    return;
+  }
+  // Brouillon : enregistré quand même, avec la liste de ce qui manque. Les
+  // deux clés commencent par « _ » : ce ne sont pas des saisies.
+  var missing = missingRequired();
+  state.values._draft = missing.length > 0;
+  state.values._missing = missing;
+  state.values._pct = overallPct(); // avancement affiché sur la carte de « Mes objets"
+
+  btn.disabled = true;
+  var hint = document.createElement("p");
+  hint.className = "savehint";
+  hint.textContent = tx("Enregistrement…");
+  panelEl.appendChild(hint);
+
+  var session = await requireAuth();
+  if(!session) return; // requireAuth a déjà redirigé vers login.html
+
+  // 12/10/2026 : deux instruments d'un même compte ne peuvent pas porter le même nom (majuscules et espaces
+  // autour ignorés). L'instrument en cours de modification est exclu, pour pouvoir le réenregistrer tel quel.
+  // Le vrai garde-fou est l'index unique en base (cf. le SQL ci-dessous) ; ce contrôle donne le message clair.
+  var DUP_NAME_MSG = "Un instrument porte déjà ce nom. Choisissez-en un autre.";
+  var sameName = await supabaseClient.from("instruments").select("id,name").eq("account_id", session.user.id).is("deleted_at", null);
+  if(!sameName.error && (sameName.data || []).some(function(r){
+    return r.id !== state.instrumentId && String(r.name || "").trim().toLowerCase() === name.toLowerCase();
+  })){
+    btn.disabled = false;
+    hint.style.color = "var(--alert)";
+    hint.textContent = tx(DUP_NAME_MSG);
+    document.getElementById("instName").focus();
+    return;
+  }
+
+  var row = { name: name, config: state.values, updated_at: new Date().toISOString() };
+
+  var result;
+  if(state.instrumentId){
+    result = await supabaseClient
+      .from("instruments")
+      .update(row)
+      .eq("id", state.instrumentId)
+      .select()
+      .single();
+  } else {
+    row.account_id = session.user.id;
+    result = await supabaseClient
+      .from("instruments")
+      .insert(row)
+      .select()
+      .single();
+  }
+
+  btn.disabled = false;
+
+  if(result.error){
+    hint.style.color = "var(--alert)";
+    // Cas particulier : limite de 20 instruments par compte (cf. trigger
+    // Postgres check_instrument_limit — même convention de message que la
+    // limite de 20 résultats sauvegardés côté simulations.html) — affiché
+    // tel quel, sans le préfixe générique, pour rester une info actionnable.
+    // 23505 = violation de l'index unique sur (compte, nom) : même message que le contrôle ci-dessus.
+    hint.textContent = result.error.code === "23505"
+      ? tx(DUP_NAME_MSG)
+      : result.error.message.indexOf("Limite de") === 0
+        ? txq(result.error.message)   // message du déclencheur de la base, traduit s'il est connu
+        : tx("Échec de l'enregistrement : {msg}", { msg: result.error.message });
+    return;
+  }
+
+  // Premier enregistrement d'un nouvel instrument : on retient son id
+  // (les sauvegardes suivantes deviennent des mises à jour, pas de
+  // nouvelles lignes) et on reflète ça dans l'URL sans recharger la page.
+  if(!state.instrumentId && result.data){
+    state.instrumentId = result.data.id;
+    var newUrl = window.location.pathname + "?id=" + result.data.id;
+    window.history.replaceState(null, "", newUrl);
+  }
+
+  markSaved(); // l'état enregistré devient la référence
+
+  // 04/10/2026 — après un enregistrement réussi, retour au menu principal
+  // (« Mes objets »). Exception : instrument complet créé depuis la page
+  // Simulations (returnTarget), qui y retourne comme avant. Pour un
+  // brouillon, le message qui liste ce qui manque reste affiché 3 secondes
+  // avant le retour, sinon il ne serait jamais lu.
+  if(missing.length){
+    hint.style.color = "var(--photon)";
+    hint.textContent = tx("Enregistré comme brouillon. Il manque : {list}.", { list: missing.map(tField).join(", ") });   // « missing » reste en français dans la base
+    setTimeout(function(){ window.location.href = "espace-personnel.html"; }, 3000);
+    return;
+  }
+  hint.style.color = "var(--ok)";
+  hint.textContent = tx("Enregistré.");
+  if(returnTarget === "simulations" && result.data){
+    window.location.href = "simulations.html?newInstrument=" + result.data.id;
+    return;
+  }
+  window.location.href = "espace-personnel.html";
+}
+
+function updateProgress(){
+  var pct = overallPct();
+  document.getElementById("pctLabel").textContent = pct + " %";
+  document.getElementById("pctFill").style.width = pct + "%";
+  var exp = document.getElementById("btnExport");
+  if(exp) exp.hidden = !hasAnyEntry();
+}
+
+// ===================== Modifications non enregistrées (04/10/2026) =====================
+// Rien n'est sauvegardé avant le clic sur « Enregistrer ». On garde une
+// photo de l'état au chargement et après chaque enregistrement ; si l'état
+// courant en diffère quand on quitte la page (fermeture d'onglet,
+// rechargement, clic sur « Mes objets »…), le navigateur demande
+// confirmation. Le texte de ce message est imposé par le navigateur.
+var savedSnapshot = null;
+function currentSnapshot(){
+  return JSON.stringify({ name: document.getElementById("instName").value, values: state.values });
+}
+function markSaved(){ savedSnapshot = currentSnapshot(); }
+function isDirty(){ return savedSnapshot !== null && currentSnapshot() !== savedSnapshot; }
+window.addEventListener("beforeunload", function(e){
+  if(!isDirty()) return;
+  e.preventDefault();
+  e.returnValue = "";
+});
+
+// ===================== Export de la configuration (04/10/2026) =====================
+// Au moins une saisie : un champ rempli, un point de courbe ou un cas WFE.
+function hasAnyEntry(){
+  return Object.keys(state.values).some(function(k){
+    if(k.charAt(0) === "_") return false; // clés internes (_draft, _missing)
+    var v = state.values[k];
+    if(Array.isArray(v)) return v.length > 0;
+    return v !== undefined && v !== null && v !== "";
+  });
+}
+// Construit un fichier au FORMAT DU PARAMFILE (mêmes blocs Telescope /
+// Detector, mêmes clés et mêmes unités SI que le backend), pour qu'il soit
+// relisible par « Charger une configuration ». Seuls les champs saisis sont
+// écrits. Ce que le paramFile ne sait pas porter (nom, WFE RMS, cas WFE,
+// mode « pleine échelle ») va dans un bloc "Formulaire".
+function buildExport(){
+  var v = state.values;
+  function has(k){ return isFilled(k); }
+  function num(k){ return Number(v[k]); }
+  function clean(x){ return Number(Number(x).toPrecision(12)); } // évite 2.0000000000000003e-6
+  var tel = {}, det = {}, form = {};
+
+  if(has("D")) tel.D = num("D");
+  if(has("I")) tel.iFoV = clean(num("I") * 1e-6);                       // µrad -> rad
+  if(has("E")) tel.central_obscuration = num("E");
+  if(num("E") > 0 && has("NSUP")) tel.n_supports = num("NSUP");
+  if(num("E") > 0 && has("ESUP")) tel.support_width = num("ESUP");
+  var tCurve = exportCurve("T");
+  if(tCurve) tel.T_opt_spectral = tCurve;
+
+  if(has("PX")) det.pixel_pitch = clean(num("PX") * 1e-6);              // µm -> m
+  var qeCurve = exportCurve("QE");
+  if(qeCurve) det.QE_spectral = qeCurve;
+  if(has("T_filter")) det.T_filter = num("T_filter");
+  if(has("FW")) det.full_well = num("FW");
+  if(has("R")) det.read_noise = num("R");
+  if(has("K")) det.dark_current = num("K");
+  if(has("P")) det.prnu_sigma = clean(num("P") / 100);                  // % -> fraction
+  if(has("dsnu_1288")) det.dsnu_1288 = num("dsnu_1288");
+  if(has("dsnu_T_ref")) det.dsnu_T_ref = num("dsnu_T_ref");
+  if(has("ADC")) det.bits = num("ADC");
+  if(v.electronics_mode === "detailed"){
+    if(has("CVF_uV_per_e")) det.CVF_uV_per_e = num("CVF_uV_per_e");
+    if(has("G_PGA")) det.G_PGA = num("G_PGA");
+    if(has("V_range")) det.V_range = num("V_range");
+  } else if(v.electronics_mode === "datasheet"){
+    if(has("CWF")) det.CWF = num("CWF");
+  }
+  if(has("DN0")) det.DN0 = num("DN0");
+  if(has("bits_TDI")) det.bits_TDI = num("bits_TDI");
+
+  var name = document.getElementById("instName").value.trim();
+  if(name) form.name = name;
+  if(v.electronics_mode) form.electronics_mode = v.electronics_mode;
+  if(has("W")) form.WFE_RMS_nm = num("W");
+  if((v.wfeCases || []).length) form.wfeCases = v.wfeCases;
+
+  var out = {};
+  if(Object.keys(form).length) out.Formulaire = form;
+  if(Object.keys(tel).length) out.Telescope = tel;
+  if(Object.keys(det).length) out.Detector = det;
+  return out;
+}
+// Courbe {wavelength_nm, values} d'un champ spectral : les points saisis en
+// mode « Courbe », une courbe plate en mode « Valeur constante » (même
+// convention que l'envoi dans simulations.html), ou null si rien n'est saisi.
+function exportCurve(fieldKey){
+  var lock = SPECTRAL_LOCKS[fieldKey];
+  if(spectralActive(fieldKey)){
+    var pts = curveStatus(state.values[lock.arr], lock.key).valid.sort(function(a,b){ return a.wl - b.wl; });
+    if(pts.length < 2) return null;
+    return { wavelength_nm: pts.map(function(p){ return p.wl; }), values: pts.map(function(p){ return p.qe; }) };
+  }
+  if(!isFilled(fieldKey)) return null;
+  var c = Number(state.values[fieldKey]);
+  return { wavelength_nm: [300, 1100], values: [c, c] };
+}
+document.getElementById("btnExport").addEventListener("click", function(){
+  var name = document.getElementById("instName").value.trim();
+  var slug = (name || "instrument").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "instrument";
+  var blob = new Blob([JSON.stringify(buildExport(), null, 2)], { type: "application/json" });
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = slug + ".json";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+});
+// Relecture d'une courbe {wavelength_nm, values} à l'import : valeurs toutes
+// égales -> mode « Valeur constante » ; sinon -> mode « Courbe » avec ses points.
+function importCurve(fieldKey, curve){
+  var lock = SPECTRAL_LOCKS[fieldKey];
+  var vals = (curve && curve.values) || [], wls = (curve && curve.wavelength_nm) || [];
+  if(!vals.length) return;
+  var flat = vals.every(function(x){ return x === vals[0]; });
+  if(flat || wls.length !== vals.length){
+    state.values[fieldKey] = flat ? vals[0] : vals.reduce(function(a,b){ return a+b; }, 0) / vals.length;
+    state.values[lock.mode] = "constant";
+  } else {
+    state.values[lock.arr] = vals.map(function(x, i){ var p = { wl: String(wls[i]) }; p[lock.key] = String(x); return p; });
+    state.values[lock.mode] = "curve";
+  }
+}
+
+document.getElementById("btnFile").addEventListener("click", function(){
+  document.getElementById("fileInput").click();
+});
+document.getElementById("fileInput").addEventListener("change", function(e){
+  var file = e.target.files[0];
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(){
+    try{
+      var data = JSON.parse(reader.result);
+
+      // 04/10/2026 — le fichier REMPLACE la saisie en cours au lieu de s'y
+      // ajouter (avant, charger un second fichier mélangeait deux
+      // instruments). Confirmation si le formulaire contient déjà quelque
+      // chose. L'instrument ouvert reste le même : seul son contenu change.
+      if(hasAnyEntry() && !confirm(tx("Charger ce fichier remplace toute la saisie en cours. Continuer ?"))) return;
+      state.values = {};
+
+      // Format réel du paramFile EO_Toolbox (imbriqué, Telescope/Detector/...)
+      // — même structure que produit paramfile_builder.py côté serveur.
+      // Chaque champ est optionnel : un paramFile partiel ne casse pas
+      // l'import, il remplit juste ce qu'il peut.
+      if(data.Telescope || data.Detector || data.Formulaire){
+        var tel = data.Telescope || {};
+        var det = data.Detector || {};
+
+        if(tel.D != null) state.values.D = tel.D;
+        if(tel.iFoV != null) state.values.I = tel.iFoV * 1e6;               // rad -> µrad
+        if(tel.central_obscuration != null) state.values.E = tel.central_obscuration;
+        if(tel.n_supports != null) state.values.NSUP = tel.n_supports;
+        if(tel.support_width != null) state.values.ESUP = tel.support_width;
+        // Courbe plate -> valeur constante ; sinon -> mode courbe (04/10/2026).
+        importCurve("T", tel.T_opt_spectral);
+        // W (WFE RMS) : pas de champ scalaire direct dans un paramFile — le
+        // front d'onde y est décrit par des coefficients de Zernike (CSV
+        // séparé), pas importé ici. Laissé tel quel (vide ou valeur déjà
+        // saisie), à renseigner manuellement si besoin.
+
+        if(det.pixel_pitch != null) state.values.PX = det.pixel_pitch * 1e6; // m -> µm
+        if(det.read_noise != null) state.values.R = det.read_noise;
+        if(det.prnu_sigma != null) state.values.P = det.prnu_sigma * 100;    // fraction -> %
+        if(det.dark_current != null) state.values.K = det.dark_current;
+        if(det.full_well != null) state.values.FW = det.full_well;
+        if(det.bits != null) state.values.ADC = det.bits;
+        // QE en fraction (0-1), comme le champ du formulaire.
+        importCurve("QE", det.QE_spectral);
+        if(det.T_filter != null) state.values.T_filter = det.T_filter;
+        if(det.dsnu_1288 != null) state.values.dsnu_1288 = det.dsnu_1288;
+        if(det.dsnu_T_ref != null) state.values.dsnu_T_ref = det.dsnu_T_ref;
+        if(det.DN0 != null) state.values.DN0 = det.DN0;
+        if(det.bits_TDI != null) state.values.bits_TDI = det.bits_TDI;
+        // Mode d'électronique déduit des clés présentes ; sans aucune clé,
+        // on ne suppose rien : le mode reste à choisir.
+        if(det.CVF_uV_per_e != null || det.V_range != null){
+          state.values.electronics_mode = "detailed";
+          if(det.CVF_uV_per_e != null) state.values.CVF_uV_per_e = det.CVF_uV_per_e;
+          if(det.G_PGA != null) state.values.G_PGA = det.G_PGA;
+          if(det.V_range != null) state.values.V_range = det.V_range;
+        } else if(det.CWF != null || det.LSB != null){
+          state.values.electronics_mode = "datasheet";
+          state.values.CWF = det.CWF != null ? det.CWF : 1 / det.LSB;
+        }
+        // Bloc "Formulaire" d'un fichier exporté d'ici : ce que le paramFile
+        // ne porte pas (nom, WFE RMS, cas WFE, mode « pleine échelle »).
+        var form = data.Formulaire || {};
+        if(form.name) document.getElementById("instName").value = form.name;
+        if(form.electronics_mode) state.values.electronics_mode = form.electronics_mode;
+        if(form.WFE_RMS_nm != null) state.values.W = form.WFE_RMS_nm;
+        if(Array.isArray(form.wfeCases)) state.values.wfeCases = form.wfeCases;
+      } else {
+        // Ancien format "plat" (clés directement D/I/E/T/W/PX/R/P/K/FW/QE/ADC)
+        // — gardé pour compatibilité si un tel fichier existe déjà quelque part.
+        Object.keys(data).forEach(function(k){ state.values[k] = data[k]; });
+      }
+
+      persist();
+      updateProgress(); renderChain(); renderPanel();
+    }catch(err){
+      alert(tx("Fichier illisible : JSON attendu."));
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = ""; // permet de recharger le même fichier ensuite
+});
+
+// ===================== Mode invité (16/10/2026) : lecture seule =====================
+// L'invité voit l'exemple en entier (navigation, aide, export), mais rien ne se modifie : champs
+// désactivés, boutons de modification grisés (info-bulle au survol, fenêtre d'invitation au clic).
+function setupGuestReadOnly(){
+  var overlay = document.getElementById("guestOverlay");
+  var tip = document.getElementById("guestTip");
+  var lastFocus = null;
+  function openInvite(){
+    lastFocus = document.activeElement;
+    tip.hidden = true;
+    overlay.classList.add("open");
+    document.getElementById("guestGoBtn").focus();
+  }
+  function closeInvite(){
+    overlay.classList.remove("open");
+    if(lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  document.getElementById("guestCloseBtn").addEventListener("click", closeInvite);
+  document.getElementById("guestLaterBtn").addEventListener("click", closeInvite);
+  overlay.addEventListener("click", function(e){ if(e.target === overlay) closeInvite(); });
+  document.addEventListener("keydown", function(e){
+    if(!overlay.classList.contains("open")) return;
+    if(e.key === "Escape"){ e.stopPropagation(); closeInvite(); return; }
+    if(e.key === "Tab"){
+      var f = [document.getElementById("guestCloseBtn"), document.getElementById("guestLaterBtn"), document.getElementById("guestGoBtn")];
+      var i = f.indexOf(document.activeElement);
+      e.preventDefault();
+      f[(i + (e.shiftKey ? f.length - 1 : 1)) % f.length].focus();
+    }
+  }, true);
+
+  function showTip(el){
+    tip.textContent = el.getAttribute("data-guest-tip");
+    tip.hidden = false;
+    var r = el.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+    var x = Math.max(8, Math.min(window.innerWidth - w - 8, r.left + r.width / 2 - w / 2));
+    var y = r.bottom + 8;
+    if(y + h > window.innerHeight - 8) y = Math.max(8, r.top - h - 8);
+    tip.style.left = x + "px"; tip.style.top = y + "px";
+  }
+  function tipTarget(e){ return e.target.closest && e.target.closest("[data-guest-tip]"); }
+  document.addEventListener("mouseover", function(e){ var el = tipTarget(e); if(el) showTip(el); else tip.hidden = true; });
+  document.addEventListener("focusin", function(e){ var el = tipTarget(e); if(el) showTip(el); else tip.hidden = true; });
+  document.addEventListener("focusout", function(){ tip.hidden = true; });
+  window.addEventListener("scroll", function(){ tip.hidden = true; }, true);
+
+  var panel = document.getElementById("fieldPanel");
+  function lock(el){
+    el.classList.add("guestlock");
+    el.setAttribute("aria-disabled", "true");
+    el.setAttribute("data-guest-tip", t("guest.tip"));
+  }
+  // Appelée après chaque rendu du panneau (le contenu est réécrit en entier).
+  function freeze(){
+    document.getElementById("instName").disabled = true;
+    document.getElementById("fileInput").disabled = true;
+    lock(document.getElementById("btnFile"));
+    panel.querySelectorAll("input, select, textarea").forEach(function(el){ el.disabled = true; });
+    panel.querySelectorAll("button").forEach(function(b){
+      if(b.id === "btnNext" || b.classList.contains("helpbtn")) return; // navigation et aide restent actives
+      lock(b);
+    });
+  }
+  // Un clic sur un bouton grisé ouvre l'invitation et ne fait rien d'autre.
+  document.addEventListener("click", function(e){
+    var el = e.target.closest && e.target.closest(".guestlock");
+    if(!el) return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    openInvite();
+  }, true);
+  new MutationObserver(freeze).observe(panel, { childList: true, subtree: true });
+  freeze();
+}
+
+(async function(){
+  var session = await requireAuth();
+  if(!session) return; // requireAuth a déjà redirigé vers login.html
+
+  // Invité : cette page ne sert qu'à voir l'exemple ; sans ?id=, rien à montrer (la création est réservée aux comptes).
+  if(session.guest && !new URLSearchParams(window.location.search).get("id")){
+    window.location.href = "espace-personnel.html";
+    return;
+  }
+
+  await loadInstrument(); // no-op si pas de ?id= dans l'URL (création)
+  markSaved(); // référence pour détecter les modifications non enregistrées
+  updateProgress();
+  renderSchema();
+  renderChain();
+  renderPanel();
+  if(session.guest) setupGuestReadOnly();
+})();
+</script>
+<script src="aide.js"></script>
+</body>
+</html>

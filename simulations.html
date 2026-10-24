@@ -1,0 +1,2526 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-i18n="sim.doc_title">Nouvelle simulation | Nysa</title>
+<!-- Traduction FR / EN : textes et moteur dans i18n.js -->
+<script src="i18n.js"></script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2048%2048%22%3E%3Ccircle%20cx%3D%2224.00%22%20cy%3D%2213.70%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2232.92%22%20cy%3D%2218.85%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2232.92%22%20cy%3D%2229.15%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2224.00%22%20cy%3D%2234.30%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2215.08%22%20cy%3D%2229.15%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2215.08%22%20cy%3D%2218.85%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2224%22%20cy%3D%2224%22%20r%3D%225.3%22%20fill%3D%22%23FFB86B%22/%3E%3C/svg%3E">
+<!-- Polices hébergées avec le site (dossier fonts/) : aucun appel à Google. -->
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+:root{
+  --void:#090E13; --panel:#131E27; --panel-2:#1A2833;
+  --line:#2E4152; --line-soft:#22323F;
+  --paper:#C4D6D4; --muted:#9BADBD; --muted-2:#8497AA;
+  --photon:#F5AC57; --pixel:#5FDCD0; --alert:#F0776D; --ok:#7FD88F;
+  --display:"Montserrat","IBM Plex Sans",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{background:var(--void);color:var(--paper);font-family:var(--body);
+  font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+button{font-family:inherit}
+
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{flex:none;width:220px;background:var(--panel);border-right:1px solid var(--line-soft);
+  display:flex;flex-direction:column;padding:16px 14px;overflow-y:auto}
+/* 05/10/2026 — logo en disposition centrée (variante 1 de la charte) : la
+   signature y est lisible, ce qu'elle n'était pas à côté du nom. */
+.brand{display:flex;flex-direction:column;align-items:center;text-align:center;gap:9px;padding:10px 8px 18px;border-bottom:1px solid var(--line-soft);
+  margin-bottom:12px}
+.brand .mark{flex:none;width:46px;height:46px;display:block}
+.brand .mark svg{width:100%;height:100%;display:block}
+.brand .name{font-family:var(--display);font-weight:500;font-size:22px;letter-spacing:.06em;line-height:1.05}
+.brand .tag{font-family:var(--display);font-weight:400;font-size:12px;letter-spacing:.13em;color:var(--muted);margin-top:5px;white-space:nowrap}
+.navlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.navlist a{display:flex;align-items:center;gap:11px;padding:8px 12px;border-radius:4px;
+  text-decoration:none;color:var(--muted);font-size:14.5px;transition:background .14s,color .14s}
+.navlist a svg{flex:none;width:18px;height:18px;opacity:.85}
+.navlist a:hover{background:var(--panel-2);color:var(--paper)}
+.navlist a.active{background:rgba(95,220,208,.10);color:var(--pixel);box-shadow:inset 2px 0 0 var(--pixel)}
+.navlist a.active svg{opacity:1}
+.navlist a.soon{cursor:default;opacity:.45;pointer-events:none}
+.sidebar-bottom{margin-top:auto;padding-top:14px;border-top:1px solid var(--line-soft)}
+
+.main{flex:1;min-width:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+.topbar{display:flex;justify-content:flex-end;align-items:center;gap:16px;flex:none;
+  padding:11px 26px;border-bottom:1px solid var(--line-soft)}
+.iconbtn{width:34px;height:34px;border-radius:50%;border:1px solid var(--line-soft);
+  background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center;
+  cursor:pointer}
+.iconbtn:hover{border-color:var(--line);color:var(--paper)}
+.userchip{display:flex;align-items:center;gap:10px;font-family:var(--mono);
+  font-size:13px;color:var(--muted)}
+.userchip .avatar{width:30px;height:30px;border-radius:50%;background:var(--panel-2);
+  border:1px solid var(--pixel);color:var(--pixel);display:flex;align-items:center;
+  justify-content:center;font-family:var(--display);font-size:12px;font-weight:600;letter-spacing:0}
+
+.wrap{max-width:1180px;margin:0 auto;padding:20px 26px 20px;width:100%;flex:1;display:flex;flex-direction:column;min-height:0}
+
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 6px}
+h1{font-family:var(--display);font-weight:500;font-size:clamp(21px,2.4vw,27.5px);
+  line-height:1.18;margin:0 0 4px;letter-spacing:-.012em}
+.pagesub{margin:0 0 14px;color:var(--muted);font-size:13.5px}
+
+.steps{display:flex;align-items:center;margin-bottom:16px;flex:none}
+.stepitem{display:flex;align-items:center;gap:8px;flex:none}
+.step-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:12px;flex:none;border:1px solid var(--line);color:var(--muted);
+  background:var(--panel);transition:background .16s,border-color .16s,color .16s}
+.step-num.active{background:var(--pixel);color:#0A141A;border-color:var(--pixel)}
+.step-num.done{border-color:var(--pixel);color:var(--pixel)}
+.step-label{font-family:var(--mono);font-size:12px;color:var(--muted-2);white-space:nowrap}
+.step-label.active{color:var(--paper)}
+.step-line{flex:1;height:1px;background:var(--line-soft);margin:0 12px}
+.step-line.done{background:var(--pixel);opacity:.5}
+
+.wizardgrid{display:grid;grid-template-columns:1fr 280px;gap:18px;flex:1;min-height:0}
+.wizardmain{display:flex;flex-direction:column;min-height:0}
+
+.stepview{flex:1;min-height:0;display:none;flex-direction:column}
+.stepview.current{display:flex}
+
+.stepbody{background:var(--panel);border:1px solid var(--line-soft);border-radius:6px;
+  padding:18px 20px;flex:1;overflow-y:auto;min-height:0}
+.stephead{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.stephead .ttl{font-family:var(--display);font-weight:600;font-size:15px;letter-spacing:0}
+.stepintro{font-size:12.5px;color:var(--muted);margin:0 0 14px}
+/* 16/10/2026 : mode invité */
+.guestnote{font-size:12.5px;color:var(--photon);margin:-6px 0 14px}
+.acq-fields input:disabled,.acq-fields select:disabled{opacity:.6;cursor:not-allowed}
+.g-tip{position:fixed;z-index:200;max-width:260px;padding:8px 11px;border-radius:6px;background:var(--panel-2);border:1px solid var(--pixel);color:var(--paper);font-size:12.5px;line-height:1.4;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.g-tip[hidden]{display:none}
+
+
+.scenegrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.scenecard{border:2px solid var(--line-soft);border-radius:6px;overflow:hidden;cursor:pointer;
+  background:var(--panel-2);text-align:left;padding:0;transition:border-color .14s}
+.scenecard.selected{border-color:var(--pixel)}
+.scenecard .img{display:block;height:96px;position:relative;overflow:hidden;
+  background:radial-gradient(circle at 75% 20%,rgba(245,172,87,.26),transparent 55%),
+    radial-gradient(circle at 20% 80%,rgba(95,220,208,.24),transparent 55%),
+    linear-gradient(135deg,#182734 0%,#0E161E 100%)}
+.scenecard .meta{padding:9px 11px}
+.scenecard .name{font-size:12.5px;color:var(--paper);line-height:1.3;margin-bottom:5px}
+.scenecard .dims{display:flex;justify-content:space-between;align-items:center;
+  font-family:var(--mono);font-size:12px;color:var(--muted)}
+.badge{display:inline-block;font-family:var(--mono);font-size:12px;padding:2px 7px;border-radius:8px;
+  background:rgba(95,220,208,.14);color:var(--pixel);text-transform:uppercase;letter-spacing:.03em}
+
+.selectcard{display:flex;gap:14px;align-items:flex-start}
+.selectcard .thumb{width:86px;height:62px;border-radius:4px;flex:none;position:relative;overflow:hidden;
+  border:1px solid var(--line-soft);
+  background:radial-gradient(circle at 75% 20%,rgba(245,172,87,.26),transparent 55%),
+    radial-gradient(circle at 20% 80%,rgba(95,220,208,.24),transparent 55%),
+    linear-gradient(135deg,#182734 0%,#0E161E 100%)}
+.selectcard .info{flex:1;min-width:0}
+.selectcard .namerow{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.selectcard .name{font-family:var(--display);font-weight:600;font-size:14px;letter-spacing:0}
+.specs{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.6}
+
+.instoption{display:flex;gap:14px;align-items:center;width:100%;text-align:left;
+  color:var(--paper);font-family:inherit; /* 04/10/2026 : sans couleur, un <button> prend le noir du navigateur */
+  background:var(--panel-2);border:2px solid var(--line-soft);border-radius:6px;
+  padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:border-color .14s}
+.instoption.selected{border-color:var(--pixel)}
+/* 04/10/2026 — instrument enregistré incomplet : tagué, non sélectionnable */
+.instoption.draft{border-style:dashed}
+.instoption.draft .name{color:var(--muted)}
+.instoption .draftbadge{font-family:var(--mono);font-size:12px;color:var(--photon);
+  border:1px solid var(--photon);border-radius:3px;padding:1px 6px;line-height:1.3;white-space:nowrap}
+.instoption .nameline{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px}
+.instoption .nameline .exbadge{margin-left:0}
+.instoption .draftgo{margin-left:auto;flex:none;font-family:var(--mono);font-size:12px;color:var(--photon)}
+.instoption .thumb{width:44px;height:44px;border-radius:4px;flex:none;
+  background:linear-gradient(135deg,#182734 0%,#0E161E 100%);border:1px solid var(--line-soft)}
+.instoption .name{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:0}
+.instoption .meta{font-family:var(--mono);font-size:12px;color:var(--muted-2);margin-top:2px}
+.instoption .check{margin-left:auto;flex:none;color:var(--pixel);opacity:0}
+.instoption.selected .check{opacity:1}
+.empty-inst{font-size:13px;color:var(--muted);padding:20px 0;display:flex;flex-direction:column;gap:14px}
+.empty-inst a.nextbtn{display:block;text-align:center;text-decoration:none;box-sizing:border-box}
+
+.fieldsgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px 22px}
+.acq-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(300px,.8fr);gap:18px;align-items:stretch}
+.acq-illustration{background:var(--void);border:1px solid var(--line-soft);border-radius:6px;min-height:330px;overflow:hidden}
+.acq-illustration svg{width:100%;height:100%;display:block}
+.acq-fields{display:grid;grid-template-columns:1fr 1fr;gap:16px 22px;align-content:start}
+.acq-advanced{grid-column:1/-1;border-top:1px solid var(--line-soft);padding-top:12px}
+.acq-advanced summary{cursor:pointer;font-size:12px;color:var(--muted);margin-bottom:14px}
+.field .soon{font-size:12px;color:var(--muted-2);margin-left:6px}
+.field input:disabled{opacity:.45;cursor:not-allowed}
+@media (max-width:900px){.acq-layout{grid-template-columns:1fr}.acq-illustration{min-height:280px}}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+.field select,.field input{width:100%;box-sizing:border-box;background:var(--panel-2);
+  border:1px solid var(--line-soft);color:var(--paper);border-radius:5px;padding:8px 11px;
+  font-family:var(--body);font-size:13px;appearance:none}
+.field .row{display:flex;gap:9px;align-items:center}
+.field .row input{flex:1}
+.field .unit{font-family:var(--mono);font-size:12px;color:var(--muted-2);flex:none;min-width:26px}
+
+.backlink{color:var(--muted);font-family:var(--mono);font-size:12.5px;background:none;border:none;
+  cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:7px;padding:9px 0;
+  margin-top:10px;flex:none}
+.backlink:hover{color:var(--paper)}
+
+.summarypanel{background:var(--panel);border:1px solid var(--line-soft);border-radius:6px;
+  padding:18px 18px;display:flex;flex-direction:column;overflow-y:auto}
+.summarypanel h2{font-family:var(--display);font-weight:600;font-size:13px;
+  margin:0 0 14px;letter-spacing:0}
+.sumsection{padding:11px 0;border-bottom:1px solid var(--line-soft)}
+.sumsection:last-of-type{border-bottom:none}
+.sumsection .lbl{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:8px}
+.sumsection .empty{color:var(--muted-2);font-size:12.5px}
+.sumfilled{display:flex;gap:10px;align-items:center}
+.sumfilled .mini{width:44px;height:32px;border-radius:3px;flex:none;
+  background:radial-gradient(circle at 75% 20%,rgba(245,172,87,.26),transparent 55%),
+    radial-gradient(circle at 20% 80%,rgba(95,220,208,.24),transparent 55%),
+    linear-gradient(135deg,#182734 0%,#0E161E 100%)}
+.sumfilled .txt .t1{font-size:12.5px;color:var(--paper);line-height:1.3}
+.sumfilled .txt .t2{font-family:var(--mono);font-size:12px;color:var(--muted-2);margin-top:2px}
+.sumlines{font-family:var(--mono);font-size:12px;color:var(--muted);line-height:1.9}
+
+.panelbtn{margin-top:auto;padding-top:14px}
+.quotanote{margin:10px 0 0;font-family:var(--mono);font-size:12px;color:var(--muted-2)}
+.quotanote[hidden]{display:none}
+.quotanote .qrow{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.quotanote .qval{color:var(--paper);white-space:nowrap}
+.quotanote .qbar{height:4px;margin-top:6px;border-radius:2px;background:var(--line-soft);overflow:hidden}
+.quotanote .qfill{display:block;height:100%;width:0;background:var(--pixel);border-radius:2px;transition:width .3s}
+.quotanote.warn .qfill{background:var(--photon)}
+.quotanote.full .qfill,.quotanote.full .qval{background:var(--alert)}
+.quotanote.full .qval{background:none;color:var(--alert)}
+.quotanote .qfull{margin:6px 0 0;color:var(--alert);line-height:1.4}
+.nextbtn,.launchbtn{width:100%;border:1px solid var(--pixel);background:var(--pixel);color:#0A141A;
+  font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.03em;
+  padding:11px 18px;border-radius:5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 2px 10px rgba(95,220,208,.22);transition:background .14s}
+.nextbtn:hover,.launchbtn:hover{background:#7CE8DC}
+/* 07/10/2026 — un bouton désactivé doit se voir : avant, il gardait l'apparence d'un bouton actif */
+.nextbtn:disabled,.launchbtn:disabled{opacity:.38;cursor:not-allowed;box-shadow:none}
+.nextbtn:disabled:hover,.launchbtn:disabled:hover{background:var(--pixel)}
+
+.finalgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;flex:1;min-height:0}
+.summarybox,.statuspanel{background:var(--panel);border:1px solid var(--line-soft);border-radius:6px;
+  padding:18px 20px;display:flex;flex-direction:column;overflow-y:auto}
+.summarybox .grouphead,.statuspanel .stathead{font-family:var(--mono);font-size:12px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 12px;
+  display:flex;align-items:center;gap:8px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--pixel);flex:none}
+.sumrow{display:flex;justify-content:space-between;gap:12px;padding:9px 0;
+  border-bottom:1px solid var(--line-soft);font-size:12.5px}
+.sumrow:last-child{border-bottom:none}
+.sumrow .k{color:var(--muted)}
+.sumrow .v{color:var(--paper);text-align:right;font-family:var(--mono);font-size:12px}
+
+.stathead .pulse{width:7px;height:7px;border-radius:50%;background:var(--pixel);flex:none;
+  animation:pulse 1.8s infinite}
+.stathead .pulse.ok{background:var(--ok);animation:none}
+.stathead .pulse.alert{background:var(--alert);animation:none}
+.stathead .pulse.muted{background:var(--muted-2);animation:none}
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(95,220,208,.5)}
+  70%{box-shadow:0 0 0 7px rgba(95,220,208,0)}
+  100%{box-shadow:0 0 0 0 rgba(95,220,208,0)}
+}
+.interruptbtn{display:none;margin-left:auto;background:transparent;border:1px solid var(--alert);
+  color:var(--alert);font-family:var(--mono);font-size:12px;letter-spacing:.03em;
+  padding:5px 10px;border-radius:4px;cursor:pointer;transition:background .14s;flex:none}
+.interruptbtn:hover{background:rgba(240,119,109,.12)}
+.progresswrap{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.ptrack{flex:1;height:5px;background:var(--line-soft);border-radius:3px;overflow:hidden}
+.pfill{height:100%;background:var(--pixel);width:0%;transition:width .5s linear}
+/* 06/10/2026 — pendant le calcul, la barre défile en continu, comme sur la
+   démo. Le calcul est synchrone : le serveur ne donne aucun pourcentage
+   avant la fin, donc une barre figée à 30 % laissait croire à un blocage. */
+.pfill.running{width:40% !important;border-radius:3px;transition:none;
+  background:linear-gradient(90deg,transparent,var(--pixel),transparent);
+  animation:pfill-sweep 1.4s ease-in-out infinite}
+@keyframes pfill-sweep{
+  0%{transform:translateX(-120%)}
+  100%{transform:translateX(320%)}
+}
+@media (prefers-reduced-motion:reduce){
+  .pfill.running{animation:none;width:100% !important;opacity:.45}
+}
+.ppct{font-family:var(--mono);font-size:12px;color:var(--pixel);flex:none;width:36px;text-align:right}
+.etarow{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:12px;
+  color:var(--muted);margin-bottom:12px}
+.etarow svg{width:13px;height:13px;flex:none;opacity:.8}
+
+.loglist{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:1px;min-height:0}
+.logline{display:flex;gap:9px;font-family:var(--mono);font-size:12px;padding:4px 0}
+.logline .time{color:var(--muted-2);flex:none;width:42px}
+.logline .ldot{width:5px;height:5px;border-radius:50%;background:var(--pixel);flex:none;
+  margin-top:5px;opacity:.8}
+.logline .msg{color:var(--muted)}
+
+.statusactions{flex:none;padding-top:12px;margin-top:10px;border-top:1px solid var(--line-soft);
+  display:flex;flex-direction:column;gap:8px}
+.statusactions .savingnote{font-family:var(--mono);font-size:12px;color:var(--muted-2);margin:0}
+.viewresultsbtn{width:100%;box-sizing:border-box;border:1px solid var(--ok);background:var(--ok);
+  color:#0A1F13;font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.03em;
+  padding:11px 18px;border-radius:5px;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;gap:8px;text-decoration:none;transition:background .14s}
+.viewresultsbtn:hover{background:#94E2A2}
+.retrybtn{width:100%;border:1px solid var(--line);background:transparent;color:var(--paper);
+  font-family:var(--mono);font-size:12px;padding:9px 16px;border-radius:5px;cursor:pointer}
+.retrybtn:hover{border-color:var(--pixel);color:var(--pixel)}
+
+@media(max-width:980px){
+  .wizardgrid{grid-template-columns:1fr}
+  .scenegrid{grid-template-columns:repeat(2,1fr)}
+  .finalgrid{grid-template-columns:1fr}
+}
+
+/* ===================== Modal Paramètres ===================== */
+.modal-overlay{position:fixed;inset:0;background:rgba(5,8,11,.72);backdrop-filter:blur(2px);
+  display:none;align-items:center;justify-content:center;z-index:100;padding:24px}
+.modal-overlay.open{display:flex}
+/* 04/10/2026 — incitation à l'abonnement (compte sans accès au simulateur) */
+.paywall{width:100%;max-width:470px;background:var(--panel);border:1px solid var(--photon);
+  border-radius:12px;padding:30px 30px 24px;box-shadow:0 18px 60px rgba(0,0,0,.55);position:relative}
+.paywall .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--photon)}
+.paywall h2{font-family:var(--display);font-weight:600;font-size:24px;line-height:1.15;
+  margin:8px 0 12px;color:var(--paper);letter-spacing:0}
+.paywall p{font-size:14px;line-height:1.55;color:var(--muted);margin:0 0 16px}
+.paywall p b{font-weight:500;color:var(--paper)}
+.paywall ul{list-style:none;margin:0 0 20px;padding:0;display:flex;flex-direction:column;gap:9px}
+.paywall li{display:flex;gap:10px;font-size:13.5px;line-height:1.45;color:var(--paper)}
+.paywall li::before{content:"✓";color:var(--pixel);flex:none;font-weight:600}
+.paywall .cta{width:100%;border:1px solid var(--photon);background:var(--photon);color:#0B1116;
+  font-family:var(--mono);font-size:13.5px;font-weight:600;letter-spacing:.02em;padding:13px 18px;
+  border-radius:6px;cursor:pointer;transition:background .14s}
+.paywall .cta:hover{background:#FFBE72}
+.paywall .cta:disabled{opacity:.6;cursor:default}
+.paywall .later{display:block;width:100%;background:none;border:none;color:var(--muted-2);
+  font-family:var(--body);font-size:12.5px;padding:12px 0 0;cursor:pointer}
+.paywall .later:hover{color:var(--paper)}
+.paywall .perr{font-size:12.5px;color:var(--alert);margin:10px 0 0;text-align:center}
+.paybanner{display:none;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  background:rgba(245,172,87,.09);border:1px solid rgba(245,172,87,.45);border-radius:8px;
+  padding:11px 16px;margin:0 0 18px;font-size:13.5px;color:var(--paper)}
+.paybanner.show{display:flex}
+.paybanner button{flex:none;border:1px solid var(--photon);background:var(--photon);color:#0B1116;
+  font-family:var(--mono);font-size:12px;font-weight:600;padding:8px 14px;border-radius:5px;cursor:pointer}
+.paybanner button:hover{background:#FFBE72}
+.modal{width:100%;max-width:820px;height:min(640px,88vh);background:var(--panel);
+  border:1px solid var(--line-soft);border-radius:10px;display:flex;flex-direction:column;overflow:hidden}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;
+  border-bottom:1px solid var(--line-soft);flex:none}
+.modal-head .htitle{display:flex;align-items:center;gap:11px}
+.modal-head .hicon{width:30px;height:30px;border-radius:7px;background:var(--panel-2);
+  border:1px solid var(--line-soft);color:var(--pixel);display:flex;align-items:center;justify-content:center;flex:none}
+.modal-head .hicon svg{width:16px;height:16px}
+.modal-head h2{font-family:var(--display);font-weight:600;font-size:16.5px;
+  margin:0;letter-spacing:0}
+.modal-close{background:transparent;border:none;color:var(--muted);font-size:19px;cursor:pointer;
+  line-height:1;padding:4px 6px;border-radius:4px}
+.modal-close:hover{color:var(--paper);background:var(--panel-2)}
+
+.modal-shell{flex:1;min-height:0;display:flex}
+.modal-rail{flex:none;width:190px;border-right:1px solid var(--line-soft);padding:14px 10px;
+  display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+.railbtn{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:6px;
+  background:transparent;border:none;color:var(--muted);font-family:var(--body);font-size:13.5px;
+  cursor:pointer;text-align:left;transition:background .14s,color .14s}
+.railbtn svg{flex:none;width:16px;height:16px;opacity:.85}
+.railbtn:hover{background:var(--panel-2);color:var(--paper)}
+.railbtn.active{background:rgba(95,220,208,.10);color:var(--pixel);box-shadow:inset 2px 0 0 var(--pixel)}
+.railbtn.active svg{opacity:1}
+
+.modal-content{flex:1;min-width:0;overflow-y:auto;padding:20px 22px 26px;
+  display:flex;flex-direction:column;gap:18px}
+
+.msection{background:var(--panel-2);border:1px solid var(--line-soft);border-radius:8px;
+  padding:16px 18px;scroll-margin-top:8px}
+.msection-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}
+.msection-head .htxt{display:flex;gap:11px;align-items:flex-start}
+.msection-head .sicon{width:32px;height:32px;border-radius:7px;background:var(--panel);
+  border:1px solid var(--line-soft);color:var(--pixel);display:flex;align-items:center;justify-content:center;flex:none}
+.msection-head .sicon svg{width:16px;height:16px}
+.msection-head h3{font-family:var(--display);font-weight:600;font-size:13.5px;
+  margin:0 0 2px;letter-spacing:0}
+.msection-head p{margin:0;font-size:12px;color:var(--muted);line-height:1.4}
+
+.msection-body{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line-soft)}
+.minfo-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;gap:12px;
+  padding:11px 0;border-bottom:1px solid var(--line-soft)}
+.minfo-row:last-child{border-bottom:none}
+.minfo-row .label{color:var(--muted)}
+.minfo-row .value{font-family:var(--mono);color:var(--paper);text-align:right}
+
+.planbadge{font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;
+  padding:3px 9px;border-radius:5px;background:var(--pixel);color:#0A1F1C;flex:none;font-weight:600}
+.planbadge.team{background:var(--photon);color:#2E1B04}
+
+.planrow{display:flex;align-items:center;gap:12px;padding:13px 0;flex-wrap:wrap}
+.planrow .ptxt{flex:1;min-width:160px}
+.planrow .ptxt .t1{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:0}
+.planrow .ptxt .t2{font-size:12px;color:var(--muted);margin-top:2px}
+.planrow .pstatus{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12px;
+  color:var(--ok);flex:none}
+.planrow .pstatus .sdot{width:6px;height:6px;border-radius:50%;background:var(--ok);flex:none}
+.planrow .pstatus.pending{color:var(--muted-2)}
+.planrow .pstatus.pending .sdot{background:var(--muted-2)}
+
+.msection-actions{display:flex;flex-direction:column;gap:8px;padding-top:14px;border-top:1px solid var(--line-soft);margin-top:2px}
+.mform-group{display:flex;flex-direction:column;gap:5px;padding:9px 0}
+.mform-group label{font-size:12.5px;color:var(--muted)}
+.mform-group input{background:var(--panel);border:1px solid var(--line-soft);border-radius:5px;
+  color:var(--paper);padding:9px 11px;font-family:var(--body);font-size:13.5px;width:100%}
+.mform-group input:focus{outline:none;border-color:var(--pixel)}
+.mbtn{border-radius:5px;padding:9px 15px;font-family:var(--mono);font-size:12px;font-weight:600;
+  letter-spacing:.03em;cursor:pointer;border:1px solid var(--line);background:transparent;
+  color:var(--paper);transition:border-color .14s,color .14s,background .14s;flex:none}
+.mbtn:hover{border-color:var(--pixel);color:var(--pixel)}
+.mbtn.primary{background:var(--photon);border-color:var(--photon);color:#0B1116}
+.mbtn.primary:hover{background:#FFBE72;border-color:#FFBE72;color:#0B1116}
+.mbtn.danger{border-color:var(--alert);color:var(--alert)}
+.mbtn.danger:hover{background:rgba(240,119,109,.12)}
+.mbtn:disabled{opacity:.5;cursor:default;border-color:var(--line);color:var(--muted)}
+.mbtn:disabled:hover{background:transparent}
+.mnote{font-size:12px;color:var(--muted-2);line-height:1.5;margin:0}
+.mnote.ok{color:var(--ok)}
+.mnote.err{color:var(--alert)}
+@media(max-width:640px){
+  .modal{max-width:100%;height:92vh}
+  .modal-shell{flex-direction:column}
+  .modal-rail{width:100%;flex-direction:row;border-right:none;border-bottom:1px solid var(--line-soft);
+    padding:8px 10px;overflow-x:auto}
+  .railbtn{white-space:nowrap}
+}
+
+/* 04/10/2026 — barre de gauche alignée sur espace-personnel.html : lien vers la démo */
+.navlist a.demolink{color:var(--photon)}
+.navlist a.demolink svg{color:var(--photon);opacity:1}
+.navlist a.demolink:hover{background:rgba(245,172,87,.1);color:#FFBE72}
+/* « à venir » ne se coupe pas en deux lignes dans le menu */
+.sidebar .navlist a em{white-space:nowrap}
+/* 06/10/2026 — téléphone : seule l'étape en cours garde son nom dans le fil d'étapes */
+@media(max-width:640px){
+  .wrap{padding:16px 16px 20px}
+  .step-label:not(.active){display:none}
+  .step-line{margin:0 6px;min-width:8px}
+  .scenegrid{grid-template-columns:1fr 1fr}
+}
+/* vignette d'instrument : petit satellite */
+.instoption .thumb svg, .sumfilled .mini.pupil svg{display:block;width:100%;height:100%}
+.instoption .thumb.example{border-color:rgba(245,172,87,.55)}
+.sumfilled .mini.pupil{background:linear-gradient(135deg,#182734 0%,#0E161E 100%);border:1px solid var(--line-soft);width:44px;height:44px;border-radius:4px}
+.exbadge{margin-left:8px;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--photon);
+  border:1px solid rgba(245,172,87,.5);border-radius:3px;padding:0 6px}
+/* fenêtre « une simulation est en cours » (07/10/2026) */
+.leaveov{position:fixed;inset:0;z-index:90;background:rgba(5,8,11,.72);display:flex;align-items:center;justify-content:center;padding:20px}
+.leavebox{width:100%;max-width:440px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:24px 24px 18px;box-shadow:0 20px 60px rgba(0,0,0,.55)}
+.leavebox h3{margin:0 0 10px;font-family:var(--display);font-weight:500;font-size:18px;color:var(--paper)}
+.leavebox p{margin:0 0 20px;font-size:14px;line-height:1.55;color:var(--muted)}
+.leaveactions{display:flex;flex-direction:column;gap:10px}
+.leavebtn{font-family:var(--body);font-size:14px;border-radius:6px;padding:11px 14px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--paper)}
+.leavebtn.main{background:var(--pixel);border-color:var(--pixel);color:#06231F;font-weight:500}
+.leavebtn.danger{border-color:rgba(240,119,109,.55);color:var(--alert)}
+.leavebtn.danger:hover{background:rgba(240,119,109,.1)}
+.leavebtn.link{border:none;color:var(--muted);text-decoration:underline;padding:6px}
+.leavebtn:focus-visible{outline:2px solid var(--pixel);outline-offset:2px}
+/* bornes des conditions (07/10/2026) */
+.field input.invalid{border-color:var(--alert)}
+.fielderr{margin:5px 0 0;font-size:12px;line-height:1.35;color:var(--alert)}
+.fieldhint{margin:5px 0 0;font-size:12px;color:var(--muted-2)}
+/* rappel des conditions, panneau de droite */
+.sumkv .kv{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:6px 0;border-bottom:1px solid var(--line-soft);font-size:12.5px}
+.sumkv .kv:last-child{border-bottom:none}
+.sumkv .k{color:var(--muted-2)}
+.sumkv .v{font-family:var(--mono);color:var(--paper);text-align:right;overflow-wrap:anywhere}
+/* bulles d'aide et FMC (07/10/2026). Les bulles laissent passer les clics (pointer-events:none) :
+   une bulle ouverte ne bloque jamais le bouton « ? » d'une autre bulle placé dessous. */
+.lblrow{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+.lblrow label{margin-bottom:0}
+.bubblebtn{width:16px;height:16px;flex:none;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--muted);
+  font-family:var(--mono);font-size:12px;line-height:1;cursor:pointer;padding:0;display:inline-flex;align-items:center;justify-content:center}
+.bubblebtn:hover,.bubblebtn[aria-expanded="true"]{color:var(--pixel);border-color:var(--pixel)}
+.bubblebtn:focus-visible{outline:2px solid var(--pixel);outline-offset:2px}
+.bubble{position:fixed;z-index:80;pointer-events:none;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:12px 14px;
+  box-shadow:0 12px 36px rgba(0,0,0,.5);font-size:12.5px;line-height:1.5;color:var(--muted)}
+.bubble strong{display:block;color:var(--paper);font-weight:500;font-size:13px;margin-bottom:6px}
+.bubble p{margin:0 0 7px}
+.bubble p:last-child{margin-bottom:0}
+.fmcbox{grid-column:1/-1;background:var(--panel-2);border:1px solid var(--line-soft);border-radius:6px;padding:11px 14px}
+.fmchead{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer}
+.fmcright{display:flex;align-items:center;gap:10px}
+.fmctoggle{flex:none;width:26px;height:26px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--muted);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:border-color .14s,color .14s}
+.fmctoggle:hover,.fmchead:hover .fmctoggle{border-color:var(--pixel);color:var(--pixel)}
+.fmctoggle svg{width:12px;height:12px;transition:transform .18s}
+.fmcbox.open .fmctoggle svg{transform:rotate(180deg)}
+.fmcbody[hidden]{display:none}
+.fmclabel{font-size:12px;color:var(--muted)}
+.fmcval{font-family:var(--mono);font-size:15px;color:var(--paper);white-space:nowrap}
+.fmcswept{margin:7px 0 0;font-size:12px;line-height:1.45;color:var(--muted)}
+.fmcdetail{margin:4px 0 0;font-size:12px;color:var(--muted-2);font-family:var(--mono)}
+/* administration (07/10/2026) */
+.adminbox{grid-column:1/-1;border:1px dashed var(--line);border-radius:6px;padding:10px 14px;background:rgba(245,172,87,.05)}
+.adminbox.on{border-color:var(--photon);background:rgba(245,172,87,.09)}
+.adminbox summary{cursor:pointer;font-size:12px;color:var(--photon);font-family:var(--mono);letter-spacing:.04em}
+.adminbox .admnote{margin:8px 0;font-size:12px;line-height:1.5;color:var(--muted)}
+.adminbox .admrow{display:flex;align-items:center;gap:10px;margin:8px 0;flex-wrap:wrap}
+.adminbox .admrow label{font-size:12px;color:var(--muted);min-width:128px}
+.adminbox input[type=file]{font-size:12px;color:var(--paper);max-width:100%}
+.adminbox .admclear{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:4px;font-size:12px;padding:3px 9px;cursor:pointer}
+.adminbox .admclear:hover{color:var(--pixel);border-color:var(--pixel)}
+.adminbox .admstate{margin:6px 0 0;font-family:var(--mono);font-size:12px;color:var(--photon)}
+.srvlogs{margin-top:12px;border:1px solid var(--line);border-radius:6px;padding:8px 12px;background:var(--panel-2)}
+.srvlogs summary{cursor:pointer;font-size:12px;color:var(--photon)}
+.srvlogs pre{margin:8px 0 0;max-height:300px;overflow:auto;white-space:pre-wrap;font-family:var(--mono);font-size:12px;line-height:1.45;color:var(--muted)}
+</style>
+</head>
+<body>
+<!-- Bandeau « version bêta » : se désactive dans beta.js (BETA_ACTIVE = false) -->
+<script src="beta.js"></script>
+<div class="g-tip" id="guestTip" role="tooltip" hidden></div>
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <!-- 05/10/2026 — logo Nysa : la fleur à six pétales -->
+      <span class="mark"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24.00" cy="13.70" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="32.92" cy="18.85" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="32.92" cy="29.15" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="24.00" cy="34.30" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="15.08" cy="29.15" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="15.08" cy="18.85" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="24" cy="24" r="5.3" fill="#FFB86B"/></svg></span>
+      <span>
+        <div class="name">Nysa</div>
+        <div class="tag">EO Imaging Engineering</div>
+      </span>
+    </div>
+    <ul class="navlist">
+      <li><a href="espace-personnel.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(-30 12 10)"><rect x="3.5" y="7" width="13" height="6" rx="1.2"/><path d="M16.5 8h3v4h-3M7.5 7v6"/></g><path d="M11.8 13.6 8 21M11.8 13.6V21M11.8 13.6 15.8 21"/></svg>
+        <span data-i18n="nav.instruments">Instruments</span></a></li>
+      <li><a class="soon" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="8" width="6" height="9" rx="1.2"/><rect x="1.5" y="9.5" width="6" height="6" rx=".6"/><rect x="16.5" y="9.5" width="6" height="6" rx=".6"/><path d="M4.5 9.5v6M19.5 9.5v6M7.5 12.5H9M15 12.5h1.5M12 8V5"/><circle cx="12" cy="3.9" r="1"/></svg>
+        <span data-i18n="nav.platform">Plateforme</span> <em style="font-style:normal;color:var(--muted-2);font-size:12px;margin-left:auto" data-i18n="nav.soon">à venir</em></a></li>
+      <li><a class="active" href="simulations.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 4l14 8-14 8V4z"/></svg>
+        <span data-i18n="nav.simulations">Simulations</span></a></li>
+      <li><a href="resultats.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
+        <span data-i18n="nav.results">Résultats</span></a></li>
+      <!-- 07/10/2026 : visible du seul compte administrateur (révélé par menu.js) ; la page elle-même est protégée par la base -->
+      <li id="navAdminItem" hidden><a href="admin.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6z"/><path d="M9.5 12l2 2 3.5-4"/></svg>
+        <span>Administration</span></a></li>
+    </ul>
+    <div class="sidebar-bottom">
+      <div data-lang-switch style="margin:0 0 10px 12px"></div>
+      <ul class="navlist">
+        <!-- 05/10/2026 — « Retour à la démo » retiré du menu connecté : la démo reste publique à l'adresse du site -->
+        <li><a href="mailto:contact@nysa-imaging.com" data-nysa-help="general">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.2 2.4c-.9.3-1.2.9-1.2 1.8"/><circle cx="12" cy="16.6" r=".4" fill="currentColor" stroke="none"/></svg>
+          <span data-i18n="nav.help">Aide</span></a></li>
+        <!-- 04/10/2026 : une seule fenêtre de paramètres, celle de l'espace personnel -->
+        <li><a href="espace-personnel.html?settings=1" id="settingsLink">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19.4 13.5a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V20a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.96 18.34a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.66 8.96a1.7 1.7 0 0 0-.34-1.87l-.06-.06A2 2 0 1 1 7.09 4.2l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.04 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.56 1.04z"/></svg>
+          <span data-i18n="nav.settings">Paramètres</span></a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <span class="userchip" id="userChip"><span class="avatar" id="userAvatar">…</span><span id="userEmail">-</span></span>
+      <button class="iconbtn" aria-label="Se déconnecter" data-i18n-aria="top.signout" type="button" id="signOutBtn" title="Se déconnecter" data-i18n-title="top.signout">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+      </button>
+    </div>
+
+    <div class="wrap">
+      <p class="eyebrow" data-i18n="sim.eyebrow">Simulations</p>
+      <h1 data-i18n="sim.h1">Nouvelle simulation</h1>
+      <p class="pagesub" data-i18n="sim.sub">Configurez votre scène, votre instrument et vos conditions d'acquisition, puis lancez la simulation.</p>
+
+      <div class="steps" id="stepsHost"></div>
+
+      <!-- 04/10/2026 — compte sans abonnement actif : rappel permanent -->
+      <div class="paybanner" id="payBanner">
+        <span id="payBannerText">Vous pouvez préparer votre simulation ; l'abonnement permet de la lancer.</span>
+        <button type="button" id="payBannerBtn">S'abonner</button>
+      </div>
+      <div class="wizardgrid" id="wizardGrid">
+        <div class="wizardmain">
+
+          <div class="stepview current" data-step="1">
+            <div class="stepbody">
+              <div class="stephead"><span class="ttl" data-i18n="sim.step1.title">1. Scène</span></div>
+              <p class="stepintro" data-i18n="sim.step1.intro">Choisissez une image dans la bibliothèque de scènes.</p>
+              <div class="scenegrid" id="sceneGrid"></div>
+            </div>
+          </div>
+
+          <div class="stepview" data-step="2">
+            <div class="stepbody">
+              <div class="stephead"><span class="ttl" data-i18n="sim.step2.title">2. Instrument</span></div>
+              <p class="stepintro" data-i18n="sim.step2.intro">Choisissez l'instrument à utiliser pour cette simulation.</p>
+              <div id="instList"></div>
+            </div>
+            <button class="backlink" type="button" data-goto="1" data-i18n="common.previous">← Précédent</button>
+          </div>
+
+          <div class="stepview" data-step="3">
+            <div class="stepbody">
+              <div class="stephead"><span class="ttl" data-i18n="sim.step3.title">3. Conditions d'acquisition</span></div>
+              <p class="stepintro" data-i18n="sim.step3.intro">Définissez le scénario d'acquisition de la scène.</p>
+              <p class="guestnote" id="guestSimNote" hidden data-i18n="guest.sim.note">En mode invité, seule la scène se choisit : les conditions d'acquisition sont figées. Créez un compte pour les modifier.</p>
+              <div class="acq-layout">
+                <div class="acq-illustration" id="acqDiagram"></div>
+                <div class="acq-fields">
+                  <div class="field">
+                    <label data-i18n="field.H">Altitude</label>
+                    <div class="row"><input type="number" id="fH" value="500" min="380" max="900" step="5"><span class="unit">km</span></div>
+                    <p class="fielderr" id="errH" hidden></p>
+                  </div>
+                  <div class="field">
+                    <label data-i18n="field.S">Élévation solaire</label>
+                    <div class="row"><input type="number" id="fS" value="60" min="8" max="80" step="1"><span class="unit">°</span></div>
+                    <p class="fielderr" id="errS" hidden></p>
+                  </div>
+                  <div class="field">
+                    <div class="lblrow"><label data-i18n="field.TI">Temps d'intégration</label><button type="button" class="bubblebtn" data-bubble="ti" aria-expanded="false" data-i18n-aria="nav.help">?</button></div>
+                    <div class="row"><input type="number" id="fTI" value="100" min="5" max="3000" step="1"><span class="unit">µs</span></div>
+                    <p class="fielderr" id="errTI" hidden></p>
+                  </div>
+                  <div class="field">
+                    <div class="lblrow"><label data-i18n="field.TDI">Étages TDI</label><button type="button" class="bubblebtn" data-bubble="tdi" aria-expanded="false" data-i18n-aria="nav.help">?</button></div>
+                    <div class="row"><input type="number" id="fTDI" value="4" min="1" max="64" step="1"><span class="unit">×</span></div>
+                    <p class="fielderr" id="errTDI" hidden></p>
+                  </div>
+                  <div class="field">
+                    <label data-i18n="field.wfe_case">Cas WFE</label>
+                    <select id="fWfeCase">
+                      <option value="" data-i18n="sim.wfe.simplified">Simplifié (RMS)</option>
+                    </select>
+                  </div>
+                  <!-- Angle de visée : non modélisé en V1 (visée au nadir), affiché grisé. -->
+                  <div class="field">
+                    <label><span data-i18n="sim.view_angle">Angle de visée</span> <span class="soon" data-i18n="nav.soon">à venir</span></label>
+                    <div class="row"><input type="number" id="fView" value="0" disabled><span class="unit">°</span></div>
+                  </div>
+                  <!-- 07/10/2026 : FMC déduite de l'altitude, de l'iFoV de l'instrument et du temps d'intégration.
+                       Valeur indicative : le calcul ne modélise pas le filé (voir updateFmc). -->
+                  <div class="fmcbox" id="fmcBox">
+                    <div class="fmchead">
+                      <div class="lblrow" style="margin:0"><span class="fmclabel" data-i18n="sim.fmc.label">FMC (défilement de l'image)</span><button type="button" class="bubblebtn" data-bubble="fmc" aria-expanded="false" data-i18n-aria="nav.help">?</button></div>
+                      <span class="fmcright"><span class="fmcval" id="fmcVal">-</span>
+                        <button type="button" class="fmctoggle" id="fmcToggle" aria-expanded="false" aria-controls="fmcBody" data-i18n-aria="sim.fmc.toggle" aria-label="Afficher le détail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button></span>
+                    </div>
+                    <div class="fmcbody" id="fmcBody" hidden>
+                      <p class="fmcswept" id="fmcSwept"></p>
+                      <p class="fmcdetail" id="fmcDetail"></p>
+                    </div>
+                  </div>
+                  <!-- 07/10/2026 : outils d'administration, visibles du seul compte au rôle administrateur (hidden sinon).
+                       Le vrai contrôle est côté serveur (_require_admin) : masquer ce bloc n'est qu'un confort. -->
+                  <details class="adminbox" id="adminBox" hidden>
+                    <summary data-i18n="sim.admin.title">Administration</summary>
+                    <p class="admnote" data-i18n="sim.admin.note">Réservé à l'administrateur.</p>
+                    <div class="admrow"><label for="admJson" data-i18n="sim.admin.json">Paramètres (JSON)</label>
+                      <input type="file" id="admJson" accept=".json,application/json">
+                      <button type="button" class="admclear" id="admJsonClear" hidden data-i18n="sim.admin.clear">Retirer</button></div>
+                    <div class="admrow"><label for="admCsv" data-i18n="sim.admin.csv">WFE Zernike (CSV)</label>
+                      <input type="file" id="admCsv" accept=".csv,text/csv,text/plain">
+                      <button type="button" class="admclear" id="admCsvClear" hidden data-i18n="sim.admin.clear">Retirer</button></div>
+                    <p class="fielderr" id="admErr" hidden></p>
+                    <p class="admstate" id="admState"></p>
+                  </details>
+                  <!-- Réglages atmosphériques (03/10/2026) : paramètres avancés, repliés par
+                       défaut. Mêmes clés et mêmes valeurs par défaut que
+                       radiometry.resolve_atmosphere (SIXS_DEFAULTS). -->
+                  <details class="acq-advanced">
+                    <summary data-i18n="sim.atm.summary">Atmosphère (paramètres avancés)</summary>
+                    <div class="acq-fields">
+                      <div class="field">
+                        <label data-i18n="sim.atm.profile">Profil atmosphérique</label>
+                        <select id="fAtmosProfile">
+                          <option value="Tropical" data-i18n="sim.atm.p.tropical">Tropical</option>
+                          <option value="MidlatitudeSummer" selected data-i18n="sim.atm.p.mls">Latitudes moyennes, été</option>
+                          <option value="MidlatitudeWinter" data-i18n="sim.atm.p.mlw">Latitudes moyennes, hiver</option>
+                          <option value="SubarcticSummer" data-i18n="sim.atm.p.sas">Subarctique, été</option>
+                          <option value="SubarcticWinter" data-i18n="sim.atm.p.saw">Subarctique, hiver</option>
+                          <option value="USStandard1962" data-i18n="sim.atm.p.us62">US Standard 1962</option>
+                          <option value="custom" data-i18n="sim.atm.p.custom">Personnalisé</option>
+                        </select>
+                      </div>
+                      <div class="field">
+                        <label data-i18n="sim.atm.aero_type">Type d'aérosols</label>
+                        <select id="fAeroProfile">
+                          <option value="Continental" selected data-i18n="sim.atm.a.continental">Continental</option>
+                          <option value="Maritime" data-i18n="sim.atm.a.maritime">Maritime</option>
+                          <option value="Urban" data-i18n="sim.atm.a.urban">Urbain</option>
+                          <option value="Desert" data-i18n="sim.atm.a.desert">Désertique</option>
+                        </select>
+                      </div>
+                      <div class="field atm-custom" hidden>
+                        <label data-i18n="sim.atm.water">Vapeur d'eau</label>
+                        <div class="row"><input type="number" id="fWater" min="0" max="10" step="0.1" placeholder="0 à 10" data-i18n-ph="sim.atm.ph.water"><span class="unit">g/cm²</span></div>
+                      </div>
+                      <div class="field atm-custom" hidden>
+                        <label data-i18n="sim.atm.ozone">Ozone</label>
+                        <div class="row"><input type="number" id="fOzone" min="0" max="1" step="0.01" placeholder="0 à 1" data-i18n-ph="sim.atm.ph.ozone"><span class="unit">cm-atm</span></div>
+                      </div>
+                      <div class="field">
+                        <label data-i18n="sim.atm.aero_load">Charge en aérosols</label>
+                        <select id="fAeroLoadKind">
+                          <option value="visibility_km" selected data-i18n="sim.atm.l.visibility">Visibilité (km)</option>
+                          <option value="aot550" data-i18n="sim.atm.l.aot">Épaisseur optique 550 nm</option>
+                        </select>
+                      </div>
+                      <div class="field">
+                        <label data-i18n="sim.atm.value">Valeur</label>
+                        <div class="row"><input type="number" id="fAeroLoad" min="0" step="any" placeholder="23 km (défaut)" data-i18n-ph="sim.atm.ph.vis"><span class="unit" id="fAeroLoadUnit">km</span></div>
+                      </div>
+                    </div>
+                  </details>
+                </div>
+              </div>
+            </div>
+            <button class="backlink" type="button" data-goto="2" data-i18n="common.previous">← Précédent</button>
+          </div>
+
+        </div>
+
+        <div class="summarypanel">
+          <h2 data-i18n="sim.sum.title">Résumé de la configuration</h2>
+
+          <div class="sumsection">
+            <div class="lbl" data-i18n="field.scene">Scène</div>
+            <div id="sumSceneSlot"><span class="empty">-</span></div>
+          </div>
+          <div class="sumsection">
+            <div class="lbl" data-i18n="sim.sum.instrument">Instrument</div>
+            <div id="sumInstSlot"><span class="empty">-</span></div>
+          </div>
+          <div class="sumsection">
+            <div class="lbl" data-i18n="sim.sum.conditions">Conditions</div>
+            <div id="sumCondSlot"><span class="empty">-</span></div>
+          </div>
+
+          <div class="panelbtn">
+            <!-- 07/10/2026 : grisé jusqu'à la fin du chargement (updatePanelButton le réactive). Avant, il était cliquable
+                 dès l'affichage alors que son action n'était branchée qu'une seconde plus tard : un clic rapide ne faisait rien. -->
+            <button class="nextbtn" type="button" id="panelActionBtn" disabled>Suivant →</button>
+            <div class="quotanote" id="quotaNote" role="status" hidden>
+              <div class="qrow"><span id="quotaLabel"></span><span class="qval" id="quotaVal"></span></div>
+              <div class="qbar"><span class="qfill" id="quotaFill"></span></div>
+              <p class="qfull" id="quotaFullMsg" hidden></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stepview" data-step="4" style="flex-direction:column">
+        <div class="finalgrid">
+          <div class="summarybox">
+            <p class="grouphead"><span class="dot"></span><span data-i18n="sim.sum.params">Résumé des paramètres</span></p>
+            <div class="sumrow"><span class="k" data-i18n="field.scene">Scène</span><span class="v" id="sumScene">-</span></div>
+            <div class="sumrow"><span class="k" data-i18n="sim.sum.resolution">Résolution</span><span class="v" id="sumRes">-</span></div>
+            <div class="sumrow"><span class="k" data-i18n="sim.sum.instrument">Instrument</span><span class="v" id="sumInst">-</span></div>
+            <div class="sumrow"><span class="k" data-i18n="field.H">Altitude</span><span class="v" id="sumAlt">-</span></div>
+            <div class="sumrow"><span class="k" data-i18n="field.S">Élévation solaire</span><span class="v" id="sumS">-</span></div>
+            <div class="sumrow"><span class="k" data-i18n="field.TI">Temps d'intégration</span><span class="v" id="sumTI">-</span></div>
+            <div class="sumrow"><span class="k" data-i18n="field.TDI">Étages TDI</span><span class="v" id="sumTDI">-</span></div>
+            <div class="sumrow"><span class="k" data-i18n="field.wfe_case">Cas WFE</span><span class="v" id="sumWfeCase">-</span></div>
+          </div>
+
+          <div class="statuspanel">
+            <div class="stathead" id="statHead">
+              <span class="pulse" id="statPulse"></span>
+              <span id="statText">Simulation en cours</span>
+              <button class="interruptbtn" type="button" id="interruptBtn" data-i18n="sim.stop">⏹ Interrompre</button>
+            </div>
+            <div class="progresswrap">
+              <div class="ptrack"><div class="pfill" id="pfill"></div></div>
+              <span class="ppct" id="ppct">0 %</span>
+            </div>
+            <div class="etarow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+              <span><span data-i18n="sim.eta">Temps estimé restant :</span> <span id="etaText">-</span></span>
+            </div>
+            <div class="loglist" id="logList"></div>
+            <div class="statusactions" id="statusActions"></div>
+          </div>
+        </div>
+        <button class="backlink" type="button" data-goto="3" id="step4Back" data-i18n="common.previous">← Précédent</button>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- 04/10/2026 — fenêtre d'incitation à l'abonnement. Affichée à l'arrivée
+     sur la page pour un compte sans accès, et à chaque tentative de
+     lancement. Les textes sont remplis par renderPaywall(). -->
+<div class="modal-overlay" id="paywallOverlay">
+  <div class="paywall" role="dialog" aria-modal="true" aria-labelledby="paywallTitle">
+    <div class="eyebrow" id="paywallEyebrow">Simulateur complet</div>
+    <h2 id="paywallTitle">-</h2>
+    <p id="paywallText">-</p>
+    <ul id="paywallList"></ul>
+    <button class="cta" type="button" id="paywallCta">-</button>
+    <button class="later" type="button" id="paywallLater">-</button>
+    <p class="perr" id="paywallErr" hidden></p>
+  </div>
+</div>
+
+<!-- Bibliothèque Supabase hébergée avec le site (dossier vendor/), version figée. -->
+<script src="vendor/supabase.js"></script>
+<script src="supabase-client.js"></script>
+<!-- Instrument d'exemple, utilisé en mode invité -->
+<script src="instrument-exemple.js"></script>
+<script>
+// Textes par défaut des éléments que ce script met ensuite à jour lui-même :
+// ils ne portent pas d'attribut data-i18n, qui écraserait la valeur calculée.
+document.getElementById("statText").textContent = t("sim.status.running");
+document.getElementById("payBannerText").textContent = t("paywall.banner");
+document.getElementById("payBannerBtn").textContent = t("sub.subscribe");
+document.getElementById("paywallEyebrow").textContent = t("paywall.eyebrow");
+document.getElementById("panelActionBtn").textContent = t("common.next");
+// URL du serveur de calcul (conteneur Scaleway) : elle est choisie dans supabase-client.js
+// selon l'environnement (prod, dev ou local). Sans supabase-client.js (aperçu Claude),
+// on garde l'adresse de la prod.
+var API_URL = (typeof NYSA_ENV !== "undefined" && NYSA_ENV.apiUrl)
+  ? NYSA_ENV.apiUrl
+  : "https://nssharphopper7bba2963-container-kind-mcclintock.functions.fnc.fr-par.scw.cloud";
+
+var session = null;
+var accountId = null;
+var guest = false;          // 16/10/2026 : mode invité (essai sans compte), voir supabase-client.js
+var guestTimer = null;
+
+// ===================== Indicateur d'étapes =====================
+var STEP_LABELS = [t("sim.steps.scene"), t("sim.steps.instrument"), t("sim.steps.conditions"), t("sim.steps.run")];
+var stepsHost = document.getElementById("stepsHost");
+function renderSteps(current){
+  stepsHost.innerHTML = "";
+  STEP_LABELS.forEach(function(label, i){
+    var n = i + 1;
+    var cls = n === current ? "active" : (n < current ? "done" : "");
+    var item = document.createElement("div");
+    item.className = "stepitem";
+    item.innerHTML =
+      "<span class='step-num " + cls + "'>" + n + "</span>"+
+      "<span class='step-label" + (n === current ? " active" : "") + "'>" + label + "</span>";
+    stepsHost.appendChild(item);
+    if(i < STEP_LABELS.length - 1){
+      var line = document.createElement("div");
+      line.className = "step-line" + (n < current ? " done" : "");
+      stepsHost.appendChild(line);
+    }
+  });
+}
+
+// ===================== Navigation séquentielle =====================
+var wizardGrid = document.getElementById("wizardGrid");
+// Atmosphère avancée (03/10/2026) : vapeur d'eau et ozone n'apparaissent
+// qu'avec le profil « Personnalisé » ; l'unité et l'indication de la charge
+// en aérosols suivent la grandeur choisie.
+document.getElementById("fAtmosProfile").addEventListener("change", function(e){
+  document.querySelectorAll(".atm-custom").forEach(function(el){ el.hidden = e.target.value !== "custom"; });
+});
+document.getElementById("fAeroLoadKind").addEventListener("change", function(e){
+  var vis = e.target.value === "visibility_km";
+  document.getElementById("fAeroLoadUnit").textContent = vis ? "km" : "";
+  document.getElementById("fAeroLoad").placeholder = vis ? t("sim.atm.ph.vis") : t("sim.atm.ph.aot");
+  document.getElementById("fAeroLoad").value = "";
+});
+
+var currentStep = 1;
+function showStep(n){
+  if(n === 4 && !hasSimAccess()){ openPaywall(true); return; } // pas de lancement sans accès (04/10/2026)
+  currentStep = n;
+  document.querySelectorAll(".stepview").forEach(function(v){
+    v.classList.toggle("current", Number(v.dataset.step) === n);
+  });
+  wizardGrid.style.display = n === 4 ? "none" : "grid";
+  document.querySelector(".stepview[data-step='4']").style.display = n === 4 ? "flex" : "none";
+  renderSteps(n);
+  updatePanelButton();
+  if(n === 4) launchSimulation();
+}
+document.querySelectorAll("[data-goto]").forEach(function(btn){
+  btn.addEventListener("click", function(){ showStep(Number(btn.dataset.goto)); });
+});
+
+// ===================== Scènes (ids réels attendus par le serveur) =====================
+var SCENES = [
+  {id:"aix",   name:"Ville", sub:"BD ORTHO IGN 2023", thumb:"assets/scenes/aix_thumb.jpg",   w:200, h:200, res:"0.2 m/pixel", badge:"VHR"},
+  {id:"avion", name:"Avion", sub:"BD ORTHO IGN 2023", thumb:"assets/scenes/avion_thumb.jpg", w:200, h:200, res:"0.2 m/pixel", badge:"VHR"},
+  {id:"port",  name:"Port",  sub:"BD ORTHO IGN 2023", thumb:"assets/scenes/port_thumb.jpg",  w:200, h:200, res:"0.2 m/pixel", badge:"VHR"}
+];
+var selectedSceneIdx = 0;
+var sceneGrid = document.getElementById("sceneGrid");
+function renderScenes(){
+  sceneGrid.innerHTML = "";
+  SCENES.forEach(function(s, i){
+    var dimStr = s.w + " × " + s.h + " m";
+    var card = document.createElement("button");
+    card.type = "button";
+    card.className = "scenecard" + (i === selectedSceneIdx ? " selected" : "");
+    card.innerHTML =
+      "<span class='img' style=\"background-image:url('" + s.thumb + "');background-size:cover;background-position:center\"></span>"+
+      "<div class='meta'><div class='name'>" + tScene(s.name) + "</div>"+
+      "<div class='dims'>" + s.sub + " <span class='badge'>" + s.badge + "</span></div></div>";
+    card.addEventListener("click", function(){
+      selectedSceneIdx = i;
+      renderScenes();
+      updateSummary();
+    });
+    sceneGrid.appendChild(card);
+  });
+}
+renderScenes();
+
+// ===================== Instruments réels (Supabase) =====================
+var instruments = [];
+var selectedInstIdx = -1;
+var instListEl = document.getElementById("instList");
+
+// Instrument de secours utilisé uniquement quand Supabase est injoignable
+// (typiquement l'aperçu Claude, qui n'a ni supabase-client.js ni accès
+// réseau à votre projet Supabase) — permet de naviguer dans l'assistant
+// pour prévisualiser l'UI. Sur le site réel, supabaseClient répond
+// normalement et ce repli n'est jamais utilisé.
+var PREVIEW_FALLBACK_INSTRUMENTS = [
+  { id: "preview-demo", name: t("sim.inst.preview"), config: { wfeCases: [], _draft: false } }
+];
+// Brouillon (04/10/2026) : instrument enregistré sans tous ses champs
+// obligatoires (cf. creer-instrument.html, config._draft). Il apparaît dans
+// la liste avec un tag, mais ne peut pas servir à une simulation : le clic
+// ouvre l'instrument pour le compléter. Un instrument enregistré avant ce
+// tag n'a pas la clé : il est traité comme un brouillon, puisqu'il n'a pas
+// d'électronique.
+function isDraft(inst){ return !inst.config || inst.config._draft !== false; }
+async function loadInstruments(){
+  try {
+    if(guest){
+      // Invité : seul l'instrument d'exemple (instrument-exemple.js), sans appel à Supabase.
+      if(typeof NYSA_EXAMPLE_INSTRUMENT === "undefined") throw new Error("instrument-exemple.js absent");
+      var nowIso = new Date().toISOString();
+      instruments = [{ id: "example", name: NYSA_EXAMPLE_INSTRUMENT.name[nysaLang()] || NYSA_EXAMPLE_INSTRUMENT.name.en,
+        config: JSON.parse(JSON.stringify(NYSA_EXAMPLE_INSTRUMENT.config)), created_at: nowIso, updated_at: nowIso }];
+      selectedInstIdx = 0;
+      renderInstruments();
+      renderWfeCaseOptions();
+      updateSummary();
+      return;
+    }
+    if(typeof supabaseClient === "undefined") throw new Error("supabaseClient indisponible");
+    var { data, error } = await supabaseClient
+      .from("instruments")
+      .select("*")
+      .is("deleted_at", null) // suppression douce (04/10/2026) : pas les instruments supprimés
+      .order("updated_at", { ascending: false });
+    if(error) throw error;
+    instruments = data || [];
+  } catch(e){
+    console.warn("Chargement instruments impossible, repli aperçu :", e);
+    instruments = PREVIEW_FALLBACK_INSTRUMENTS;
+  }
+  selectedInstIdx = instruments.findIndex(function(inst){ return !isDraft(inst); }); // premier instrument complet, ou -1
+  renderInstruments();
+  renderWfeCaseOptions();
+  updateSummary();
+}
+
+// 07/10/2026 — vignette d'un instrument : un petit satellite d'observation
+// (corps, deux panneaux solaires, télescope pointé vers le bas), dessiné ici
+// en SVG. Même dessin pour tous les instruments ; l'instrument d'exemple
+// fourni aux nouveaux comptes est en orange pour se distinguer, un brouillon
+// est estompé. (Une première version dessinait la pupille de l'instrument ;
+// elle a été jugée peu parlante et remplacée.)
+function isExample(inst){
+  var c = (inst && inst.config) || {};
+  return c._example === true ||
+    /^(Exemple : instrument de référence|Example: reference instrument)$/.test((inst && inst.name) || "");
+}
+function satThumb(inst){
+  var c = (inst && inst.config) || {};
+  var col = isExample(inst) ? "#F5AC57" : "#5FDCD0";
+  var dim = c._draft ? " opacity='.5'" : "";
+  var panel = function(x){
+    // panneau solaire : cadre, trois cellules
+    return "<rect x='" + x + "' y='14' width='11' height='15' rx='1' fill='" + col + "' fill-opacity='.22' stroke='" + col + "' stroke-width='1.1'/>"+
+           "<path d='M" + (x + 3.67) + " 14v15M" + (x + 7.33) + " 14v15M" + x + " 21.5h11' stroke='" + col + "' stroke-opacity='.55' stroke-width='.7'/>";
+  };
+  return "<svg viewBox='0 0 44 44' aria-hidden='true'" + dim + ">"+
+    "<path d='M13 21.5h3M28 21.5h3' stroke='" + col + "' stroke-width='1.3'/>"+
+    panel(2) + panel(31)+
+    // antenne
+    "<path d='M22 13V9' stroke='" + col + "' stroke-width='1.2'/><circle cx='22' cy='8' r='1.7' fill='" + col + "'/>"+
+    // corps
+    "<rect x='16' y='13' width='12' height='18' rx='2' fill='" + col + "' fill-opacity='.35' stroke='" + col + "' stroke-width='1.2'/>"+
+    "<rect x='18.5' y='16' width='7' height='3' rx='.8' fill='#0B1218' fill-opacity='.55'/>"+
+    // télescope : tube et ouverture
+    "<rect x='18.5' y='31' width='7' height='6.5' fill='" + col + "' fill-opacity='.5' stroke='" + col + "' stroke-width='1'/>"+
+    "<ellipse cx='22' cy='37.8' rx='3.7' ry='1.7' fill='#0B1218' stroke='" + col + "' stroke-width='1'/>"+
+  "</svg>";
+}
+
+function renderInstruments(){
+  if(instruments.length === 0){
+    instListEl.innerHTML = "<div class='empty-inst'>"+
+      "<p style='margin:0'>" + t("sim.inst.none") + "</p>"+
+      "<a class='nextbtn' href='creer-instrument.html?return=simulations'>" + t("home.create") + "</a>"+
+    "</div>";
+    return;
+  }
+  instListEl.innerHTML = "";
+  instruments.forEach(function(inst, i){
+    var exBadge = isExample(inst) ? "<span class='exbadge'>" + t("sim.inst.example") + "</span>" : "";
+    var b = document.createElement("button");
+    b.type = "button";
+    if(isDraft(inst)){
+      var miss = (inst.config && inst.config._missing) || [];
+      b.className = "instoption draft";
+      b.title = miss.length ? t("inst.missing", { list: miss.map(tField).join(", ") }) : t("sim.inst.to_complete");
+      b.innerHTML =
+        "<span class='thumb'>" + satThumb(inst) + "</span>"+
+        "<span><div class='nameline'><div class='name'>" + escH(inst.name) + "</div><span class='draftbadge'>" + t("inst.badge.draft") + "</span></div>"+
+        "<div class='meta'>" +
+          (miss.length ? t(miss.length > 1 ? "sim.inst.fields_many" : "sim.inst.fields_one", { n: miss.length }) : t("sim.inst.to_complete_short")) + "</div></span>"+
+        "<span class='draftgo'>" + t("inst.complete_cta") + "</span>";
+      b.addEventListener("click", function(){
+        window.location.href = "creer-instrument.html?id=" + encodeURIComponent(inst.id);
+      });
+      instListEl.appendChild(b);
+      return;
+    }
+    b.className = "instoption" + (i === selectedInstIdx ? " selected" : "");
+    b.innerHTML =
+      "<span class='thumb" + (isExample(inst) ? " example" : "") + "'>" + satThumb(inst) + "</span>"+
+      "<span><div class='nameline'><div class='name'>" + escH(inst.name) + "</div>" + exBadge + "</div></span>"+
+      "<span class='check'>✓</span>";
+    b.addEventListener("click", function(){
+      selectedInstIdx = i;
+      renderInstruments();
+      renderWfeCaseOptions();
+      updateSummary();
+    });
+    instListEl.appendChild(b);
+  });
+}
+
+// ===================== Cas WFE de l'instrument sélectionné =====================
+// Peuple le sélecteur "Cas WFE" avec les cas nommés définis pour cet
+// instrument (config.wfeCases, cf. creer-instrument.html). "" = mode
+// simplifié (RMS + mode d'aberration, comportement historique).
+function renderWfeCaseOptions(){
+  var sel = document.getElementById("fWfeCase");
+  var cases = (selectedInstIdx >= 0 && instruments[selectedInstIdx].config && instruments[selectedInstIdx].config.wfeCases) || [];
+  var current = sel.value;
+  sel.innerHTML = "<option value=\"\">" + t("sim.wfe.simplified") + "</option>" +
+    cases.map(function(c){ return "<option value='"+escH(c.id)+"'>"+escH(c.name)+(c.mode === "rms" ? " (RMS)" : t("sim.wfe.file_suffix"))+"</option>"; }).join("");
+  sel.value = cases.some(function(c){ return c.id === current; }) ? current : "";
+}
+
+
+function selectedWfeCase(){
+  var wfeCaseId = document.getElementById("fWfeCase").value;
+  if(!wfeCaseId || selectedInstIdx < 0) return null;
+  var cases = (instruments[selectedInstIdx].config && instruments[selectedInstIdx].config.wfeCases) || [];
+  return cases.find(function(c){ return c.id === wfeCaseId; }) || null;
+}
+
+document.getElementById("fWfeCase").addEventListener("change", function(){
+  updateSummary();
+});
+
+// ===================== Schéma des conditions d'acquisition =====================
+// Halo de lecture derrière le texte : reste net même quand il croise une
+// ligne du schéma, sans encadré.
+function haloText(x, y, text, color, size, anchor){
+  anchor = anchor || "middle";
+  var xs = x.toFixed(1), ys = y.toFixed(1);
+  return "<text x='"+xs+"' y='"+ys+"' fill='none' stroke='#060A0F' stroke-width='4.2' stroke-linejoin='round' font-family='var(--mono)' font-size='"+size+"' text-anchor='"+anchor+"'>"+text+"</text>"+
+    "<text x='"+xs+"' y='"+ys+"' fill='"+color+"' font-family='var(--mono)' font-size='"+size+"' text-anchor='"+anchor+"'>"+text+"</text>";
+}
+// Petit nuage (trois bulles + base) pour marquer une interaction avec
+// l'atmosphère sur le trajet du signal — inspiré des schémas de bilan
+// radiatif (énergie incidente / diffuse / réfléchie).
+function cloudIcon(cx, cy, scale, color){
+  scale = scale || 1;
+  var s = scale;
+  return "<g transform='translate("+cx.toFixed(1)+" "+cy.toFixed(1)+") scale("+s+")' opacity='.8'>"+
+    "<ellipse cx='0' cy='2' rx='15' ry='7' fill='"+color+"' fill-opacity='.5'/>"+
+    "<circle cx='-8' cy='-2' r='7' fill='"+color+"' fill-opacity='.55'/>"+
+    "<circle cx='2' cy='-5' r='9' fill='"+color+"' fill-opacity='.6'/>"+
+    "<circle cx='10' cy='-1' r='6.5' fill='"+color+"' fill-opacity='.5'/>"+
+  "</g>";
+}
+function renderAcquisitionDiagram(){
+  var host = document.getElementById("acqDiagram");
+  if(!host) return;
+  try{
+
+  var H = Number(document.getElementById("fH").value) || 500;
+  var S = Number(document.getElementById("fS").value) || 45;
+
+  var VBW = 620;
+  var rectW = host.clientWidth || VBW;
+  var rectH = host.clientHeight || 360;
+  var VBH = Math.max(300, Math.min(760, VBW * (rectH / rectW)));
+  var scaleY = VBH / 360;
+
+  // Physical-to-screen vertical scale.
+  // The displayed ground-to-satellite distance changes with altitude.
+  var H_MIN = 380, H_MAX = 900;
+  var satGroundPxMin = 150 * scaleY;
+  var satGroundPxMax = 248 * scaleY;
+  var hNorm = Math.max(0, Math.min(1, (H - H_MIN) / (H_MAX - H_MIN)));
+  var satGroundPx = satGroundPxMin + (satGroundPxMax - satGroundPxMin) * hNorm;
+
+  var groundY = 292 * scaleY;
+  var targetX = 292;
+  var satX = targetX; // le capteur pointe toujours au nadir — directement au-dessus de la cible
+  var satY = groundY - satGroundPx;
+  var sensorBottomY = satY + 31;
+
+  var angle = Math.max(8, Math.min(80, S));
+  var rad = angle * Math.PI / 180;
+
+  // Atmosphere is tied to the same altitude scale:
+  // a constant physical thickness is represented as a fraction of the
+  // current ground-to-satellite distance.
+  var atmosphereKm = 80;
+  var atmospherePx = satGroundPx * (atmosphereKm / Math.max(H, 1));
+  atmospherePx = Math.max(17 * scaleY, Math.min(34 * scaleY, atmospherePx));
+  var atmBottomY = groundY - atmospherePx;
+  var atmTopY = atmBottomY - 22 * scaleY;
+
+  // Sun follows the requested elevation angle around the target.
+  // The radius grows slightly with altitude to preserve readability.
+  var sunRadius = 205 * scaleY + 0.12 * satGroundPx;
+  var sunX = targetX - sunRadius * Math.cos(rad);
+  var sunY = groundY - sunRadius * Math.sin(rad);
+
+  var rayStartX = sunX;
+  var rayStartY = sunY;
+  var dx = targetX - rayStartX;
+  var dy = groundY - rayStartY;
+  var rayLen = Math.hypot(dx, dy) || 1;
+  var rayDirX = dx / rayLen;
+  var rayDirY = dy / rayLen;
+
+  // Solar elevation arc.
+  var arcR = 52;
+  var arcStartX = targetX - arcR;
+  var arcEndX = targetX - arcR * Math.cos(rad);
+  var arcEndY = groundY - arcR * Math.sin(rad);
+
+  // Altitude dimension.
+  var dimX = 442;
+  var dimTopY = satY + 6;
+  var dimMidY = (dimTopY + groundY) / 2;
+
+  host.innerHTML =
+    "<svg viewBox='0 0 "+VBW+" "+VBH.toFixed(1)+"' xmlns='http://www.w3.org/2000/svg' role='img' aria-label='" + t("sim.diag.aria") + "'>"+
+      "<defs>"+
+        "<linearGradient id='acqSatBody' x1='0' y1='0' x2='0' y2='1'>"+
+          "<stop offset='0%' stop-color='#294655'/><stop offset='100%' stop-color='#13222A'/>"+
+        "</linearGradient>"+
+        "<linearGradient id='atmBand' x1='0' y1='0' x2='0' y2='1'>"+
+          "<stop offset='0%' stop-color='#527688' stop-opacity='.10'/>"+
+          "<stop offset='100%' stop-color='#527688' stop-opacity='.025'/>"+
+        "</linearGradient>"+
+        "<marker id='acqArrowSun' markerWidth='9' markerHeight='9' refX='7' refY='4.5' orient='auto'>"+
+          "<path d='M0,0 L9,4.5 L0,9 Z' fill='#F5AC57'/>"+
+        "</marker>"+
+      "</defs>"+
+
+      // Atmosphere adapts with the displayed altitude.
+      "<path d='M0 "+atmTopY.toFixed(1)+" Q305 "+(atmTopY-7*scaleY).toFixed(1)+" "+VBW+" "+atmTopY.toFixed(1)+
+        " L"+VBW+" "+atmBottomY.toFixed(1)+" Q305 "+(atmBottomY-5*scaleY).toFixed(1)+" 0 "+atmBottomY.toFixed(1)+" Z' fill='url(#atmBand)'/>"+
+      "<path d='M0 "+atmTopY.toFixed(1)+" Q305 "+(atmTopY-7*scaleY).toFixed(1)+" "+VBW+" "+atmTopY.toFixed(1)+"' fill='none' stroke='#587887' stroke-width='1' opacity='.42'/>"+
+      "<path d='M0 "+atmBottomY.toFixed(1)+" Q305 "+(atmBottomY-5*scaleY).toFixed(1)+" "+VBW+" "+atmBottomY.toFixed(1)+"' fill='none' stroke='#446373' stroke-width='1' opacity='.28'/>"+
+      "<path d='M0 "+groundY.toFixed(1)+" Q305 "+(groundY-12*scaleY).toFixed(1)+" "+VBW+" "+(groundY+1*scaleY).toFixed(1)+"' fill='none' stroke='#5A7A88' stroke-width='1.2' opacity='.68'/>"+
+      haloText(92, atmTopY-9, t("sim.diag.atmosphere"), "#718896", 10, "start")+
+      haloText(VBW-18, groundY+24, t("sim.diag.surface"), "#718896", 10, "end")+
+
+      // Solar ray: same angle as the input.
+      "<line x1='"+rayStartX.toFixed(1)+"' y1='"+rayStartY.toFixed(1)+"' x2='"+(targetX-7*rayDirX).toFixed(1)+"' y2='"+(groundY-7*rayDirY).toFixed(1)+
+      "' stroke='#F5AC57' stroke-width='2.2' stroke-linecap='round' stroke-dasharray='1 7' marker-end='url(#acqArrowSun)'/>"+
+
+      // Nadir axis adapts with altitude.
+      "<line x1='"+satX+"' y1='"+sensorBottomY.toFixed(1)+"' x2='"+targetX+"' y2='"+groundY.toFixed(1)+"' stroke='#5FDCD0' stroke-width='1.4' stroke-dasharray='2 6' opacity='.82'/>"+
+      haloText(targetX+18, satY+76*scaleY, t("sim.diag.nadir"), "#8497AA", 10.5, "start")+
+
+      // Target.
+      "<circle cx='"+targetX+"' cy='"+groundY.toFixed(1)+"' r='7' fill='#5FDCD0'/>"+
+      "<circle cx='"+targetX+"' cy='"+groundY.toFixed(1)+"' r='17' fill='none' stroke='#5FDCD0' stroke-width='1' opacity='.22'/>"+
+      haloText(targetX, groundY+31, t("sim.diag.target"), "#8497AA", 10.5, "middle")+
+
+      // Solar elevation angle.
+      "<path d='M"+arcStartX.toFixed(1)+" "+groundY.toFixed(1)+" A"+arcR+" "+arcR+" 0 0 1 "+arcEndX.toFixed(1)+" "+arcEndY.toFixed(1)+"' fill='none' stroke='#F5AC57' stroke-width='1.8'/>"+
+      haloText(targetX-arcR-2, groundY+21, t("sim.diag.sun_elev"), "#F5AC57", 9.5, "middle")+
+      haloText(targetX-arcR-2, groundY+39, angle+"°", "#F5AC57", 13.5, "middle")+
+
+      // Altitude dimension.
+      "<line x1='"+dimX+"' y1='"+dimTopY.toFixed(1)+"' x2='"+dimX+"' y2='"+groundY.toFixed(1)+"' stroke='#8497AA' stroke-width='1' stroke-dasharray='2 5' opacity='.6'/>"+
+      "<line x1='"+(dimX-7)+"' y1='"+dimTopY.toFixed(1)+"' x2='"+(dimX+7)+"' y2='"+dimTopY.toFixed(1)+"' stroke='#8497AA' stroke-width='1.1'/>"+
+      "<line x1='"+(dimX-7)+"' y1='"+groundY.toFixed(1)+"' x2='"+(dimX+7)+"' y2='"+groundY.toFixed(1)+"' stroke='#8497AA' stroke-width='1.1'/>"+
+      haloText(dimX+15, dimMidY-4, t("sim.diag.altitude"), "#8497AA", 10, "start")+
+      haloText(dimX+15, dimMidY+17, H+" km", "#C4D6D4", 15, "start")+
+
+      // Sun — its position follows the entered elevation.
+      "<g transform='translate("+sunX.toFixed(1)+" "+sunY.toFixed(1)+")'>"+
+        "<g stroke='#F5AC57' stroke-width='1.8' stroke-linecap='round'>"+
+          "<line x1='-18' y1='0' x2='-11' y2='0'/><line x1='11' y1='0' x2='18' y2='0'/>"+
+          "<line x1='0' y1='-18' x2='0' y2='-11'/><line x1='0' y1='11' x2='0' y2='18'/>"+
+          "<line x1='-13' y1='-13' x2='-8' y2='-8'/><line x1='13' y1='13' x2='8' y2='8'/>"+
+          "<line x1='13' y1='-13' x2='8' y2='-8'/><line x1='-13' y1='13' x2='-8' y2='8'/>"+
+        "</g>"+
+        "<circle r='8' fill='#F5AC57'/>"+
+      "</g>"+
+      haloText(sunX-19, sunY+4, t("sim.diag.sun"), "#F5AC57", 11.5, "end")+
+
+      // Satellite.
+      "<g transform='translate("+satX+" "+satY.toFixed(1)+")'>"+
+        "<rect x='-18' y='-11' width='36' height='20' rx='3' fill='url(#acqSatBody)' stroke='#5FDCD0' stroke-width='1.5'/>"+
+        "<rect x='-12' y='-7' width='24' height='6' rx='1.5' fill='#315363' opacity='.55'/>"+
+        "<circle cx='9' cy='-3.5' r='1.4' fill='#F0776D'/>"+
+        "<rect x='-43' y='-5' width='20' height='10' rx='1.5' fill='#1A2A33' stroke='#4A7688' stroke-width='1'/>"+
+        "<line x1='-36' y1='-5' x2='-36' y2='5' stroke='#345A6B' stroke-width='.8'/><line x1='-30' y1='-5' x2='-30' y2='5' stroke='#345A6B' stroke-width='.8'/>"+
+        "<line x1='-43' y1='0' x2='-23' y2='0' stroke='#345A6B' stroke-width='.8'/>"+
+        "<rect x='23' y='-5' width='20' height='10' rx='1.5' fill='#1A2A33' stroke='#4A7688' stroke-width='1'/>"+
+        "<line x1='30' y1='-5' x2='30' y2='5' stroke='#345A6B' stroke-width='.8'/><line x1='36' y1='-5' x2='36' y2='5' stroke='#345A6B' stroke-width='.8'/>"+
+        "<line x1='23' y1='0' x2='43' y2='0' stroke='#345A6B' stroke-width='.8'/>"+
+        "<rect x='-7' y='8' width='14' height='10' rx='2.5' fill='#101B22' stroke='#5FDCD0' stroke-width='1.35'/>"+
+        "<circle cx='0' cy='20' r='4.6' fill='#091117' stroke='#5FDCD0' stroke-width='1.5'/>"+
+        "<circle cx='0' cy='20' r='1.6' fill='#5FDCD0'/>"+
+      "</g>"+
+
+      // Legend.
+      "<g transform='translate("+ (VBW-182) +" 22)'>"+
+        "<line x1='0' y1='4' x2='20' y2='4' stroke='#F5AC57' stroke-width='2' stroke-dasharray='1 5'/><text x='27' y='8' fill='#8497AA' font-family='var(--mono)' font-size='9.5'>" + t("sim.diag.illumination") + "</text>"+
+        "<line x1='0' y1='22' x2='20' y2='22' stroke='#5FDCD0' stroke-width='1.4' stroke-dasharray='2 5'/><text x='27' y='26' fill='#8497AA' font-family='var(--mono)' font-size='9.5'>" + t("sim.diag.los") + "</text>"+
+      "</g>"+
+    "</svg>";
+  }catch(e){
+    // Ne doit JAMAIS remonter : une exception non rattrapée ici, avant la
+    // fin du script (bloc "Démarrage" plus bas), empêche updatePanelButton()
+    // de tourner au chargement — donc le bouton "Suivant →" de répondre au
+    // clic, sur TOUTE l'appli, pas juste le schéma. C'est précisément ce
+    // qui vient de se produire (satX non déclarée, cf. fix ci-dessus).
+    console.warn("renderAcquisitionDiagram a échoué (schéma non affiché) :", e);
+  }
+}
+
+["fH","fS"].forEach(function(id){
+  var el = document.getElementById(id);
+  if(el){
+    el.addEventListener("input", renderAcquisitionDiagram);
+    el.addEventListener("change", renderAcquisitionDiagram);
+  }
+});
+
+// ===================== Résumé permanent (étapes 1-3) =====================
+// ===================== FMC : défilement de l'image pendant l'intégration (07/10/2026) =====================
+// FMC (facteur) = distance balayée pendant l'intégration, en pixels = vitesse au sol × temps d'intégration ÷ pas au sol.
+// Un facteur de FMC est appliqué pour ramener ce défilement à 1 pixel ; FMC = 1 : aucune compensation nécessaire.
+//   vitesse au sol : orbite circulaire, vitesse orbitale √(μ/(R+H)) ramenée à la surface (× R/(R+H)),
+//                    rotation de la Terre négligée ;
+//   pas au sol     : iFoV × altitude (visée au nadir) ;
+//   iFoV           : celui de l'instrument choisi à l'étape 2.
+// Valeur indicative : le calcul de simulation ne modélise pas le filé (voir la page Hypothèses).
+var EARTH_RADIUS_KM = 6371, EARTH_MU_KM3_S2 = 398600.4418;
+function fmcGeometry(){
+  var H = Number(document.getElementById("fH").value);
+  var inst = selectedInstIdx >= 0 ? instruments[selectedInstIdx] : null;
+  var iFoV = (inst && inst.config) ? Number(inst.config.I) : NaN;          // µrad
+  if(!(H > 0) || !(iFoV > 0)) return null;
+  var r = EARTH_RADIUS_KM + H;
+  var vg = Math.sqrt(EARTH_MU_KM3_S2 / r) * EARTH_RADIUS_KM / r;           // km/s
+  var gsd = iFoV * 1e-6 * H * 1000;                                         // m
+  // tLineUs : temps que met l'image à parcourir un pixel, c'est-à-dire le temps d'intégration pour FMC = 1
+  return { vg: vg, gsd: gsd, tLineUs: gsd / (vg * 1000) * 1e6 };
+}
+function fmcCompute(){
+  var g = fmcGeometry(), TI = Number(document.getElementById("fTI").value);
+  if(!g || !(TI > 0)) return null;
+  return { px: TI / g.tLineUs, vg: g.vg, gsd: g.gsd };
+}
+// Temps d'intégration minimal : celui qui donne FMC = 1 (une FMC inférieure à 1 voudrait dire que la
+// scène défile moins vite que le pixel ne l'attend, ce que la compensation ne peut pas produire).
+// Plancher de 5 µs ; sans iFoV connu, on retombe sur ce plancher.
+function tiMinInfo(){
+  var g = fmcGeometry();
+  if(g && g.tLineUs >= 5) return { min: g.tLineUs, fmc: true };
+  return { min: 5, fmc: false };
+}
+// Valeur par défaut du champ : le minimum (FMC = 1), tant que l'utilisateur n'y a pas touché ; et rappel
+// du minimum sous le champ. Une erreur déjà affichée est mise à jour quand l'altitude ou l'instrument changent.
+var tiTouched = false;
+function syncTimeField(){
+  var el = document.getElementById("fTI");
+  var rule = CONDITION_RULES.filter(function(r){ return r.id === "fTI"; })[0];
+  var m = tiMinInfo(), minInt = Math.min(Math.ceil(m.min - 1e-9), rule.max);
+  el.min = String(minInt); el.max = String(rule.max); el.step = "1";
+  if(!tiTouched && m.fmc && el.value !== String(minInt)) el.value = String(minInt);
+  if(!tiTouched || document.activeElement !== el) paintRule(rule, ruleMessage(rule));
+}
+// Le détail de la FMC est replié par défaut : seule la valeur reste visible. Un clic sur l'en-tête (hors bouton « ? ») le déplie.
+(function(){
+  var box = document.getElementById("fmcBox"), head = box && box.querySelector(".fmchead"), tg = document.getElementById("fmcToggle"), body = document.getElementById("fmcBody");
+  if(!box || !head || !tg || !body) return;
+  function toggle(){
+    var open = body.hidden;
+    body.hidden = !open;
+    box.classList.toggle("open", open);
+    tg.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+  head.addEventListener("click", function(e){
+    if(e.target.closest(".bubblebtn")) return;
+    toggle();
+  });
+})();
+function updateFmc(){
+  var val = document.getElementById("fmcVal"), swept = document.getElementById("fmcSwept"), det = document.getElementById("fmcDetail");
+  if(!val || !swept || !det) return;
+  var info = fmcCompute();
+  var fmt = function(x){ return x.toLocaleString(nysaLocale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+  // La FMC est un FACTEUR (valeur affichée en grand). La distance balayée en pixels, qui est le même nombre
+  // avant compensation, est expliquée dessous : « X px balayés, ramenés à 1 px par la FMC ».
+  val.textContent = info ? "\u00D7\u00A0" + fmt(info.px) : "-";
+  swept.textContent = info ? t("sim.fmc.swept", { px: fmt(info.px) }) : "";
+  det.textContent = info ? t("sim.fmc.detail", { vg: fmt(info.vg), gsd: fmt(info.gsd) }) : t("sim.fmc.unavailable");
+}
+
+// ===================== Bulles d'aide (07/10/2026) =====================
+// Un bouton « ? » (classe bubblebtn, attribut data-bubble) ouvre une bulle placée près du bouton.
+// Elle se ferme avec Échap, un clic ailleurs ou un nouveau clic sur le bouton ; elle suit son bouton quand on défile.
+// text peut être une fonction (clé choisie à l'ouverture) et vars une fonction (valeurs insérées dans le texte).
+var BUBBLES = {
+  tdi: { title: "sim.help.tdi.title", text: "sim.help.tdi.text" },
+  fmc: { title: "sim.help.fmc.title", text: "sim.help.fmc.text" },
+  ti:  { title: "sim.help.ti.title",
+         text: function(){ return tiMinInfo().fmc ? "sim.help.ti.text" : "sim.help.ti.text_nofmc"; },
+         vars: function(){
+           var m = tiMinInfo(), inst = selectedInstIdx >= 0 ? instruments[selectedInstIdx] : null;
+           var rule = CONDITION_RULES.filter(function(r){ return r.id === "fTI"; })[0];
+           return { min: Math.ceil(m.min - 1e-9), max: rule.max,
+                    ifov: inst && inst.config ? Number(inst.config.I).toLocaleString(nysaLocale(), { maximumFractionDigits: 3 }) : "-",
+                    alt: Number(document.getElementById("fH").value).toLocaleString(nysaLocale(), { maximumFractionDigits: 0 }) };
+         } }
+};
+var bubbleEl = null, bubbleBtn = null;
+function closeBubble(){
+  if(!bubbleEl) return;
+  bubbleEl.remove(); bubbleEl = null;
+  if(bubbleBtn){ bubbleBtn.setAttribute("aria-expanded", "false"); bubbleBtn.removeAttribute("aria-describedby"); bubbleBtn = null; }
+}
+function openBubble(btn){
+  var def = BUBBLES[btn.getAttribute("data-bubble")];
+  if(!def) return;
+  closeBubble();
+  var el = document.createElement("div");
+  el.className = "bubble"; el.id = "bubbleNote"; el.setAttribute("role", "note");
+  var h = document.createElement("strong"); h.textContent = t(def.title); el.appendChild(h);
+  var textKey = typeof def.text === "function" ? def.text() : def.text;
+  t(textKey, def.vars ? def.vars() : undefined).split("\n").forEach(function(line){
+    var para = document.createElement("p"); para.textContent = line; el.appendChild(para);
+  });
+  document.body.appendChild(el);
+  bubbleEl = el; bubbleBtn = btn;
+  placeBubble();
+  btn.setAttribute("aria-expanded", "true"); btn.setAttribute("aria-describedby", "bubbleNote");
+}
+// Place la bulle près de son bouton. Rappelée au défilement et au redimensionnement : sur
+// téléphone, la barre d'adresse qui se rétracte déclenche ces événements, et fermer la bulle
+// à ce moment-là la ferait disparaître toute seule.
+function placeBubble(){
+  if(!bubbleEl || !bubbleBtn) return;
+  var r = bubbleBtn.getBoundingClientRect();
+  if(r.bottom < 0 || r.top > window.innerHeight){ closeBubble(); return; }   // bouton sorti de l'écran
+  var w = Math.min(320, window.innerWidth - 24);
+  bubbleEl.style.width = w + "px";
+  var hh = bubbleEl.getBoundingClientRect().height, left, top;
+  var ar = (bubbleBtn.closest(".field, .fmcbox") || bubbleBtn).getBoundingClientRect();     // le champ que la bulle décrit
+  if(ar.left - w - 12 >= 12){
+    // assez de place à gauche du champ : la bulle s'y place, à hauteur du bouton, sans cacher le champ
+    left = ar.left - w - 12;
+    top = Math.max(12, Math.min(r.top + r.height / 2 - hh / 2, window.innerHeight - hh - 12));
+  } else {
+    // sinon sous le bouton, ou au-dessus s'il n'y a pas la place dessous
+    left = Math.max(12, Math.min(r.left + r.width / 2 - w / 2, window.innerWidth - w - 12));
+    top = r.bottom + 8;
+    if(top + hh > window.innerHeight - 12 && r.top - 8 - hh > 12) top = r.top - 8 - hh;
+  }
+  bubbleEl.style.left = left + "px"; bubbleEl.style.top = top + "px";
+}
+document.addEventListener("click", function(e){
+  var btn = e.target.closest && e.target.closest(".bubblebtn");
+  if(btn){ e.preventDefault(); if(bubbleBtn === btn) closeBubble(); else openBubble(btn); return; }
+  if(bubbleEl && !(e.target.closest && e.target.closest(".bubble"))) closeBubble();
+});
+document.addEventListener("keydown", function(e){ if(e.key === "Escape") closeBubble(); });
+window.addEventListener("resize", placeBubble);
+window.addEventListener("scroll", placeBubble, true);
+
+function updateSummary(){
+  updateFmc();
+  var s = SCENES[selectedSceneIdx];
+  var dimStr = s.w + " × " + s.h + " m";
+  document.getElementById("sumSceneSlot").innerHTML =
+    "<div class='sumfilled'><span class='mini' style=\"background-image:url('" + s.thumb + "');background-size:cover;background-position:center\"></span><div class='txt'>"+
+    "<div class='t1'>" + tScene(s.name) + "</div><div class='t2'>" + dimStr + " · " + s.badge + "</div>"+
+    "</div></div>";
+
+  if(currentStep >= 2 && selectedInstIdx >= 0){
+    document.getElementById("sumInstSlot").innerHTML =
+      "<div class='sumfilled'><span class='mini pupil'>" + satThumb(instruments[selectedInstIdx]) + "</span><div class='txt'>"+
+      "<div class='t1'>" + escH(instruments[selectedInstIdx].name) + "</div></div></div>";
+  } else {
+    document.getElementById("sumInstSlot").innerHTML = "<span class='empty'>-</span>";
+  }
+
+  if(currentStep >= 3){
+    // 07/10/2026 — une ligne par grandeur, avec son nom en toutes lettres (avant : « 615 km · 76° / TI -1µs · TDI 1 »)
+    var wfeCase = selectedWfeCase();
+    function condVal(id, suffix){ var x = document.getElementById(id).value; return x === "" ? "-" : x + suffix; }
+    var condRows = [
+      [t("field.H"),  condVal("fH", " km")],
+      [t("field.S"),  condVal("fS", "°")],
+      [t("field.TI"), condVal("fTI", " µs")],
+      [t("field.TDI"), condVal("fTDI", "")],
+      [t("field.wfe_case"), wfeCase ? wfeCase.name : t("sim.wfe.simplified")]
+    ];
+    var condSlot = document.getElementById("sumCondSlot");
+    condSlot.textContent = "";
+    var condBox = document.createElement("div"); condBox.className = "sumkv";
+    condRows.forEach(function(r){
+      var row = document.createElement("div"); row.className = "kv";
+      var k = document.createElement("span"); k.className = "k"; k.textContent = r[0];
+      var v = document.createElement("span"); v.className = "v"; v.textContent = r[1];   // textContent : le nom d'un cas WFE ne peut pas injecter de balise
+      row.appendChild(k); row.appendChild(v); condBox.appendChild(row);
+    });
+    condSlot.appendChild(condBox);
+  } else {
+    document.getElementById("sumCondSlot").innerHTML = "<span class='empty'>-</span>";
+  }
+}
+// ===================== Accès au simulateur (04/10/2026) =====================
+// Un compte sans abonnement actif peut tout préparer (scène, instrument,
+// conditions) mais pas lancer. Avant, il ne l'apprenait qu'après avoir
+// cliqué sur « Lancer », par une ligne d'erreur du serveur. Désormais :
+//   - une fenêtre s'ouvre dès l'arrivée sur la page ;
+//   - un bandeau reste affiché au-dessus de l'assistant ;
+//   - le bouton de lancement devient « S'abonner pour lancer ».
+// Ce n'est qu'un affichage : le vrai contrôle reste celui du serveur
+// (main.py, _require_active_plan), dont la règle est reprise ici à
+// l'identique — plan payant, statut « active », échéance absente ou future.
+// L'adresse des fonctions se déduit de celle du projet (supabase-client.js) :
+// un seul endroit à changer si le projet déménage.
+var FUNCTIONS_URL = SUPABASE_URL + "/functions/v1";
+var PAID_PLANS = ["individuel", "equipe"];   // le rôle administrateur est la colonne is_admin, pas un plan
+// Marge après l'échéance (04/10/2026), identique à celle du serveur
+// (main.py, _PERIOD_GRACE_DAYS) : à chaque renouvellement, le webhook Stripe
+// repousse la date d'échéance ; s'il a du retard ou échoue ce jour-là, un
+// abonné qui vient de payer ne doit pas être bloqué.
+var PERIOD_GRACE_MS = 2 * 24 * 3600 * 1000;
+var entitlement = null;     // ligne account_entitlements du compte, ou null
+var accessKnown = false;    // false tant que la lecture n'a pas abouti : on ne bloque rien
+function hasSimAccess(){
+  if(!accessKnown) return true;
+  if(!entitlement) return false;
+  if(entitlement.isAdmin && !entitlement.simulated) return true;   // administrateur sans simulation : accès complet, comme le serveur
+  if(PAID_PLANS.indexOf(entitlement.plan) < 0 || entitlement.subscription_status !== "active") return false;
+  if(entitlement.current_period_end
+     && new Date(entitlement.current_period_end).getTime() + PERIOD_GRACE_MS <= Date.now()) return false;
+  return true;
+}
+function paymentPending(){ return !!entitlement && entitlement.subscription_status === "past_due"; }
+async function loadEntitlement(){
+  // 05/10/2026 — bêta gratuite : tout compte reçoit l'accès au simulateur
+  // jusqu'à la fin de la bêta. C'est la base qui l'accorde (fonction
+  // claim_beta_access, cf. beta-gratuite.sql) : elle écrit une vraie ligne
+  // d'abonnement, celle que le serveur de simulation vérifie. Elle ne fait
+  // rien pour un abonné payant, ni après la date de fin. Si la fonction
+  // n'existe pas encore, l'appel échoue sans conséquence.
+  try {
+    if(typeof supabaseClient.rpc === "function"){
+      var betaRes = await supabaseClient.rpc("claim_beta_access");
+      if(betaRes && betaRes.error) console.warn("Accès bêta non accordé :", betaRes.error.message);
+    }
+  } catch(e){ console.warn("Accès bêta non accordé :", e); }
+  try {
+    var { data, error } = await supabaseClient
+      .from("account_entitlements")
+      .select("*")
+      .maybeSingle();
+    if(error) throw error;
+    entitlement = data ? applySimulatedPlan(data) : null;
+    accessKnown = true;
+  } catch(e){
+    // Lecture impossible (aperçu, réseau) : on n'affiche rien, le serveur tranchera.
+    console.warn("Lecture de l'abonnement impossible :", e);
+  }
+}
+// atLaunch = true quand la fenêtre s'ouvre au clic sur le bouton de
+// lancement : le texte rappelle alors la simulation préparée (instrument,
+// scène, altitude) au lieu d'une phrase générale.
+function renderPaywall(atLaunch){
+  var pending = paymentPending();
+  var inst = selectedInstIdx >= 0 ? instruments[selectedInstIdx] : null;
+  var sc = SCENES[selectedSceneIdx];
+  var altEl = document.getElementById("fH");
+  var ready = !!(atLaunch && inst && sc);
+  document.getElementById("paywallEyebrow").textContent = ready ? t("paywall.ready_eyebrow") : t("paywall.eyebrow");
+  document.getElementById("paywallTitle").textContent = pending
+    ? t("paywall.title.pending")
+    : t("paywall.title");
+  var generic = t("paywall.generic");
+  var text = document.getElementById("paywallText");
+  if(pending){
+    text.textContent = t("paywall.pending");
+  } else if(ready){
+    // Noms saisis par l'utilisateur : insérés en texte, jamais en HTML.
+    text.textContent = "";
+    var b1 = document.createElement("b"); b1.textContent = inst.name;
+    var b2 = document.createElement("b"); b2.textContent = tScene(sc.name);
+    // La phrase vient du dictionnaire ; {inst} et {scene} y marquent la place des deux noms en gras.
+    var tpl = (altEl && altEl.value) ? t("paywall.ready_alt", { alt: altEl.value }) : t("paywall.ready");
+    tpl.split(/(\{inst\}|\{scene\})/).forEach(function(part){
+      if(part === "{inst}") text.append(b1);
+      else if(part === "{scene}") text.append(b2);
+      else if(part) text.append(part);
+    });
+  } else {
+    text.textContent = generic;
+  }
+  document.getElementById("paywallList").innerHTML = pending ? "" :
+    "<li>" + t("paywall.li1") + "</li>"+
+    "<li>" + t("paywall.li2") + "</li>"+
+    "<li>" + t("paywall.li3") + "</li>";
+  document.getElementById("paywallCta").textContent = pending ? t("sub.update_btn") : t("sub.subscribe");   // 05/10/2026 — plus de prix affiché (tarif décidé après la bêta)
+  document.getElementById("paywallLater").textContent = pending ? t("paywall.later") : t("paywall.continue");
+  document.getElementById("payBannerText").textContent = pending
+    ? t("paywall.banner.pending")
+    : t("paywall.banner");
+  document.getElementById("payBannerBtn").textContent = pending ? t("sub.update_btn") : t("sub.subscribe");
+}
+function openPaywall(atLaunch){
+  renderPaywall(atLaunch === true);
+  document.getElementById("paywallErr").hidden = true;
+  document.getElementById("paywallOverlay").classList.add("open");
+}
+function closePaywall(){ document.getElementById("paywallOverlay").classList.remove("open"); }
+// Même aiguillage que le bouton d'abonnement des paramètres
+// (espace-personnel.html) : portail client pour un abonnement à gérer,
+// page de paiement dans tous les autres cas.
+async function goSubscribe(){
+  var cta = document.getElementById("paywallCta"), errEl = document.getElementById("paywallErr");
+  var previous = cta.textContent;
+  cta.disabled = true; cta.textContent = "Redirection…"; errEl.hidden = true;
+  var url = null;
+  try {
+    var { data: { session: s } } = await supabaseClient.auth.getSession();
+    if(!s){ window.location.href = "login.html"; return; }
+    // Cette fenêtre ne s'affiche que pour un compte SANS accès. Le portail
+    // client ne sert qu'à régulariser un paiement en retard ; dans tous les
+    // autres cas (jamais abonné, résilié, accès expiré) on va vers la page
+    // de paiement, qui réutilise le client Stripe existant.
+    var res = await fetch(FUNCTIONS_URL + "/" + (paymentPending() ? "create-portal-session" : "create-checkout-session"), {
+      method: "POST",
+      headers: { "Authorization": "Bearer " + s.access_token, "Content-Type": "application/json" }
+    });
+    if(res.ok){
+      var out = await res.json();
+      // Déjà abonné d'après Stripe (base en retard ou fausse) : la fonction
+      // n'a pas créé de page de paiement et vient de réaligner la base. On
+      // recharge : l'accès est maintenant reconnu, la simulation peut partir.
+      if(out.already_subscribed){ window.location.reload(); return; }
+      url = out.url;
+    } else console.error("abonnement :", await res.text());
+  } catch(e){ console.error("abonnement :", e); }
+  if(!url){
+    cta.disabled = false; cta.textContent = previous;
+    errEl.textContent = t("sub.pay_fail");
+    errEl.hidden = false;
+    return;
+  }
+  window.location.href = url;
+}
+document.getElementById("paywallCta").addEventListener("click", goSubscribe);
+document.getElementById("paywallLater").addEventListener("click", closePaywall);
+document.getElementById("payBannerBtn").addEventListener("click", function(){ openPaywall(false); });
+document.getElementById("paywallOverlay").addEventListener("click", function(e){
+  if(e.target === e.currentTarget) closePaywall(); // clic en dehors de la fenêtre
+});
+
+// ===================== Bornes des conditions d'acquisition (07/10/2026) =====================
+// Avant, les attributs min/max des champs ne servaient qu'aux flèches : on pouvait
+// taper -1 µs ou 5000 km et lancer quand même. Désormais le bouton « Lancer » reste
+// grisé tant qu'une valeur est hors bornes, avec le message sous le champ.
+//   Altitude : 380 à 900 km          Élévation solaire : 8 à 80°
+//   Temps d'intégration : de « FMC = 1 » (le temps que met l'image à parcourir un pixel, voir fmcGeometry)
+//                          à 3000 µs. Le minimum dépend de l'altitude et de l'iFoV de l'instrument choisi.
+//                          Par défaut, le champ prend ce minimum tant que l'utilisateur n'y a pas touché.
+//   Étages TDI : entier de 1 à 64 (1 = pas de TDI : un seul étage, l'intégration
+//   sur le pixel a toujours lieu ; zéro étage n'aurait aucun signal à sommer)
+var CONDITION_RULES = [
+  { id: "fH",   err: "errH",   min: 380, max: 900, unit: " km" },
+  { id: "fS",   err: "errS",   min: 8,   max: 80,  unit: "°" },
+  { id: "fTI",  err: "errTI",  min: 5,   max: 3000, unit: " µs" },
+  { id: "fTDI", err: "errTDI", min: 1,   max: 64,  unit: "", integer: true }
+];
+function ruleMessage(rule){
+  var raw = document.getElementById(rule.id).value.trim();
+  if(raw === "" || isNaN(Number(raw))) return t("sim.val.required");
+  var v = Number(raw);
+  if(rule.integer && !Number.isInteger(v)) return t("sim.val.int_between", { min: rule.min, max: rule.max });
+  if(rule.id === "fTI"){
+    var m = tiMinInfo(), minInt = Math.ceil(m.min - 1e-9);
+    if(minInt > rule.max) return t("sim.val.ti_unreachable", { min: minInt, max: rule.max });
+    if(v < m.min - 1e-9) return t(m.fmc ? "sim.val.min_fmc" : "sim.val.min", { min: minInt });
+    if(v > rule.max) return t("sim.val.max", { max: rule.max });
+    return "";
+  }
+  if(v < rule.min || v > rule.max){
+    return rule.integer ? t("sim.val.int_between", { min: rule.min, max: rule.max })
+                        : t("sim.val.between", { min: rule.min, max: rule.max, unit: rule.unit });
+  }
+  return "";
+}
+function paintRule(rule, msg){
+  var el = document.getElementById(rule.id), err = document.getElementById(rule.err);
+  el.classList.toggle("invalid", !!msg);
+  el.setAttribute("aria-invalid", msg ? "true" : "false");
+  if(msg) el.setAttribute("aria-describedby", rule.err); else el.removeAttribute("aria-describedby");
+  err.textContent = msg; err.hidden = !msg;
+}
+function conditionsValid(){
+  return CONDITION_RULES.every(function(r){ return ruleMessage(r) === ""; });
+}
+function validateConditions(show){
+  var firstBad = null;
+  CONDITION_RULES.forEach(function(r){
+    var m = ruleMessage(r);
+    if(m && !firstBad) firstBad = r;
+    if(show) paintRule(r, m);
+  });
+  if(show && firstBad) document.getElementById(firstBad.id).focus();
+  return !firstBad;
+}
+
+// 12/10/2026 : limite de simulations par semaine glissante (plan bêta). Le serveur la fait respecter (main.py,
+// _BETA_WEEKLY_LIMIT) ; ici on l'affiche, et on grise le bouton quand elle est atteinte. L'administrateur n'en a pas,
+// ni le compte marqué unlimited_simulations (compte des tests automatiques, 19/10/2026).
+var QUOTA_MAX = 20;        // même valeur que _BETA_WEEKLY_LIMIT dans main.py
+var quotaMsg = "";
+var quotaUsed = null;      // dates (ms) des simulations réussies des 7 derniers jours ; null = sans objet ou illisible
+function quotaApplies(){ return !!entitlement && !entitlement.isAdmin && entitlement.beta_access === true && entitlement.unlimited_simulations !== true; }
+function quotaFull(){ return quotaApplies() && quotaUsed !== null && quotaUsed.length >= QUOTA_MAX; }
+async function loadQuota(){
+  var note = document.getElementById("quotaNote");
+  quotaUsed = null;
+  if(quotaApplies()){
+    try {
+      var since = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString();
+      var { data, error } = await supabaseClient.from("simulation_usage")
+        .select("created_at").gte("created_at", since).order("created_at", { ascending: true });
+      if(error) throw error;
+      quotaUsed = (data || []).map(function(r){ return new Date(r.created_at).getTime(); });
+    } catch(e){ console.warn("Compteur de simulations illisible :", e); }
+  }
+  if(quotaUsed === null){ note.hidden = true; updatePanelButton(); return; }
+  var n = quotaUsed.length;
+  note.hidden = false;
+  note.classList.toggle("full", n >= QUOTA_MAX);
+  note.classList.toggle("warn", n >= QUOTA_MAX * 0.8 && n < QUOTA_MAX);
+  document.getElementById("quotaLabel").textContent = t("sim.quota");
+  document.getElementById("quotaVal").textContent = n + " / " + QUOTA_MAX;
+  document.getElementById("quotaFill").style.width = Math.min(100, Math.round(100 * n / QUOTA_MAX)) + "%";
+  var fm = document.getElementById("quotaFullMsg");
+  quotaMsg = "";
+  if(n >= QUOTA_MAX){
+    var freeAt = new Date(quotaUsed[n - QUOTA_MAX] + 7 * 24 * 3600 * 1000);
+    quotaMsg = t("sim.quota.full", { max: QUOTA_MAX,
+      date: freeAt.toLocaleString(nysaLocale(), { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) });
+  }
+  fm.textContent = quotaMsg;
+  fm.hidden = !quotaMsg;
+  updatePanelButton();
+}
+
+function updatePanelButton(){
+  var btn = document.getElementById("panelActionBtn");
+  if(currentStep === 3){
+    if(!hasSimAccess()){
+      // Compte sans accès : le bouton ouvre la fenêtre d'abonnement.
+      btn.textContent = paymentPending() ? t("sim.btn.fix_payment") : t("sim.btn.subscribe_to_run");
+      btn.disabled = false;
+      btn.onclick = function(){ openPaywall(true); };
+      updateSummary();
+      return;
+    }
+    btn.textContent = t("sim.btn.run");
+    syncTimeField();
+    var badRule = adminMode() ? null : CONDITION_RULES.filter(function(r){ return ruleMessage(r) !== ""; })[0];
+    btn.disabled = selectedInstIdx < 0 || !!badRule || quotaFull();
+    btn.title = badRule ? ruleMessage(badRule) : (quotaFull() ? quotaMsg : "");
+    btn.onclick = function(){ showStep(4); };
+  } else {
+    btn.textContent = t("common.next");
+    // Étape 1 (scène) : jamais bloquée par l'absence d'instrument — on
+    // doit pouvoir passer à l'étape 2 même sans instrument existant, pour
+    // pouvoir en créer un depuis là (cf. renderInstruments). Étape 2
+    // (instrument) : bloquée tant qu'aucun instrument n'est sélectionné.
+    btn.disabled = (currentStep === 2 && selectedInstIdx < 0);
+    btn.onclick = function(){ showStep(currentStep + 1); };
+  }
+  updateSummary();
+}
+// ===================== Frappe limitée aux chiffres (07/10/2026) =====================
+// Les champs sont de type « number », que les navigateurs laissent taper presque comme
+// ils veulent : « e », « + », « - » (donc 1e2 ou -50), et, selon la langue du navigateur,
+// une virgule SUPPRIMÉE sans prévenir (« 12,5 » devenait 125, soit dix fois trop).
+// Ici : seuls les chiffres passent ; la virgule est remplacée par un point (décimales
+// permises sauf pour le nombre d'étages TDI, entier) ; un collage est nettoyé de la même
+// façon (« 615 km » donne 615). La validation des bornes reste le filet de sécurité.
+function restrictNumericTyping(el, allowDecimal){
+  el.inputMode = allowDecimal ? "decimal" : "numeric";
+  var forbidden = allowDecimal ? /[^0-9.,]/g : /[^0-9]/g;
+  el.addEventListener("beforeinput", function(e){
+    if(e.inputType !== "insertText" && e.inputType !== "insertFromPaste" && e.inputType !== "insertFromDrop") return;
+    var raw = e.data;
+    if(raw == null && e.dataTransfer) raw = e.dataTransfer.getData("text");
+    if(raw == null) return;
+    var cleaned = raw.replace(forbidden, "").replace(/,/g, ".");
+    if(cleaned === raw) return;                      // rien à corriger : la frappe se fait normalement
+    e.preventDefault();
+    if(!cleaned) return;                             // caractère interdit : ignoré
+    if(!document.execCommand("insertText", false, cleaned)){
+      el.value = el.value + cleaned;                 // repli si le navigateur refuse insertText
+      el.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+  });
+}
+
+["fH","fS","fTI","fTDI"].forEach(function(id){
+  var rule = CONDITION_RULES.filter(function(r){ return r.id === id; })[0];
+  var el = document.getElementById(id);
+  restrictNumericTyping(el, !rule.integer);
+  if(id === "fTI"){
+    // dès que l'utilisateur écrit dans le champ, il n'est plus recalé sur le minimum
+    el.addEventListener("beforeinput", function(){ tiTouched = true; });
+    el.addEventListener("input", function(e){ if(e.isTrusted) tiTouched = true; });
+  }
+  el.addEventListener("input", function(){
+    if(id === "fH" || id === "fS") renderAcquisitionDiagram();
+    // Une erreur déjà affichée disparaît dès que la valeur redevient correcte ; une nouvelle
+    // erreur n'apparaît qu'à la sortie du champ, pour ne pas gêner la frappe (« 1 » avant « 100 »).
+    if(el.classList.contains("invalid") && ruleMessage(rule) === "") paintRule(rule, "");
+    updatePanelButton();
+  });
+  // « change » ne se déclenche pas si on retape la valeur d'origine dans la même saisie : « blur » garantit
+  // que l'erreur est réaffichée à la sortie du champ dans tous les cas.
+  function recheck(){ paintRule(rule, ruleMessage(rule)); updatePanelButton(); }
+  el.addEventListener("change", recheck);
+  el.addEventListener("blur", recheck);
+});
+renderAcquisitionDiagram();
+setTimeout(renderAcquisitionDiagram, 60); // re-mesure une fois la mise en page stabilisée
+var acqResizeTimer = null;
+window.addEventListener("resize", function(){
+  clearTimeout(acqResizeTimer);
+  acqResizeTimer = setTimeout(renderAcquisitionDiagram, 120);
+});
+
+// ===================== Étape 4 : lancement réel + sauvegarde automatique =====================
+var lastResult = null;     // réponse brute du serveur (image_b64, bands, logs)
+var lastPayload = null;    // ce qui a été envoyé (pour le résumé + la sauvegarde)
+var simRunning = false;
+var abortController = null;
+var pingInterval = null;
+
+function addLog(msg){
+  var logList = document.getElementById("logList");
+  if(!logList) return;
+  var line = document.createElement("div");
+  line.className = "logline";
+  line.innerHTML = "<span class='ldot'></span><span class='msg'>" + msg + "</span>";
+  logList.appendChild(line);
+  logList.scrollTop = logList.scrollHeight;
+}
+
+// kind: "running" | "ok" | "error" | "interrupted"
+function setStatus(kind, text){
+  var pulse = document.getElementById("statPulse");
+  var textEl = document.getElementById("statText");
+  var interruptBtn = document.getElementById("interruptBtn");
+  pulse.className = "pulse" + (kind === "ok" ? " ok" : kind === "error" ? " alert" : kind === "interrupted" ? " muted" : "");
+  textEl.textContent = text;
+  interruptBtn.style.display = kind === "running" ? "inline-flex" : "none";
+  // La barre défile tant que le calcul tourne, et s'arrête dans tous les
+  // autres états (terminé, échec, interrompu) : c'est ici que passent
+  // toutes les fins de simulation.
+  var fill = document.getElementById("pfill");
+  if(fill){
+    fill.classList.toggle("running", kind === "running");
+    if(kind === "error" || kind === "interrupted"){ fill.style.transition = "none"; fill.style.width = "0%"; }
+  }
+}
+
+// Libellés lisibles des champs du payload — utilisés pour traduire les
+// erreurs de validation de l'API (qui ne connaît que les codes courts).
+var FIELD_LABELS = {};   // libellés dans i18n.js (clés field.*), dans la langue de l'interface
+["scene","D","I","E","T","W","PX","NSUP","ESUP","R","P","K","FW","QE","ADC","T_filter","H","S","TI","TDI","perfoCsv","perfoCsvAlign","perfoCsvConvention","qeSpectral"].forEach(function(k){
+  FIELD_LABELS[k] = t("field." + k);
+});
+
+// Traduction des messages Pydantic les plus courants — le reste est
+// affiché tel quel plutôt que de risquer une traduction fausse.
+function translateApiMsg(msg){
+  if(!msg) return "";
+  // Ces messages de validation arrivent en anglais du serveur : en anglais, ils sont affichés tels quels.
+  if(nysaLang() !== "fr") return msg;
+  if(msg === "Field required") return "champ requis";
+  if(msg.indexOf("none is not an allowed value") === 0) return "valeur manquante";
+  if(msg.indexOf("value is not a valid float") === 0 || msg.indexOf("value is not a valid integer") === 0) return "doit être un nombre";
+  if(msg.indexOf("ensure this value is greater than or equal to") === 0) return msg.replace("ensure this value is greater than or equal to", "doit être supérieur ou égal à");
+  if(msg.indexOf("ensure this value is less than or equal to") === 0) return msg.replace("ensure this value is less than or equal to", "doit être inférieur ou égal à");
+  if(msg.indexOf("ensure this value is greater than") === 0) return msg.replace("ensure this value is greater than", "doit être supérieur à");
+  if(msg.indexOf("ensure this value is less than") === 0) return msg.replace("ensure this value is less than", "doit être inférieur à");
+  return msg;
+}
+
+// Met en forme le champ "detail" d'une réponse d'erreur de l'API FastAPI,
+// qui peut être une simple chaîne, un tableau d'erreurs de validation
+// Pydantic ([{loc, msg, type}, ...]) ou un objet — jamais affiché tel
+// quel (sinon un tableau d'objets devient "[object Object],[object Object]").
+function formatApiError(detail, status){
+  if(!detail) return t("api.server_error", { status: status });
+  if(typeof detail === "string") return tApi(detail);   // messages du serveur, écrits en français : traduits quand ils sont connus
+  if(Array.isArray(detail)){
+    return detail.map(function(d){
+      if(d && typeof d === "object"){
+        var fieldKey = Array.isArray(d.loc) ? d.loc.filter(function(p){ return p !== "body"; }).join(".") : "";
+        var fieldLabel = FIELD_LABELS[fieldKey];
+        var msg = translateApiMsg(d.msg) || JSON.stringify(d);
+        var sep = t("common.colon");
+        return fieldLabel ? (fieldLabel + " (" + fieldKey + ")" + sep + msg) : (fieldKey ? (fieldKey + sep + msg) : msg);
+      }
+      return String(d);
+    }).join(" ; ");
+  }
+  if(typeof detail === "object") return detail.msg || JSON.stringify(detail);
+  return String(detail);
+}
+
+async function launchSimulation(){
+  // garde : jamais de calcul avec des conditions hors bornes (le bouton est déjà grisé dans ce cas)
+  if(!adminMode() && !validateConditions(true)){ showStep(3); return; }
+  var inst = instruments[selectedInstIdx];
+  var scene = SCENES[selectedSceneIdx];
+
+  document.getElementById("sumScene").textContent = tScene(scene.name);
+  document.getElementById("sumRes").textContent = scene.res;
+  document.getElementById("sumInst").textContent = inst ? inst.name : "-";
+  document.getElementById("sumAlt").textContent = document.getElementById("fH").value + " km";
+  document.getElementById("sumS").textContent = document.getElementById("fS").value + "°";
+  document.getElementById("sumTI").textContent = document.getElementById("fTI").value + " µs";
+  document.getElementById("sumTDI").textContent = document.getElementById("fTDI").value;
+  var wfeCaseForSummary = selectedWfeCase();
+  document.getElementById("sumWfeCase").textContent = wfeCaseForSummary ? wfeCaseForSummary.name : "-";
+
+  if(simRunning || !inst) return;
+  simRunning = true;
+  document.getElementById("statusActions").innerHTML = "";
+
+  var pfill = document.getElementById("pfill");
+  var ppct = document.getElementById("ppct");
+  var etaText = document.getElementById("etaText");
+  var logList = document.getElementById("logList");
+  logList.innerHTML = "";
+  pfill.style.transition = "none"; pfill.style.width = "0%"; // l'animation de défilement est lancée par setStatus("running")
+  ppct.textContent = "";
+  etaText.textContent = t("sim.eta.running");
+  setStatus("running", t("sim.status.running"));
+  addLog(t("sim.log.started"));
+
+  // 16/10/2026 : invité = attente fictive puis résultat pré-calculé (dossier demo/), aucun appel serveur.
+  if(guest){ runGuestSimulation(scene); return; }
+
+  // Ping périodique pendant l'attente : le calcul est synchrone côté
+  // serveur (pas de flux de logs en direct), donc sans ça le panneau
+  // paraît figé pendant 1-2 minutes.
+  pingInterval = setInterval(function(){ addLog(t("sim.log.still")); }, 10000);
+
+  var conditions = {
+    H: Number(document.getElementById("fH").value),
+    S: Number(document.getElementById("fS").value),
+    TI: Number(document.getElementById("fTI").value),
+    TDI: Number(document.getElementById("fTDI").value),
+    Z: "none",
+  };
+
+  // Valeurs par défaut (03/10/2026) : le formulaire de création d'instrument
+  // annonce « 0 (défaut) » ou « 1 (défaut) » pour ces champs, mais un champ
+  // laissé vide partait tel quel et le serveur le refusait (champ requis).
+  // Elles sont maintenant appliquées ici, au moment de l'envoi. D, I, PX,
+  // ADC et FW n'ont pas de défaut : ils restent obligatoires.
+  function orDefault(v, d){ return (v === undefined || v === null || v === "") ? d : Number(v); }
+  // Longueurs d'onde des deux points d'une courbe plate (mode « Valeur constante »).
+  var FLAT_CURVE_NM = [300, 1100];
+  var payload = Object.assign({
+    scene: scene.id,
+    D: inst.config.D, I: inst.config.I,
+    W: orDefault(inst.config.W, 0), E: orDefault(inst.config.E, 0), T: orDefault(inst.config.T, 1),
+    R: orDefault(inst.config.R, 0), P: orDefault(inst.config.P, 0), K: orDefault(inst.config.K, 0),
+    FW: inst.config.FW,
+    PX: inst.config.PX, QE: orDefault(inst.config.QE, 1), ADC: inst.config.ADC,
+    // 12/10/2026 : transmission du filtre, 1 par défaut (instrument sans filtre ou créé avant ce champ)
+    T_filter: orDefault(inst.config.T_filter, 1),
+    NSUP: orDefault(inst.config.NSUP, 0), ESUP: orDefault(inst.config.ESUP, 0),
+  }, conditions);
+  // Pas de supports sans obscuration centrale (04/10/2026) : le formulaire
+  // grise ces champs quand l'obscuration est nulle, et des valeurs saisies
+  // avant restent enregistrées ; elles ne sont pas envoyées.
+  if(!(payload.E > 0)){ payload.NSUP = 0; payload.ESUP = 0; }
+
+  // Atmosphère (03/10/2026) — seules les valeurs modifiées sont envoyées :
+  // sans bloc "atmosphere", le backend applique ses réglages par défaut
+  // (radiometry.SIXS_DEFAULTS). Vapeur d'eau et ozone vont ensemble et
+  // remplacent le profil ; visibilité et épaisseur optique s'excluent.
+  var atm = {};
+  var atmProfile = document.getElementById("fAtmosProfile").value;
+  if(atmProfile === "custom"){
+    var water = document.getElementById("fWater").value, ozone = document.getElementById("fOzone").value;
+    if(water !== "" && ozone !== ""){ atm.water_vapour_gcm2 = Number(water); atm.ozone_cmatm = Number(ozone); }
+  } else if(atmProfile !== "MidlatitudeSummer"){
+    atm.atmos_profile = atmProfile;
+  }
+  var aeroProfile = document.getElementById("fAeroProfile").value;
+  if(aeroProfile !== "Continental") atm.aero_profile = aeroProfile;
+  var aeroLoad = document.getElementById("fAeroLoad").value;
+  if(aeroLoad !== "") atm[document.getElementById("fAeroLoadKind").value] = Number(aeroLoad);
+  if(Object.keys(atm).length) payload.atmosphere = atm;
+
+  // Électronique et DSNU (03/10/2026) — clés explicites, identiques à
+  // celles du paramFile (cf. creer-instrument.html et paramfile_builder.py).
+  // Seuls les champs du mode choisi sont envoyés : le backend refuse un
+  // mélange de modes (module_SNR.resolve_electronics). Un champ vide n'est
+  // pas envoyé (undefined disparaît à la sérialisation JSON).
+  function numOrUndef(v){ return (v === undefined || v === null || v === "") ? undefined : Number(v); }
+  var cfg = inst.config;
+  payload.electronics_mode = cfg.electronics_mode || undefined;
+  if(cfg.electronics_mode === "detailed"){
+    payload.CVF_uV_per_e = numOrUndef(cfg.CVF_uV_per_e);
+    payload.G_PGA = numOrUndef(cfg.G_PGA);
+    payload.V_range = numOrUndef(cfg.V_range);
+  } else if(cfg.electronics_mode === "datasheet"){
+    payload.CWF = numOrUndef(cfg.CWF);
+  }
+  payload.DN0 = numOrUndef(cfg.DN0);
+  payload.bits_TDI = numOrUndef(cfg.bits_TDI);
+  payload.dsnu_1288 = numOrUndef(cfg.dsnu_1288);
+  payload.dsnu_T_ref = numOrUndef(cfg.dsnu_T_ref);
+
+  // Cas WFE actif — deux formes possibles (cf. creer-instrument.html,
+  // échange du 19/09/2026) :
+  //  - "rms" : remplace juste W par la valeur du cas ; le mode
+  //    d'aberration choisi ci-dessus s'applique toujours par-dessus.
+  //  - "file" : CSV Zernike réel, remplace entièrement le mode simplifié
+  //    W/Z pour cet envoi — même champ "perfoCsv" (texte brut) que côté
+  //    backend SimulateParams/main.py, où W/Z sont alors ignorés pour le
+  //    WFE mais restent requis dans le payload (valeurs de l'instrument
+  //    envoyées normalement, simplement sans effet sur le résultat dans
+  //    ce cas). perfoCsvAlign : quelle portion du CSV garder si sa
+  //    largeur ne correspond pas à celle, dépendante de l'altitude, de
+  //    cette simulation (cf. _remap_perfo_csv côté serveur) — "center"
+  //    par défaut si absent. perfoCsvConvention : convention
+  //    d'indexation Zernike du cas — module_MTF.py en a besoin dès qu'un
+  //    perfoCsv est fourni (paramFile.Telescope.WFE_convention, sans
+  //    valeur par défaut côté backend). Valeurs "OSA"/"Noll"/"Fringe"
+  //    supposées attendues par op.convert_WFE, non confirmées faute
+  //    d'accès à optics.py.
+  var wfeCase = selectedWfeCase();
+  if(wfeCase && wfeCase.mode === "rms"){
+    payload.W = wfeCase.rms;
+  } else if(wfeCase){
+    payload.perfoCsv = wfeCase.csv;
+    payload.perfoCsvAlign = wfeCase.align || "center";
+    payload.perfoCsvConvention = wfeCase.convention === "noll" ? "Noll"
+      : wfeCase.convention === "fringe" ? "Fringe" : "OSA";
+  }
+
+  // Courbe QE(λ) réelle (cf. creer-instrument.html, state.values.qeSpectral)
+  // : remplace le QE scalaire pour cet envoi — même format que
+  // paramFile.Detector.QE_spectral côté backend (confirmé le 17/09/2026
+  // via radiometry.py) : {wavelength_nm:[...], values:[...]}, QE en
+  // fraction 0-1. Seuls les points valides (les deux champs remplis et
+  // numériques) sont envoyés ; en dessous de 2 points valides, on retombe
+  // sur le QE scalaire — cohérent avec le seuil minimum d'affichage de la
+  // courbe dans creer-instrument.html (renderQeChart).
+  var qePts = (inst.config.qeSpectral || [])
+    .filter(function(p){ return p.wl !== "" && p.qe !== "" && !isNaN(p.wl) && !isNaN(p.qe) && Number(p.qe) >= 0 && Number(p.qe) <= 1; })
+    .map(function(p){ return { wl: Number(p.wl), qe: Number(p.qe) }; })
+    .filter(function(p, i, all){ return all.findIndex(function(q){ return q.wl === p.wl; }) === i; }) // pas de λ en double
+    .sort(function(a,b){ return a.wl - b.wl; });
+  // Mode de saisie (04/10/2026, cf. creer-instrument.html, QE_mode) :
+  //   "curve"    : la courbe saisie est envoyée telle quelle ;
+  //   "constant" : la valeur unique est envoyée comme une courbe PLATE, deux
+  //                points à la même valeur. Avant, le backend remettait à
+  //                l'échelle la forme spectrale de son template, que
+  //                l'utilisateur ne voyait pas. Les longueurs d'onde des deux
+  //                points sont sans effet : hors de la plage, le backend
+  //                garde la valeur du bord.
+  // Instrument sans mode enregistré : "curve" s'il a une courbe d'au moins
+  // 2 points valides, "constant" sinon. Dans les deux cas une courbe est
+  // envoyée, donc le QE scalaire ne l'est plus (sinon le builder ferait une
+  // remise à l'échelle inutile, écrasée ensuite par la courbe).
+  var qeMode = inst.config.QE_mode || (qePts.length >= 2 ? "curve" : "constant");
+  if(qeMode === "curve" && qePts.length >= 2){
+    payload.qeSpectral = {
+      wavelength_nm: qePts.map(function(p){ return p.wl; }),
+      values: qePts.map(function(p){ return p.qe; }),
+    };
+  } else {
+    payload.qeSpectral = { wavelength_nm: FLAT_CURVE_NM, values: [payload.QE, payload.QE] };
+  }
+  delete payload.QE;
+
+  // Courbe de transmission optique T(λ) (04/10/2026) — même principe et
+  // même format que la courbe QE ci-dessus : avec au moins 2 points
+  // valides, elle remplace la transmission scalaire pour cet envoi.
+  var tPts = (inst.config.tSpectral || [])
+    .filter(function(p){ return p.wl !== "" && p.t !== "" && !isNaN(p.wl) && !isNaN(p.t) && Number(p.t) >= 0 && Number(p.t) <= 1; })
+    .map(function(p){ return { wl: Number(p.wl), t: Number(p.t) }; })
+    .filter(function(p, i, all){ return all.findIndex(function(q){ return q.wl === p.wl; }) === i; }) // pas de λ en double
+    .sort(function(a,b){ return a.wl - b.wl; });
+  // Même choix de mode que pour le QE (T_mode). Le champ T reste envoyé
+  // parce que le serveur l'exige ; en mode courbe il vaut la moyenne des
+  // points, et le builder ne s'en sert pas quand une courbe est fournie.
+  var tMode = inst.config.T_mode || (tPts.length >= 2 ? "curve" : "constant");
+  if(tMode === "curve" && tPts.length >= 2){
+    payload.tSpectral = {
+      wavelength_nm: tPts.map(function(p){ return p.wl; }),
+      values: tPts.map(function(p){ return p.t; }),
+    };
+    payload.T = tPts.reduce(function(a, p){ return a + p.t; }, 0) / tPts.length;
+  } else {
+    payload.tSpectral = { wavelength_nm: FLAT_CURVE_NM, values: [payload.T, payload.T] };
+  }
+
+  lastPayload = { payload: payload, scene: scene, inst: inst, conditions: conditions, wfeCase: wfeCase };
+  // simulation admin : on garde dans le résultat les entrées réellement utilisées (JSON complet, nom du CSV)
+  if(adminMode()){
+    lastPayload.conditions = Object.assign({}, conditions, { admin: { paramFileName: adminJsonName, paramFile: adminJson || {}, perfoCsvName: adminCsvName } });
+  }
+
+  abortController = new AbortController();
+
+  try{
+    // Rafraîchit la session juste avant l'appel plutôt que de réutiliser
+    // celle capturée une fois au chargement de la page (var "session",
+    // ligne ~1271) — un onglet resté ouvert plus d'une heure (durée de
+    // vie par défaut d'un jeton Supabase) finissait sinon par envoyer un
+    // jeton expiré ("Jeton invalide ou expiré : Signature has expired"),
+    // même si la session elle-même restait valide. getSession() renvoie
+    // le jeton actuel, rafraîchi automatiquement par le client Supabase
+    // si besoin.
+    var { data: freshSessionData, error: sessionErr } = await supabaseClient.auth.getSession();
+    if(sessionErr || !freshSessionData.session){
+      throw new Error(t("sim.err.session"));
+    }
+    session = freshSessionData.session;
+
+    var viaAdmin = adminMode();
+    var resp = await fetch(API_URL + (viaAdmin ? "/simulate_admin" : "/simulate_account"), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + session.access_token,
+      },
+      body: JSON.stringify(viaAdmin ? { scene: scene.id, paramFile: adminJson || {}, perfoCsv: adminCsv } : payload),
+      signal: abortController.signal,
+    });
+    var data = await resp.json();
+
+    if(!resp.ok){
+      if(viaAdmin && data && data.logs) admShowServerLogs(data.logs);
+      throw new Error(formatApiError(data.detail, resp.status));
+    }
+
+    if(viaAdmin) delete data.dn_b64;       // DN bruts : lourds, inutiles ici (la page Résultats n'en a pas l'usage)
+    lastResult = data;
+    pfill.style.transition = "width .4s ease-out";
+    pfill.style.width = "100%";
+    ppct.textContent = "100 %";
+    etaText.textContent = t("sim.eta.done");
+
+    // 04/10/2026 — les logs du serveur (diagnostics internes : statistiques
+    // par bande, gains, étirement…) ne sont plus recopiés dans ce panneau.
+    // Ils restent dans lastResult.logs et sont enregistrés avec le résultat
+    // (colonne saved_results.logs). Le panneau ne montre que les étapes.
+    addLog(t("sim.log.done"));
+    clearInterval(pingInterval);
+    simRunning = false;
+    setStatus("ok", t("sim.status.done"));
+    loadQuota();   // le serveur vient d'ajouter cette simulation au compteur
+
+    await autoSaveResult();
+  }catch(err){
+    clearInterval(pingInterval);
+    simRunning = false;
+    if(err.name === "AbortError"){
+      etaText.textContent = "-";
+      addLog(t("sim.log.stopped"));
+      setStatus("interrupted", t("sim.status.stopped"));
+    } else {
+      ppct.textContent = t("sim.pct.failed");
+      etaText.textContent = "-";
+      addLog(t("common.error_msg", { msg: escH(err.message) }));
+      setStatus("error", t("sim.status.failed"));
+    }
+  }
+}
+
+// ===================== Mode invité : simulation fictive (16/10/2026) =====================
+// Les trois résultats possibles ont été calculés d'avance (demo/<scène>/result.json). On fait attendre environ
+// une minute (durée variable de quelques secondes) pour que le parcours reste celui d'une vraie simulation.
+var GUEST_SLUGS = { aix: "ville", avion: "avion", port: "port" };
+function runGuestSimulation(scene){
+  var pfill = document.getElementById("pfill"), ppct = document.getElementById("ppct"), etaText = document.getElementById("etaText");
+  var duration = 55000 + Math.round(Math.random() * 10000);
+  pingInterval = setInterval(function(){ addLog(t("sim.log.still")); }, 10000);
+  abortController = { abort: function(){
+    if(!simRunning) return;
+    clearTimeout(guestTimer); clearInterval(pingInterval);
+    simRunning = false;
+    etaText.textContent = "-";
+    addLog(t("sim.log.stopped"));
+    setStatus("interrupted", t("sim.status.stopped"));
+  } };
+  guestTimer = setTimeout(function(){
+    clearInterval(pingInterval);
+    simRunning = false;
+    pfill.style.transition = "width .4s ease-out";
+    pfill.style.width = "100%";
+    ppct.textContent = "100 %";
+    etaText.textContent = t("sim.eta.done");
+    addLog(t("sim.log.done"));
+    setStatus("ok", t("sim.status.done"));
+    var slug = GUEST_SLUGS[scene.id] || scene.id;
+    // Le résultat est retenu pour la durée de l'onglet : la page Résultats de l'invité le liste (sessionStorage).
+    try {
+      var kept = JSON.parse(sessionStorage.getItem("nysa_guest_results") || "[]").filter(function(x){ return x.slug !== slug; });
+      kept.push({ slug: slug, at: Date.now() });
+      sessionStorage.setItem("nysa_guest_results", JSON.stringify(kept));
+    } catch(e){ /* stockage indisponible : le lien direct fonctionne quand même */ }
+    document.getElementById("statusActions").innerHTML =
+      "<a class='viewresultsbtn' href='resultats.html?id=demo-" + encodeURIComponent(slug) + "'>" + t("sim.save.view") + "</a>";
+  }, duration);
+}
+
+document.getElementById("interruptBtn").addEventListener("click", function(){
+  if(abortController) abortController.abort();
+});
+// « Précédent » pendant un calcul : demande confirmation avant d'interrompre (08/10/2026).
+// Écouteur en phase de capture : il passe avant celui de data-goto qui change d'étape.
+document.getElementById("step4Back").addEventListener("click", function(e){
+  if(!simBusy()) return;
+  if(!confirm(t("sim.leave.prev"))){ e.preventDefault(); e.stopImmediatePropagation(); }
+}, true);
+document.getElementById("step4Back").addEventListener("click", function(){
+  if(abortController && simRunning) abortController.abort();
+});
+
+// ===================== Quitter la page pendant un calcul (07/10/2026) =====================
+// Le calcul vit dans cette page : la quitter coupe l'attente de la réponse, et
+// le résultat est perdu (le serveur finit son calcul, mais personne ne récupère
+// l'image). Tant qu'un calcul ou la sauvegarde qui le suit est en cours :
+//   - un clic sur un lien de la page (menu de gauche, etc.) ouvre une fenêtre
+//     qui propose d'ouvrir la destination dans un nouvel onglet (la simulation
+//     continue ici), de quitter quand même, ou de rester ;
+//   - le bouton de déconnexion demande une confirmation ;
+//   - fermer ou recharger l'onglet déclenche l'avertissement du navigateur.
+// Ctrl/Cmd-clic et clic du milieu (nouvel onglet) ne sont pas interceptés.
+var leavingOnPurpose = false;
+function simBusy(){ return simRunning || simSaving; }
+
+window.addEventListener("beforeunload", function(e){
+  if(!simBusy() || leavingOnPurpose) return;
+  e.preventDefault();
+  e.returnValue = "";
+});
+
+var leaveModal = null, leaveReturnFocus = null;
+function closeLeaveModal(){
+  if(!leaveModal) return;
+  leaveModal.remove(); leaveModal = null;
+  if(leaveReturnFocus && leaveReturnFocus.focus) leaveReturnFocus.focus();
+}
+function askLeave(href, label){
+  if(leaveModal) return;
+  var saving = !simRunning && simSaving;
+  leaveReturnFocus = document.activeElement;
+  var ov = document.createElement("div");
+  ov.className = "leaveov";
+  ov.innerHTML =
+    "<div class='leavebox' role='dialog' aria-modal='true' aria-labelledby='leaveTitle'>"+
+      "<h3 id='leaveTitle'></h3><p id='leaveText'></p>"+
+      "<div class='leaveactions'>"+
+        "<button type='button' class='leavebtn main' id='leaveNewTab'></button>"+
+        "<button type='button' class='leavebtn danger' id='leaveGo'></button>"+
+        "<button type='button' class='leavebtn link' id='leaveStay'></button>"+
+      "</div></div>";
+  document.body.appendChild(ov);
+  leaveModal = ov;
+  // textContent : le nom du lien ne peut pas injecter de balise
+  ov.querySelector("#leaveTitle").textContent = t(saving ? "sim.leave.title_saving" : "sim.leave.title");
+  ov.querySelector("#leaveText").textContent = t(saving ? "sim.leave.text_saving" : "sim.leave.text", { page: label });
+  ov.querySelector("#leaveNewTab").textContent = t("sim.leave.newtab");
+  ov.querySelector("#leaveGo").textContent = t(saving ? "sim.leave.go_saving" : "sim.leave.go");
+  ov.querySelector("#leaveStay").textContent = t("sim.leave.stay");
+
+  ov.querySelector("#leaveNewTab").addEventListener("click", function(){
+    window.open(href, "_blank", "noopener");
+    document.body.classList.remove("menu-open");   // referme le menu sur petit écran
+    closeLeaveModal();
+  });
+  ov.querySelector("#leaveGo").addEventListener("click", function(){
+    leavingOnPurpose = true;
+    window.location.href = href;
+  });
+  ov.querySelector("#leaveStay").addEventListener("click", closeLeaveModal);
+  ov.addEventListener("click", function(e){ if(e.target === ov) closeLeaveModal(); });
+  ov.addEventListener("keydown", function(e){
+    if(e.key === "Escape"){ e.stopPropagation(); closeLeaveModal(); return; }
+    if(e.key === "Tab"){
+      var btns = ov.querySelectorAll("button"), first = btns[0], last = btns[btns.length - 1];
+      if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+      else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+    }
+  });
+  ov.querySelector("#leaveNewTab").focus();
+}
+function leaveLabel(a){
+  var txt = (a.getAttribute("data-leave-label") || a.textContent || "").replace(/\s+/g, " ").trim();
+  txt = txt.replace(/\s*(à venir|coming soon|soon)\s*$/i, "");
+  return (txt && txt.length <= 32) ? txt : t("sim.leave.this_page");
+}
+document.addEventListener("click", function(e){
+  if(!simBusy()) return;
+  if(e.defaultPrevented || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+  var a = e.target.closest && e.target.closest("a[href]");
+  if(!a || a.target === "_blank" || a.hasAttribute("download") || a.hasAttribute("data-nysa-help")) return;
+  var href = a.getAttribute("href");
+  if(!href || href.charAt(0) === "#" || /^(mailto:|tel:|javascript:)/i.test(href)) return;
+  e.preventDefault(); e.stopPropagation();
+  askLeave(a.href, leaveLabel(a));
+}, true);
+// déconnexion : pas de « nouvel onglet » possible, donc une simple confirmation
+document.addEventListener("click", function(e){
+  if(!simBusy() || !(e.target.closest && e.target.closest("#signOutBtn"))) return;
+  if(!confirm(t("sim.leave.signout"))){ e.preventDefault(); e.stopImmediatePropagation(); }
+  else leavingOnPurpose = true;
+}, true);
+
+// ===================== Utilitaire : base64 -> Blob (pour l'upload) =====================
+function base64ToBlob(b64, mime){
+  var byteChars = atob(b64);
+  var byteNumbers = new Array(byteChars.length);
+  for(var i = 0; i < byteChars.length; i++) byteNumbers[i] = byteChars.charCodeAt(i);
+  return new Blob([new Uint8Array(byteNumbers)], { type: mime });
+}
+
+// ===================== Sauvegarde automatique du résultat =====================
+// Se déclenche seule dès que la simulation réussit — plus besoin de clic
+// manuel. Les résultats sont sauvegardés par défaut ; en cas d'échec de la
+// sauvegarde (ex. limite de 20 résultats atteinte), un bouton "Réessayer"
+// permet de relancer juste cette étape sans refaire tourner la simulation.
+//
+// Migration SQL nécessaire si la colonne n'existe pas encore sur
+// "saved_results" (ajoutée pour la comparaison source/simulé plein
+// résolution, cf. resultats.html) :
+//   alter table saved_results add column if not exists source_image_path text;
+// 07/10/2026 — la sauvegarde qui suit le calcul est suivie elle aussi (simSaving) :
+// quitter la page à ce moment-là perdrait le résultat, comme pendant le calcul.
+var simSaving = false;
+async function autoSaveResult(){
+  simSaving = true;
+  try { await autoSaveResultInner(); } finally { simSaving = false; }
+}
+async function autoSaveResultInner(){
+  var actions = document.getElementById("statusActions");
+  actions.innerHTML = "<p class='savingnote'>" + t("sim.save.saving") + "</p>";
+
+  var resultId = crypto.randomUUID();
+  var basePath = accountId + "/" + resultId + "/";
+
+  try{
+    // Image principale
+    var mainBlob = base64ToBlob(lastResult.image_b64, "image/png");
+    var { error: upErr } = await supabaseClient.storage.from("results").upload(basePath + "main.png", mainBlob);
+    if(upErr) throw upErr;
+
+    // Image source plein résolution (vrai crop utilisé en entrée du
+    // calcul, cf. source_preview_b64 dans main.py) — sans elle, la page
+    // résultats retombe sur une vignette JS générique, sans rapport avec
+    // le crop réellement simulé. Best-effort : son absence (résultat
+    // sauvegardé avant ce changement, ou vieux payload) ne doit pas faire
+    // échouer toute la sauvegarde.
+    var sourceImagePath = null;
+    if(lastResult.source_preview_b64){
+      var srcBlob = base64ToBlob(lastResult.source_preview_b64, "image/png");
+      var { error: srcErr } = await supabaseClient.storage.from("results").upload(basePath + "source.png", srcBlob);
+      if(!srcErr) sourceImagePath = basePath + "source.png";
+      else console.error("Erreur upload image source :", srcErr);
+    }
+
+    // Graphiques par bande — mêmes clés que la réponse de /simulate_account
+    var GRAPH_KEYS = ["pupil_png_b64","psf_png_b64","mtf_png_b64","snr_noise_maps_sim_png_b64",
+      "snr_image_compare_png_b64","snr_regimes_png_b64","snr_noise_budget_png_b64",
+      "snr_map_png_b64","snr_histogram_png_b64","saturated_mask_png_b64","dn_png16_b64"];
+
+    var diagBands = {};
+    for(var bandName in lastResult.bands){
+      var d = lastResult.bands[bandName];
+      var bandDiag = {
+        rho_ref: d.rho_ref, reflectance_min: d.reflectance_min, reflectance_max: d.reflectance_max,
+        reflectance_mean: d.reflectance_mean, full_well_e: d.full_well_e, signal_mean_e: d.signal_mean_e,
+        signal_median_e: d.signal_median_e, fill_pct: d.fill_pct, snr_mean: d.snr_mean,
+        mtf_at_nyquist: d.mtf_at_nyquist, S_ref_e: d.S_ref_e, rgb_gain_applied: d.rgb_gain_applied,
+        saturation: d.saturation || null, dn_bits: d.dn_bits || null,
+      };
+      for(var gi = 0; gi < GRAPH_KEYS.length; gi++){
+        var key = GRAPH_KEYS[gi];
+        if(!d[key]) continue;
+        var fname = bandName + "_" + key.replace("_png_b64", "") + ".png";
+        var blob = base64ToBlob(d[key], "image/png");
+        var { error: gErr } = await supabaseClient.storage.from("results").upload(basePath + fname, blob);
+        if(!gErr) bandDiag[key.replace("_b64", "_path")] = basePath + fname;
+      }
+      diagBands[bandName] = bandDiag;
+    }
+
+    // Image RGB en DN bruts (nombre de bits réel de l'électronique de l'instrument)
+    var dnDiag = null;
+    if(lastResult.dn_raw_png16_b64){
+      var { error: dnErr } = await supabaseClient.storage.from("results").upload(basePath + "dn_rgb.png", base64ToBlob(lastResult.dn_raw_png16_b64, "image/png"));
+      if(!dnErr) dnDiag = Object.assign({}, lastResult.dn_info || {}, { rgb_path: basePath + "dn_rgb.png" });
+    }
+    // TIFF 32 bits (DN exacts, une page par bande Rouge, Vert, Bleu), téléchargeable depuis la page Résultats
+    if(dnDiag && lastResult.dn_raw_tiff32_b64){
+      var { error: tifErr } = await supabaseClient.storage.from("results").upload(basePath + "dn_rgb32.tif", base64ToBlob(lastResult.dn_raw_tiff32_b64, "image/tiff"));
+      if(!tifErr) dnDiag.tiff_path = basePath + "dn_rgb32.tif";
+    }
+
+    var { error: insErr } = await supabaseClient.from("saved_results").insert({
+      id: resultId,
+      account_id: accountId,
+      instrument_id: lastPayload.inst.id,
+      instrument_snapshot: { name: lastPayload.inst.name, config: lastPayload.inst.config },
+      scene: lastPayload.scene.name,
+      // wfeCaseName ajouté ici (pas de colonne dédiée) pour l'afficher sur
+      // la brique résultat (cf. resultats.html, renderResultsList) sans
+      // dépendre de l'instrument encore vivant — null si mode simplifié.
+      conditions: Object.assign({}, lastPayload.conditions, {
+        wfeCaseName: lastPayload.wfeCase ? lastPayload.wfeCase.name : null,
+      }),
+      image_path: basePath + "main.png",
+      source_image_path: sourceImagePath,
+      diagnostics: { bands: diagBands, dn: dnDiag },
+      logs: lastResult.logs || "",
+    });
+    if(insErr) throw insErr;
+
+    addLog(t("sim.save.done"));
+    // 04/10/2026 : bouton « Analyser en détail » retiré avec l'onglet Analyse.
+    actions.innerHTML = "<a class='viewresultsbtn' href='resultats.html?id=" + resultId + "'>" + t("sim.save.view") + "</a>";
+  }catch(err){
+    // « Limite de… » : message du déclencheur de la base quand les 20 résultats sont atteints.
+    var msg = (err.message || "").includes("Limite de")
+      ? (nysaLang() === "fr" ? err.message : t("sim.save.limit"))
+      : t("sim.save.fail", { msg: (err.message || err) });
+    addLog(t("common.error_msg", { msg: escH(msg) }));
+    actions.innerHTML =
+      "<p class='savingnote' style='color:var(--alert)'>" + escH(msg) + "</p>"+
+      "<button class='retrybtn' type='button' id='retrySaveBtn'>" + t("sim.save.retry") + "</button>";
+    document.getElementById("retrySaveBtn").addEventListener("click", autoSaveResult);
+  }
+}
+
+// 04/10/2026 — l'ancienne fenêtre de paramètres de cette page (antérieure à
+// Stripe) est retirée : le lien « Paramètres » ouvre celle de l'espace
+// personnel (espace-personnel.html?settings=1), seule à jour.
+
+
+// ===================== Démarrage =====================
+// ===================== Administration (07/10/2026) =====================
+// Un fichier JSON et/ou un CSV Zernike chargés ici font passer la simulation par /simulate_admin (route
+// réservée au rôle administrateur, sans contrôle de plausibilité) au lieu de /simulate_account. Le JSON est
+// fusionné par le serveur sur son modèle : il remplace l'instrument et les conditions du formulaire.
+var isAdminUser = false, adminJson = null, adminJsonName = "", adminCsv = null, adminCsvName = "";
+var ADM_MAX_JSON = 1024 * 1024, ADM_MAX_CSV = 5 * 1024 * 1024;
+function adminMode(){ return isAdminUser && (adminJson !== null || adminCsv !== null); }
+function admSize(n){ return n >= 1048576 ? (n / 1048576) + " Mo" : (n / 1024) + " Ko"; }
+function admShowErr(msg){ var e = document.getElementById("admErr"); e.textContent = msg || ""; e.hidden = !msg; }
+function admRefresh(){
+  var names = [adminJsonName, adminCsvName].filter(Boolean).join(" + ");
+  document.getElementById("admState").textContent = adminMode() ? t("sim.admin.state", { name: names }) : "";
+  document.getElementById("admJsonClear").hidden = adminJson === null;
+  document.getElementById("admCsvClear").hidden = adminCsv === null;
+  document.getElementById("adminBox").classList.toggle("on", adminMode());
+  updatePanelButton();
+}
+async function admLoad(input, kind){
+  admShowErr("");
+  var f = input.files && input.files[0];
+  if(!f) return;
+  var max = kind === "json" ? ADM_MAX_JSON : ADM_MAX_CSV;
+  if(f.size > max){ admShowErr(t("sim.admin.err_size", { max: admSize(max) })); input.value = ""; return; }
+  var text = await f.text();
+  if(kind === "json"){
+    var obj;
+    try{ obj = JSON.parse(text); }catch(e){ admShowErr(t("sim.admin.err_json", { msg: e.message })); input.value = ""; return; }
+    if(obj === null || typeof obj !== "object" || Array.isArray(obj)){ admShowErr(t("sim.admin.err_obj")); input.value = ""; return; }
+    adminJson = obj; adminJsonName = f.name;
+  } else {
+    adminCsv = text; adminCsvName = f.name;
+  }
+  admRefresh();
+}
+document.getElementById("admJson").addEventListener("change", function(){ admLoad(this, "json"); });
+document.getElementById("admCsv").addEventListener("change", function(){ admLoad(this, "csv"); });
+document.getElementById("admJsonClear").addEventListener("click", function(){ adminJson = null; adminJsonName = ""; document.getElementById("admJson").value = ""; admShowErr(""); admRefresh(); });
+document.getElementById("admCsvClear").addEventListener("click", function(){ adminCsv = null; adminCsvName = ""; document.getElementById("admCsv").value = ""; admShowErr(""); admRefresh(); });
+// En cas d'échec d'une simulation admin, le serveur renvoie ses journaux : on les affiche sous le statut.
+function admShowServerLogs(logs){
+  var host = document.getElementById("statusActions");
+  var old = document.getElementById("admSrvLogs"); if(old) old.remove();
+  var d = document.createElement("details"); d.id = "admSrvLogs"; d.className = "srvlogs"; d.open = true;
+  var s = document.createElement("summary"); s.textContent = t("sim.admin.srv_logs");
+  var pre = document.createElement("pre"); pre.textContent = logs;
+  d.appendChild(s); d.appendChild(pre); host.appendChild(d);
+}
+
+// Conditions figées de l'essai invité : 500 km, 60°, TDI 4, TI 298 µs, cas WFE simplifié. Les champs restent
+// visibles mais désactivés ; seule la scène se choisit. Les résultats pré-calculés correspondent à ces valeurs.
+function setupGuestConditions(){
+  var vals = { fH: 500, fS: 60, fTI: 298, fTDI: 4 };
+  Object.keys(vals).forEach(function(id){
+    var el = document.getElementById(id);
+    el.min = "1"; el.max = "3000";   // les bornes de validation ne s'appliquent plus à des valeurs figées
+    el.value = String(vals[id]);
+    el.disabled = true;
+    el.closest(".field").setAttribute("data-guest-tip", t("guest.tip"));
+  });
+  tiTouched = true;   // syncTimeField ne doit plus réécrire le temps d'intégration
+  var wfe = document.getElementById("fWfeCase");
+  wfe.disabled = true; wfe.closest(".field").setAttribute("data-guest-tip", t("guest.tip"));
+  ["fAtmosProfile", "fAeroProfile", "fAeroLoadKind", "fAeroLoad", "fWater", "fOzone"].forEach(function(id){
+    var el = document.getElementById(id); if(el) el.disabled = true;
+  });
+  document.getElementById("guestSimNote").hidden = false;
+  var tip = document.getElementById("guestTip");
+  function show(el){
+    tip.textContent = el.getAttribute("data-guest-tip"); tip.hidden = false;
+    var r = el.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+    tip.style.left = Math.max(8, Math.min(window.innerWidth - w - 8, r.left + r.width / 2 - w / 2)) + "px";
+    var y = r.bottom + 8; if(y + h > window.innerHeight - 8) y = Math.max(8, r.top - h - 8);
+    tip.style.top = y + "px";
+  }
+  document.addEventListener("mouseover", function(e){
+    var el = e.target.closest && e.target.closest("[data-guest-tip]");
+    if(el) show(el); else tip.hidden = true;
+  });
+  window.addEventListener("scroll", function(){ tip.hidden = true; }, true);
+}
+
+(async function(){
+  try {
+    session = (typeof requireAuth === "function") ? await requireAuth() : null;
+  } catch(e){
+    console.warn("requireAuth indisponible, repli aperçu :", e);
+    session = null;
+  }
+  if(!session){
+    // Aperçu Claude (ou tout environnement sans supabase-client.js /
+    // session valide) : on simule une session minimale pour pouvoir
+    // prévisualiser l'assistant. Sur le site réel, requireAuth()
+    // redirige vers la connexion et ce repli n'intervient jamais.
+    session = { user: { id: "preview", email: "" } };
+  }
+  accountId = session.user.id;
+  guest = !!session.guest;
+
+  if(guest){
+    document.getElementById("userEmail").textContent = t("guest.name");
+    document.getElementById("userAvatar").textContent = "?";
+    var soBtn = document.getElementById("signOutBtn");
+    soBtn.removeAttribute("data-i18n-aria"); soBtn.removeAttribute("data-i18n-title");
+    soBtn.removeAttribute("aria-label"); soBtn.removeAttribute("title");
+    soBtn.className = "nextbtn";
+    soBtn.style.cssText = "width:auto;margin:0;padding:8px 16px";
+    soBtn.textContent = t("guest.create");
+    soBtn.addEventListener("click", function(){ window.location.href = "login.html?signup=1"; });
+    setupGuestConditions();
+  } else {
+    document.getElementById("userEmail").textContent = session.user.email || "";
+    document.getElementById("userAvatar").textContent = (session.user.email || "").slice(0, 2).toUpperCase();
+    document.getElementById("signOutBtn").addEventListener("click", signOut);
+  }
+
+  await loadInstruments();
+
+  // Accès au simulateur (04/10/2026) : sans abonnement actif, un bandeau
+  // prévient dès l'arrivée, sans interrompre. La fenêtre d'abonnement ne
+  // s'ouvre qu'au moment de lancer, une fois la scène, l'instrument et les
+  // conditions choisis : c'est là que l'envie de voir le résultat est la
+  // plus forte (choix du 04/10/2026, à la place de l'ouverture à l'arrivée).
+  if(!guest){
+    await loadEntitlement();
+    await loadQuota();
+  }
+  // 09/10/2026 : pendant une simulation de plan (« Voir comme »), les outils d'administration disparaissent, comme pour un vrai compte de ce plan.
+  if(!guest && typeof isAdminAccount === "function" && await isAdminAccount() && !(typeof simulatedPlan === "function" && await simulatedPlan())){
+    isAdminUser = true;
+    document.getElementById("adminBox").hidden = false;
+  }
+  if(!hasSimAccess()){
+    renderPaywall();
+    document.getElementById("payBanner").classList.add("show");
+    updatePanelButton();
+  }
+
+  // Retour depuis creer-instrument.html?return=simulations (cf. échange
+  // du 18/09/2026) : instrument tout juste créé, on le sélectionne et on
+  // saute directement à l'étape 3 (conditions d'acquisition) plutôt que
+  // de laisser l'utilisateur repasser par la sélection.
+  var newInstId = new URLSearchParams(window.location.search).get("newInstrument");
+  if(newInstId){
+    var idx = instruments.findIndex(function(i){ return i.id === newInstId; });
+    if(idx >= 0){
+      selectedInstIdx = idx;
+      renderInstruments();
+      renderWfeCaseOptions();
+    }
+    window.history.replaceState(null, "", "simulations.html");
+    showStep(idx >= 0 ? 3 : 1);
+    return;
+  }
+
+  renderSteps(1);
+  updatePanelButton();
+})();
+</script>
+<script src="aide.js"></script>
+<!-- Menu de gauche repliable sur petit écran -->
+<script src="menu.js"></script>
+<script src="onboarding.js"></script>
+</body>
+</html>

@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-i18n="login.doc_title">Connexion | Nysa</title>
+<!-- Traduction FR / EN : textes et moteur dans i18n.js -->
+<script src="i18n.js"></script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2048%2048%22%3E%3Ccircle%20cx%3D%2224.00%22%20cy%3D%2213.70%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2232.92%22%20cy%3D%2218.85%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2232.92%22%20cy%3D%2229.15%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2224.00%22%20cy%3D%2234.30%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2215.08%22%20cy%3D%2229.15%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2215.08%22%20cy%3D%2218.85%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2224%22%20cy%3D%2224%22%20r%3D%225.3%22%20fill%3D%22%23FFB86B%22/%3E%3C/svg%3E">
+<!-- Polices hébergées avec le site (dossier fonts/) : aucun appel à Google. -->
+<link rel="stylesheet" href="fonts/fonts.css">
+<!-- Bibliothèque Supabase hébergée avec le site (dossier vendor/), version figée. -->
+<script src="vendor/supabase.js"></script>
+<style>
+:root{
+  --void:#090E13; --panel:#131E27; --panel-2:#1A2833;
+  --line:#2E4152; --line-soft:#22323F;
+  --paper:#C4D6D4; --muted:#9BADBD; --muted-2:#8497AA;
+  --photon:#F5AC57; --pixel:#5FDCD0; --alert:#F0776D; --ok:#7FD88F;
+  --display:"Montserrat","IBM Plex Sans",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{background:var(--void);color:var(--paper);font-family:var(--body);
+  font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;
+  display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+
+.card{width:100%;max-width:400px;background:var(--panel);border:1px solid var(--line-soft);
+  border-radius:8px;padding:32px 30px}
+.brand{display:flex;align-items:center;gap:11px;margin-bottom:26px}
+.brand .mark{flex:none;width:32px;height:32px;display:block}
+.brand .mark svg{width:100%;height:100%;display:block}
+.brand .name{font-family:var(--display);font-weight:500;font-size:21px;letter-spacing:.035em;line-height:1.05}
+.brand .tag{font-family:var(--display);font-weight:400;font-size:12px;letter-spacing:.115em;color:var(--muted-2);margin-top:3px;white-space:nowrap}
+
+h1{font-family:var(--display);font-weight:500;font-size:21px;
+  margin:0 0 6px;letter-spacing:-.012em}
+.sub{font-size:13px;color:var(--muted);margin:0 0 22px}
+
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--line-soft);margin-bottom:22px}
+.tab{flex:1;background:none;border:none;color:var(--muted-2);font-family:var(--mono);
+  font-size:12.5px;letter-spacing:.03em;padding:10px 0;border-bottom:2px solid transparent;
+  cursor:pointer;text-transform:uppercase}
+.tab[aria-selected="true"]{color:var(--pixel);border-color:var(--pixel)}
+
+.field{margin-bottom:16px}
+.field label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:7px}
+.field input{width:100%;box-sizing:border-box;background:var(--panel-2);border:1px solid var(--line-soft);
+  color:var(--paper);border-radius:5px;padding:10px 13px;font-family:var(--body);font-size:14px}
+.field input:focus{outline:none;border-color:var(--pixel)}
+.field select{width:100%;box-sizing:border-box;background:var(--panel-2);border:1px solid var(--line-soft);
+  color:var(--paper);border-radius:5px;padding:10px 13px;font-family:var(--body);font-size:14px}
+.field select:focus{outline:none;border-color:var(--pixel)}
+
+.submitbtn{width:100%;border:1px solid var(--pixel);background:var(--pixel);color:#0A141A;
+  font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.03em;
+  padding:11px 18px;border-radius:5px;cursor:pointer;margin-top:6px;
+  box-shadow:0 2px 10px rgba(95,220,208,.22);transition:background .14s}
+.submitbtn:hover{background:#7CE8DC}
+.submitbtn:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
+
+.msg{font-size:12.5px;margin-top:14px;padding:10px 12px;border-radius:5px;display:none}
+.msg.err{display:block;background:rgba(240,119,109,.1);border:1px solid rgba(240,119,109,.3);color:var(--alert)}
+.msg.ok{display:block;background:rgba(127,216,143,.1);border:1px solid rgba(127,216,143,.3);color:var(--ok)}
+
+.formview{display:none}
+.formview.current{display:block}
+/* 05/10/2026 — charte Nysa : logo plus présent sur la page de connexion */
+.brand{gap:13px;margin-bottom:30px}
+.brand .mark{width:42px;height:42px}
+.brand .name{font-size:27px}
+.brand .tag{font-size:12px;margin-top:4px}
+/* sélecteur de langue, en haut à droite de la carte (affiché au basculement, cf. i18n.js) */
+.card{position:relative}
+.card > [data-lang-switch]{position:absolute;top:16px;right:16px}
+.linkbtn{display:block;margin:14px auto 0;background:none;border:none;padding:2px 4px;cursor:pointer;
+  font-family:var(--body);font-size:12.5px;color:var(--muted);text-decoration:underline;
+  text-decoration-color:var(--line);text-underline-offset:3px}
+.linkbtn:hover{color:var(--pixel);text-decoration-color:var(--pixel)}
+.viewintro{margin:0 0 18px;font-size:13px;line-height:1.5;color:var(--muted)}
+.submitbtn:disabled{opacity:.5;cursor:default}
+.legalnote{margin:12px 0 0;font-size:12px;line-height:1.5;color:var(--muted);text-align:center}
+.legalnote a{color:var(--muted);text-decoration:underline;text-underline-offset:2px}
+.legalnote a:hover{color:var(--pixel)}
+</style>
+</head>
+<body>
+<!-- Bandeau « version bêta » : se désactive dans beta.js (BETA_ACTIVE = false) -->
+<script src="beta.js"></script>
+<div class="card">
+  <div data-lang-switch></div>
+  <div class="brand">
+    <!-- 05/10/2026 — logo Nysa : la fleur à six pétales -->
+      <span class="mark"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24.00" cy="13.70" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="32.92" cy="18.85" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="32.92" cy="29.15" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="24.00" cy="34.30" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="15.08" cy="29.15" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="15.08" cy="18.85" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="24" cy="24" r="5.3" fill="#FFB86B"/></svg></span>
+    <span>
+      <div class="name">Nysa</div>
+      <div class="tag">EO Imaging Engineering</div>
+    </span>
+  </div>
+
+  <div id="authArea">
+    <h1 data-i18n="login.h1">Accès au simulateur complet</h1>
+    <p class="sub" data-i18n="login.sub">Connectez-vous ou créez un compte pour accéder à vos instruments et résultats.</p>
+
+    <div class="tabs" role="tablist">
+      <button class="tab" type="button" data-view="login" aria-selected="true" data-i18n="login.tab.login">Se connecter</button>
+      <button class="tab" type="button" data-view="signup" aria-selected="false" data-i18n="login.tab.signup">Créer un compte</button>
+    </div>
+
+    <!-- ============ Connexion ============ -->
+    <form class="formview current" id="loginForm" data-view="login">
+      <div class="field">
+        <label for="loginEmail" data-i18n="login.email">E-mail</label>
+        <input type="email" id="loginEmail" required autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="loginPassword" data-i18n="login.password">Mot de passe</label>
+        <input type="password" id="loginPassword" required autocomplete="current-password">
+      </div>
+      <button class="submitbtn" type="submit" data-i18n="login.btn.login">Se connecter</button>
+      <button class="linkbtn" type="button" id="forgotLink" data-i18n="login.forgot">Mot de passe oublié ?</button>
+      <div class="msg" id="loginMsg"></div>
+    </form>
+
+    <!-- ============ Inscription ============ -->
+    <form class="formview" id="signupForm" data-view="signup">
+      <div class="field">
+        <label for="signupEmail" data-i18n="login.email">E-mail</label>
+        <input type="email" id="signupEmail" required autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="signupPassword" data-i18n="login.password">Mot de passe</label>
+        <input type="password" id="signupPassword" required minlength="6" autocomplete="new-password">
+      </div>
+      <!-- 05/10/2026 — confirmation du mot de passe : une faute de frappe à
+           l'inscription créait un compte dont personne ne connaissait le mot de passe. -->
+      <div class="field">
+        <label for="signupPassword2" data-i18n="login.password2">Confirmer le mot de passe</label>
+        <input type="password" id="signupPassword2" required minlength="6" autocomplete="new-password">
+      </div>
+      <!-- 06/10/2026 — langue de préférence, enregistrée avec le compte : elle
+           vaut pour l'interface et pour les e-mails. Modifiable dans Paramètres. -->
+      <div class="field">
+        <label for="signupLang" data-i18n="login.lang">Langue de l'interface et des e-mails</label>
+        <select id="signupLang">
+          <option value="en">English</option>
+          <option value="fr">Français</option>
+        </select>
+      </div>
+      <button class="submitbtn" type="submit" data-i18n="login.btn.signup">Créer mon compte</button>
+      <p class="legalnote"><span data-i18n="login.legal.a">En créant un compte, vous acceptez les </span><a href="conditions.html" target="_blank" rel="noopener" data-i18n="login.legal.terms">conditions d'essai</a><span data-i18n="login.legal.b"> et la </span><a href="confidentialite.html" target="_blank" rel="noopener" data-i18n="login.legal.privacy">politique de confidentialité</a>.</p>
+      <div class="msg" id="signupMsg"></div>
+    </form>
+
+    <!-- ============ Mot de passe oublié (06/10/2026) ============
+         1. l'utilisateur donne son adresse : Supabase lui envoie un lien ;
+         2. le lien le ramène sur cette page (login.html?reset=1), où il
+            choisit son nouveau mot de passe (vue suivante). -->
+    <form class="formview" id="forgotForm" data-view="forgot">
+      <p class="viewintro" data-i18n="login.forgot.intro">Saisissez l'adresse e-mail de votre compte : nous vous envoyons un lien pour choisir un nouveau mot de passe.</p>
+      <div class="field">
+        <label for="forgotEmail" data-i18n="login.email">E-mail</label>
+        <input type="email" id="forgotEmail" required autocomplete="email">
+      </div>
+      <button class="submitbtn" type="submit" data-i18n="login.forgot.btn">Envoyer le lien</button>
+      <button class="linkbtn" type="button" id="forgotBack" data-i18n="login.forgot.back">← Retour à la connexion</button>
+      <div class="msg" id="forgotMsg"></div>
+    </form>
+
+    <form class="formview" id="resetForm" data-view="reset">
+      <p class="viewintro" data-i18n="login.reset.intro">Choisissez votre nouveau mot de passe.</p>
+      <div class="field">
+        <label for="resetPassword" data-i18n="settings.pwd.new">Nouveau mot de passe</label>
+        <input type="password" id="resetPassword" required minlength="8" autocomplete="new-password" data-i18n-ph="settings.pwd.ph" placeholder="8 caractères minimum">
+      </div>
+      <div class="field">
+        <label for="resetPassword2" data-i18n="settings.pwd.confirm">Confirmer le nouveau mot de passe</label>
+        <input type="password" id="resetPassword2" required minlength="8" autocomplete="new-password">
+      </div>
+      <button class="submitbtn" type="submit" id="resetBtn" data-i18n="login.reset.btn" disabled>Enregistrer le mot de passe</button>
+      <div class="msg" id="resetMsg"></div>
+    </form>
+  </div>
+</div>
+
+<script src="supabase-client.js"></script>
+<script>
+var urlParams = new URLSearchParams(window.location.search);
+
+// Retour depuis l'e-mail « mot de passe oublié » : le lien ouvre une session
+// provisoire sur cette page, qui sert uniquement à choisir un nouveau mot de
+// passe. Il ne faut donc pas rediriger vers l'espace personnel.
+var RESET_MODE = urlParams.get("reset") === "1";
+
+// Si déjà connecté, inutile de repasser par cette page.
+if (!RESET_MODE) {
+  supabaseClient.auth.getSession().then(function(res){
+    if (res.data.session) window.location.href = "espace-personnel.html";
+  });
+}
+
+// Déconnecté·e automatiquement car ce compte a été utilisé ailleurs
+// (une seule session active à la fois, cf. requireAuth dans supabase-client.js).
+if (urlParams.get("reason") === "other_device") {
+  var banner = document.createElement("div");
+  banner.className = "msg err";
+  banner.style.display = "block";
+  banner.style.marginBottom = "20px";
+  banner.textContent = t("login.msg.other_device");
+  document.getElementById("authArea").insertBefore(banner, document.getElementById("authArea").firstChild);
+}
+
+// Retour après la suppression d'un compte (cf. espace-personnel.html,
+// Paramètres > Suppression) — confirmation que tout a été effacé.
+if (urlParams.get("reason") === "account_created") {
+  var newBanner = document.createElement("div");
+  newBanner.className = "msg ok";
+  newBanner.style.display = "block";
+  newBanner.style.marginBottom = "20px";
+  newBanner.textContent = t("login.msg.created");
+  document.getElementById("authArea").insertBefore(newBanner, document.getElementById("authArea").firstChild);
+}
+if (urlParams.get("reason") === "account_deleted") {
+  var delBanner = document.createElement("div");
+  delBanner.className = "msg ok";
+  delBanner.style.display = "block";
+  delBanner.style.marginBottom = "20px";
+  delBanner.textContent = t("login.msg.deleted");
+  document.getElementById("authArea").insertBefore(delBanner, document.getElementById("authArea").firstChild);
+}
+
+// Langue proposée à l'inscription : celle de l'interface en cours.
+document.getElementById("signupLang").value = nysaLang();
+
+// ===================== Bascule connexion / inscription =====================
+// Affiche une des quatre vues : login, signup, forgot, reset. Les onglets
+// ne concernent que les deux premières ; ils sont masqués pendant le choix
+// d'un nouveau mot de passe.
+function showView(name){
+  document.querySelectorAll(".tab").forEach(function(tabEl){
+    tabEl.setAttribute("aria-selected", tabEl.dataset.view === name ? "true" : "false");
+  });
+  document.querySelector(".tabs").style.display = name === "reset" ? "none" : "";
+  document.querySelectorAll(".formview").forEach(function(v){
+    v.classList.toggle("current", v.dataset.view === name);
+  });
+}
+document.querySelectorAll(".tab").forEach(function(tab){
+  tab.addEventListener("click", function(){ showView(tab.dataset.view); });
+});
+// 16/10/2026 : « login.html?signup=1 » ouvre directement l'onglet « Créer un compte » (depuis le mode invité).
+if (urlParams.get("signup") === "1" && !RESET_MODE) showView("signup");
+
+// ===================== Mot de passe oublié =====================
+document.getElementById("forgotLink").addEventListener("click", function(){
+  // l'adresse déjà saisie pour se connecter est reprise
+  document.getElementById("forgotEmail").value = document.getElementById("loginEmail").value.trim();
+  showView("forgot");
+  document.getElementById("forgotEmail").focus();
+});
+document.getElementById("forgotBack").addEventListener("click", function(){ showView("login"); });
+
+document.getElementById("forgotForm").addEventListener("submit", async function(e){
+  e.preventDefault();
+  var btn = e.target.querySelector(".submitbtn");
+  var msgEl = document.getElementById("forgotMsg");
+  msgEl.className = "msg"; msgEl.textContent = "";
+  btn.disabled = true;
+  var email = document.getElementById("forgotEmail").value.trim();
+  var { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+    redirectTo: new URL("login.html?reset=1", window.location.href).href
+  });
+  btn.disabled = false;
+  if (error && (error.status === 429 || /security purposes|rate limit/i.test(error.message || ""))) {
+    msgEl.className = "msg err";
+    msgEl.textContent = t("login.forgot.rate");
+    return;
+  }
+  // Même message qu'un compte existe ou non : la page ne révèle pas quelles
+  // adresses ont un compte.
+  if (error) console.warn("Demande de réinitialisation :", error.message);
+  msgEl.className = "msg ok";
+  msgEl.textContent = t("login.forgot.sent");
+});
+
+// ===================== Nouveau mot de passe (retour depuis l'e-mail) =====================
+if (RESET_MODE) {
+  showView("reset");
+  var resetMsg = document.getElementById("resetMsg");
+  var resetBtn = document.getElementById("resetBtn");
+  resetMsg.className = "msg ok";
+  resetMsg.textContent = t("login.reset.checking");
+
+  // Le lien est-il valable ? Supabase ouvre la session en lisant l'adresse ;
+  // on lui laisse quelques secondes, puis on conclut.
+  (async function(){
+    var session = null;
+    var failed = /error=|error_code=/.test(window.location.hash + window.location.search);
+    for (var i = 0; i < 12 && !session && !failed; i++) {
+      var res = await supabaseClient.auth.getSession();
+      session = res.data.session;
+      if (!session) await new Promise(function(r){ setTimeout(r, 400); });
+    }
+    if (session) {
+      resetMsg.className = "msg"; resetMsg.textContent = "";
+      resetBtn.disabled = false;
+      document.getElementById("resetPassword").focus();
+    } else {
+      // Lien expiré ou déjà utilisé : on repropose l'envoi d'un e-mail.
+      showView("forgot");
+      var fm = document.getElementById("forgotMsg");
+      fm.className = "msg err";
+      fm.textContent = t("login.reset.expired");
+    }
+  })();
+}
+
+document.getElementById("resetForm").addEventListener("submit", async function(e){
+  e.preventDefault();
+  var btn = document.getElementById("resetBtn");
+  var msgEl = document.getElementById("resetMsg");
+  var p1 = document.getElementById("resetPassword").value, p2 = document.getElementById("resetPassword2").value;
+  msgEl.className = "msg"; msgEl.textContent = "";
+  if (p1.length < 8) { msgEl.className = "msg err"; msgEl.textContent = t("pwd.min"); return; }
+  if (p1 !== p2) { msgEl.className = "msg err"; msgEl.textContent = t("pwd.mismatch"); return; }
+  btn.disabled = true;
+  var { data, error } = await supabaseClient.auth.updateUser({ password: p1 });
+  if (error) {
+    btn.disabled = false;
+    msgEl.className = "msg err";
+    msgEl.textContent = frenchAuthError(error);
+    return;
+  }
+  msgEl.className = "msg ok";
+  msgEl.textContent = t("login.reset.done");
+  // L'utilisateur est connecté par le lien : on enregistre cette session
+  // comme la session active du compte, puis on ouvre l'espace personnel.
+  if (data && data.user) {
+    await registerSessionMarker(data.user.id);
+    var pref = data.user.user_metadata ? data.user.user_metadata.lang : null;
+    if (pref === "en" || pref === "fr") nysaStoreLang(pref);
+  }
+  window.location.href = "espace-personnel.html";
+});
+
+// ===================== Connexion =====================
+document.getElementById("loginForm").addEventListener("submit", async function(e){
+  e.preventDefault();
+  var btn = e.target.querySelector(".submitbtn");
+  var msgEl = document.getElementById("loginMsg");
+  msgEl.className = "msg"; msgEl.textContent = "";
+  btn.disabled = true;
+
+  var email = document.getElementById("loginEmail").value.trim();
+  var password = document.getElementById("loginPassword").value;
+
+  var { data: loginData, error } = await supabaseClient.auth.signInWithPassword({ email: email, password: password });
+
+  btn.disabled = false;
+  if (error) {
+    msgEl.className = "msg err";
+    msgEl.textContent = frenchAuthError(error);
+    return;
+  }
+  await registerSessionMarker(loginData.user.id);
+  // L'interface s'ouvre dans la langue de préférence du compte.
+  var prefLang = loginData.user.user_metadata ? loginData.user.user_metadata.lang : null;
+  if (prefLang === "en" || prefLang === "fr") nysaStoreLang(prefLang);
+  window.location.href = "espace-personnel.html";
+});
+
+// ===================== Inscription =====================
+document.getElementById("signupForm").addEventListener("submit", async function(e){
+  e.preventDefault();
+  var btn = e.target.querySelector(".submitbtn");
+  var msgEl = document.getElementById("signupMsg");
+  msgEl.className = "msg"; msgEl.textContent = "";
+  btn.disabled = true;
+
+  var email = document.getElementById("signupEmail").value.trim();
+  var password = document.getElementById("signupPassword").value;
+
+  // Les deux saisies doivent être identiques : sinon rien n'est envoyé.
+  var password2El = document.getElementById("signupPassword2");
+  if (password !== password2El.value) {
+    btn.disabled = false;
+    msgEl.className = "msg err";
+    msgEl.textContent = t("login.msg.mismatch");
+    password2El.focus();
+    password2El.select();
+    return;
+  }
+
+  var signupLang = document.getElementById("signupLang").value === "fr" ? "fr" : "en";
+
+  // 04/10/2026 — adresse de retour du lien de confirmation envoyé par e-mail.
+  // Sans elle, Supabase utilise son « Site URL », qui vaut localhost:3000
+  // par défaut : le lien menait à une page inaccessible. Cette adresse doit
+  // figurer dans Supabase (Authentication > URL Configuration >
+  // Redirect URLs), sinon Supabase l'ignore.
+  // 11/10/2026 — le lien mène maintenant à une page « e-mail validé » (email-valide.html) et non plus à
+  // cette page de connexion : la validation se fait souvent sur le téléphone, et la fenêtre de bienvenue
+  // ne doit pas s'y ouvrir (ni être consommée) avant la première vraie connexion sur l'ordinateur.
+  var { data, error } = await supabaseClient.auth.signUp({
+    email: email,
+    password: password,
+    options: {
+      emailRedirectTo: new URL("email-valide.html", window.location.href).href,
+      data: { lang: signupLang }   // préférence de langue du compte (interface et e-mails)
+    }
+  });
+
+  btn.disabled = false;
+  if (error) {
+    msgEl.className = "msg err";
+    msgEl.textContent = frenchAuthError(error);
+    return;
+  }
+
+  // Selon la configuration du projet Supabase, une confirmation par e-mail
+  // peut être requise avant que la session soit active (data.session est
+  // alors null même si le compte est bien créé).
+  nysaStoreLang(signupLang);
+  if (!data.session) {
+    // La langue choisie n'est pas celle affichée : la page se recharge dans
+    // la langue du compte et y répète le message de confirmation.
+    if (signupLang !== nysaLang()) { window.location.href = "login.html?reason=account_created"; return; }
+    msgEl.className = "msg ok";
+    msgEl.textContent = t("login.msg.created");
+    return;
+  }
+  await registerSessionMarker(data.user.id);
+  window.location.href = "espace-personnel.html";
+});
+</script>
+</body>
+</html>

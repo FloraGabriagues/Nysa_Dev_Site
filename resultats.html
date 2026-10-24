@@ -1,0 +1,2836 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-i18n="res.doc_title">Résultat | Nysa</title>
+<!-- Traduction FR / EN : textes et moteur dans i18n.js -->
+<script src="i18n.js"></script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2048%2048%22%3E%3Ccircle%20cx%3D%2224.00%22%20cy%3D%2213.70%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2232.92%22%20cy%3D%2218.85%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2232.92%22%20cy%3D%2229.15%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2224.00%22%20cy%3D%2234.30%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2215.08%22%20cy%3D%2229.15%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2215.08%22%20cy%3D%2218.85%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2224%22%20cy%3D%2224%22%20r%3D%225.3%22%20fill%3D%22%23FFB86B%22/%3E%3C/svg%3E">
+<!-- Polices hébergées avec le site (dossier fonts/) : aucun appel à Google. -->
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+:root{
+  --void:#090E13; --panel:#131E27; --panel-2:#1A2833;
+  --line:#2E4152; --line-soft:#22323F;
+  --paper:#C4D6D4; --muted:#9BADBD; --muted-2:#8497AA;
+  --photon:#F5AC57; --pixel:#5FDCD0; --alert:#F0776D; --ok:#7FD88F;
+  --display:"Montserrat","IBM Plex Sans",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{background:var(--void);color:var(--paper);font-family:var(--body);
+  font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+button{font-family:inherit}
+
+/* ================= sidebar / topbar — identiques au reste du site ================= */
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{flex:none;width:220px;background:var(--panel);border-right:1px solid var(--line-soft);
+  display:flex;flex-direction:column;padding:16px 14px;overflow-y:auto}
+/* 05/10/2026 — logo en disposition centrée (variante 1 de la charte) : la
+   signature y est lisible, ce qu'elle n'était pas à côté du nom. */
+.brand{display:flex;flex-direction:column;align-items:center;text-align:center;gap:9px;padding:10px 8px 18px;border-bottom:1px solid var(--line-soft);
+  margin-bottom:12px}
+.brand .mark{flex:none;width:46px;height:46px;display:block}
+.brand .mark svg{width:100%;height:100%;display:block}
+.brand .name{font-family:var(--display);font-weight:500;font-size:22px;letter-spacing:.06em;line-height:1.05}
+.brand .tag{font-family:var(--display);font-weight:400;font-size:12px;letter-spacing:.13em;color:var(--muted);margin-top:5px;white-space:nowrap}
+.navlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.navlist a{display:flex;align-items:center;gap:11px;padding:8px 12px;border-radius:4px;
+  text-decoration:none;color:var(--muted);font-size:14.5px;transition:background .14s,color .14s}
+.navlist a svg{flex:none;width:18px;height:18px;opacity:.85}
+.navlist a:hover{background:var(--panel-2);color:var(--paper)}
+.navlist a.active{background:rgba(95,220,208,.10);color:var(--pixel);box-shadow:inset 2px 0 0 var(--pixel)}
+.navlist a.active svg{opacity:1}
+.navlist a.soon{cursor:default;opacity:.45;pointer-events:none}
+.sidebar-bottom{margin-top:auto;padding-top:14px;border-top:1px solid var(--line-soft)}
+
+.main{flex:1;min-width:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+.topbar{display:flex;justify-content:flex-end;align-items:center;gap:16px;flex:none;
+  padding:11px 26px;border-bottom:1px solid var(--line-soft)}
+.iconbtn{width:34px;height:34px;border-radius:50%;border:1px solid var(--line-soft);
+  background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center;
+  cursor:pointer}
+.iconbtn:hover{border-color:var(--line);color:var(--paper)}
+.userchip{display:flex;align-items:center;gap:10px;font-family:var(--mono);
+  font-size:13px;color:var(--muted)}
+.userchip .avatar{width:30px;height:30px;border-radius:50%;background:var(--panel-2);
+  border:1px solid var(--pixel);color:var(--pixel);display:flex;align-items:center;
+  justify-content:center;font-family:var(--display);font-size:12px;font-weight:600;letter-spacing:0}
+
+.wrap{max-width:1180px;margin:0 auto;padding:20px 26px 16px;width:100%;
+  flex:1;min-height:0;display:flex;flex-direction:column}
+#listView{flex:1;min-height:0;overflow-y:auto}
+#detailView{display:none;flex-direction:column;flex:1;min-height:0}
+
+/* ================= fil d'ariane + en-tête ================= */
+.backlink{color:var(--muted);font-family:var(--mono);font-size:12.5px;text-decoration:none;
+  display:inline-flex;align-items:center;gap:7px;margin-bottom:10px}
+.backlink:hover{color:var(--paper)}
+
+.pageheadrow{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:14px;flex:none}
+h1{font-family:var(--display);font-weight:500;font-size:clamp(21px,2.4vw,27.5px);
+  line-height:1.18;margin:0 0 4px;letter-spacing:-.012em}
+.pagesub{margin:0;color:var(--muted);font-size:13.5px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 6px}
+.editbtn{flex:none;background:transparent;border:none;color:var(--muted-2);cursor:pointer;
+  padding:4px;display:flex}
+.editbtn:hover{color:var(--pixel)}
+
+/* ================= onglets Image/MTF/SNR/Logs ================= */
+.restabs{display:flex;gap:4px;border-bottom:1px solid var(--line-soft);margin-bottom:14px;flex:none}
+.restab{background:none;border:none;color:var(--muted-2);font-family:var(--mono);font-size:12.5px;
+  letter-spacing:.03em;padding:9px 16px;border-bottom:2px solid transparent;cursor:pointer}
+.restab:hover{color:var(--paper)}
+.restab[aria-selected="true"]{color:var(--pixel);border-color:var(--pixel)}
+
+/* ================= mise en page principale : viewer + panneau droit ================= */
+.resgrid{display:grid;grid-template-columns:1fr 320px;gap:16px;flex:1;min-height:0}
+.tabpanel{display:none}
+.tabpanel.current{display:flex;flex-direction:column;flex:1;min-height:0}
+.tabpanel.current:not([data-tab="image"]){overflow-y:auto}
+.resgrid > div{min-height:0;overflow-y:auto;display:flex;flex-direction:column}
+
+.viewerbox{position:relative;background:var(--void);border:1px solid var(--line-soft);border-radius:6px;
+  overflow:hidden;height:64vh;flex:1;min-height:0}
+.cornerlabel{position:absolute;top:12px;z-index:5;background:rgba(9,14,19,.8);backdrop-filter:blur(3px);
+  font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;padding:5px 11px;
+  border-radius:4px;border:1px solid var(--line)}
+.cornerlabel.src{left:12px;color:var(--photon);border-color:var(--photon)}
+.cornerlabel.sim{right:12px;color:var(--pixel);border-color:var(--pixel)}
+/* 05/10/2026 — vraie échelle graphique (avant : le texte fixe « 100 m », sans
+   barre, quelle que soit la taille d'affichage). Même dessin que sur la démo. */
+.scalebar{position:absolute;left:14px;bottom:14px;z-index:5;pointer-events:none;
+  display:flex;flex-direction:column-reverse;gap:5px;align-items:flex-start}
+.scalebar .sbar{display:block;height:7px;border:1px solid rgba(196,214,212,.95);border-top:none;
+  box-shadow:0 1px 3px rgba(0,0,0,.7)}
+.scalebar .slab{font-family:var(--mono);font-size:12px;color:var(--paper);letter-spacing:.04em;
+  text-align:center;text-shadow:0 1px 3px rgba(0,0,0,.95)}
+.viewer-tools{position:absolute;bottom:12px;right:12px;z-index:5;display:flex;flex-direction:column;gap:6px}
+.viewer-tools button{width:32px;height:32px;border-radius:5px;border:1px solid var(--line-soft);
+  background:rgba(19,30,39,.85);color:var(--muted);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;backdrop-filter:blur(3px)}
+.viewer-tools button:hover{color:var(--paper);border-color:var(--line)}
+
+.viewercaption{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-top:9px;flex:none}
+.viewerhint{font-size:12px;color:var(--muted-2)}
+
+/* 06/10/2026 — comparateur rendu fluide :
+   - les images ne reçoivent plus la souris (sinon le navigateur démarrait un
+     glisser-déposer de l'image et le mouvement se figeait) ;
+   - touch-action:none : sur écran tactile, le doigt déplace le curseur au
+     lieu de faire défiler la page ;
+   - la poignée se déplace par transform, sans recalcul de mise en page. */
+.comparewrap{position:relative;width:100%;height:100%;cursor:ew-resize;touch-action:none;outline:none}
+.comparewrap:focus-visible{box-shadow:inset 0 0 0 2px var(--pixel)}
+.compareimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;user-select:none;
+  -webkit-user-drag:none;pointer-events:none}
+.compareimg.right{clip-path:inset(0 0 0 50%);will-change:clip-path}
+/* 11/10/2026 : l'image simulée est montrée telle quelle, pixel par pixel : aucun lissage à l'agrandissement
+   (le navigateur interpole sinon, et les pixels du capteur disparaissent). */
+#imgSim{image-rendering:pixelated}
+.comparehandle{position:absolute;top:0;bottom:0;left:0;margin-left:-1px;width:2px;background:var(--paper);
+  cursor:ew-resize;z-index:4;will-change:transform;pointer-events:none}
+.comparehandle .grip{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:34px;height:34px;border-radius:50%;background:var(--void);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;color:var(--paper);font-size:13px}
+
+/* ================= bandes spectrales ================= */
+.bandsrow{margin-top:14px;flex:none}
+.bandsrow h3{font-family:var(--display);font-weight:600;font-size:12.5px;margin:0 0 8px;letter-spacing:0}
+.bandthumbs{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.bandthumb{width:104px;border:2px solid var(--line-soft);border-radius:5px;overflow:hidden;cursor:pointer;
+  background:var(--panel-2)}
+.bandthumb.selected{border-color:var(--pixel)}
+.bandthumb img{width:100%;height:58px;object-fit:cover;display:block}
+.bandthumb .lab{display:flex;align-items:center;gap:6px;padding:6px 8px;font-size:12px}
+.bandthumb .lab i{width:8px;height:8px;border-radius:50%;flex:none}
+
+/* ================= panneau "Affichage" ================= */
+.apanel h3{display:flex;align-items:center;gap:8px;font-family:var(--display);font-weight:600;font-size:13px;
+  color:var(--paper);margin:0 0 14px;letter-spacing:0}
+.apanel h3 svg{width:16px;height:16px;color:var(--pixel);flex:none}
+.aslider{margin-bottom:14px}
+.aslider-head{display:flex;align-items:center;gap:7px;margin-bottom:6px;font-size:12.5px;color:var(--paper)}
+.aslider-head svg{width:14px;height:14px;color:var(--muted-2);flex:none}
+.aslider-head .aval{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--muted-2)}
+.aslider input[type=range]{width:100%;accent-color:var(--pixel)}
+.afield{margin-bottom:14px}
+.afield label{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:12px;color:var(--muted);
+  margin-bottom:7px}
+.afield label svg{width:14px;height:14px;color:var(--muted-2);flex:none}
+.afield select{width:100%;background:var(--panel-2);border:1px solid var(--line-soft);color:var(--paper);
+  border-radius:5px;padding:8px 11px;font-family:var(--body);font-size:12.5px}
+.satwrap{position:relative;display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.satwrap .checkrow{margin-bottom:0}
+.sathelp{appearance:none;cursor:pointer;background:transparent;border:1px solid var(--line);color:var(--muted);
+  border-radius:50%;width:18px;height:18px;font-size:12px;line-height:1;padding:0;flex:none}
+.sathelp:hover,.sathelp[aria-expanded="true"]{border-color:var(--pixel);color:var(--pixel)}
+.sathint{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:20;margin:0;padding:10px 12px;font-size:12px;line-height:1.45;
+  color:var(--paper);background:var(--panel-2);border:1px solid var(--pixel);border-radius:6px;box-shadow:0 6px 18px rgba(0,0,0,.4)}
+/* 12/10/2026 : le téléchargement est un seul bouton à menu déroulant (mise à l'échelle ou valeurs brutes) */
+.dlmenu{position:relative;flex:1;min-width:0}
+.dlmenu .downloadbtn{display:flex;align-items:center;justify-content:center;gap:10px}
+.dlmenu .dlchev{flex:none;margin-left:2px;transition:transform .15s}
+.dlmenu .downloadbtn[aria-expanded="true"] .dlchev{transform:rotate(180deg)}
+.dlmenu .dlchev[hidden]{display:none}
+.dlmenulist{position:absolute;left:0;right:0;bottom:calc(100% + 6px);z-index:30;display:flex;flex-direction:column;
+  background:var(--panel-2);border:1px solid var(--pixel);border-radius:6px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+.dlmenulist[hidden]{display:none}
+.dlmenulist button[hidden]{display:none}
+.dlmenulist button{font-family:var(--body);font-size:13.5px;text-align:left;padding:11px 14px;background:transparent;border:0;
+  color:var(--paper);cursor:pointer}
+.dlmenulist button+button{border-top:1px solid var(--line-soft)}
+.dlmenulist button:hover,.dlmenulist button:focus-visible{background:rgba(95,220,208,.14);color:var(--pixel);outline:none}
+.sathint.up{top:auto;bottom:calc(100% + 6px)}
+.sathint[hidden]{display:none}
+.checkrow.disabled{opacity:.5}
+.checkrow{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin-bottom:14px}
+.apanelbtns{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.downloadbtn{width:100%;border:1px solid var(--pixel);background:var(--pixel);color:#0A141A;
+  font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.03em;padding:11px 16px;
+  border-radius:5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;flex:none}
+.downloadbtn:hover{background:#7CE8DC}
+
+/* ================= panneau droit (info) ================= */
+/* 04/10/2026 — liste des résultats : une ligne par résultat (proposition C).
+   Les mesures sont alignées en colonnes d'une ligne à l'autre, pour comparer
+   d'un coup d'œil. Renommer / Supprimer sont dans le menu ⋮ de la ligne. */
+.resultslist{display:flex;flex-direction:column;gap:10px}
+/* Filtres de la liste (04/10/2026) */
+.resultsfilters{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:16px}
+.resultsfilters[hidden]{display:none}
+.resultsfilters input,.resultsfilters select{background:var(--panel);border:1px solid var(--line-soft);color:var(--paper);
+  border-radius:5px;padding:8px 11px;font-family:var(--body);font-size:13px}
+.resultsfilters input{flex:1;min-width:220px;max-width:360px}
+.resultsfilters input:focus,.resultsfilters select:focus{outline:none;border-color:var(--pixel)}
+.resultsfilters .count{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--muted-2)}
+.resultsfilters .reset{background:none;border:none;color:var(--pixel);cursor:pointer;font-family:var(--body);font-size:12.5px;padding:0;margin-left:8px}
+/* En-tête triable. Colonnes : [vignette + texte] | MTF | SNR | GSD | menu — mêmes
+   largeurs que dans .resultrow (118px par mesure, 47px pour le menu). */
+.resultshead{display:grid;grid-template-columns:1fr 104px 104px 104px 47px;padding:0 1px 8px;align-items:end}
+.resultshead[hidden]{display:none}
+.resultshead button{background:none;border:none;cursor:pointer;text-align:left;padding:4px 22px;
+  font-family:var(--body);font-size:12px;color:var(--muted-2);white-space:nowrap}
+.resultshead button:first-child{padding-left:2px}
+.resultshead button:hover{color:var(--paper)}
+.resultshead button.on{color:var(--pixel)}
+.resultshead button .arrow{margin-left:5px;font-size:12px}
+.resultrow{display:grid;grid-template-columns:1fr auto;align-items:stretch;background:var(--panel);
+  border:1px solid var(--line-soft);border-radius:8px;transition:border-color .14s}
+.resultrow[hidden]{display:none}
+.resultrow.open{border-color:var(--line)}
+.resultrow:hover{border-color:var(--pixel)}
+.resultrow .rowlink{display:grid;grid-template-columns:116px 1fr 104px 104px 104px;align-items:stretch;
+  text-decoration:none;color:var(--paper);min-width:0;min-height:92px;cursor:pointer}
+.resultrow .rowlink:focus-visible{outline:2px solid var(--pixel);outline-offset:-2px;border-radius:7px}
+.resultrow .more{font-size:12px;color:var(--muted-2);white-space:nowrap}
+.resultrow .rowlink:hover .more,.resultrow.open .more{color:var(--pixel)}
+.resultrow.open .thumb{border-radius:7px 0 0 0}
+/* Détail des entrées, déplié sous la ligne (04/10/2026) */
+.resultrow .inputs{grid-column:1 / -1;border-top:1px solid var(--line-soft);padding:16px 18px 18px;
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px 26px}
+.resultrow .inputs[hidden]{display:none}
+.resultrow .inputs h4{font-family:var(--display);font-weight:600;font-size:12px;
+  color:var(--muted);margin:0 0 8px;letter-spacing:0}
+.resultrow .inputs dl{margin:0;display:grid;grid-template-columns:1fr auto;gap:5px 12px;font-size:12.5px}
+.resultrow .inputs dt{color:var(--muted-2)}
+.resultrow .inputs dd{margin:0;font-family:var(--mono);font-size:12px;color:var(--paper);text-align:right;white-space:nowrap}
+.resultrow .inputs .openfull{grid-column:1 / -1;display:flex;justify-content:flex-end}
+.resultrow .inputs .openfull a{border:1px solid var(--pixel);color:var(--pixel);text-decoration:none;border-radius:5px;
+  padding:8px 14px;font-family:var(--mono);font-size:12px;font-weight:600}
+.resultrow .inputs .openfull a:hover{background:rgba(95,220,208,.1)}
+@media(max-width:900px){.resultrow .inputs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.resultrow .thumb{background-size:cover;background-position:center;background-color:var(--void);
+  border-radius:7px 0 0 7px}
+.resultrow .txt{padding:0 18px;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:5px}
+.resultrow .namerow{display:flex;align-items:center;gap:10px;min-width:0}
+.resultrow .name{font-family:var(--display);font-weight:600;font-size:17.5px;
+  line-height:1.1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:0}
+.resultrow .sub{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.resultrow .sub .date{font-family:var(--mono);font-size:12px;color:var(--muted-2)}
+.resultrow .wfebadge{font-family:var(--mono);font-size:12px;color:var(--pixel);
+  border:1px solid rgba(95,220,208,.45);border-radius:3px;padding:1px 7px;white-space:nowrap}
+.resultrow .metric{padding:0 22px;border-left:1px solid var(--line-soft);min-width:0;
+  display:flex;flex-direction:column;justify-content:center}
+.resultrow .metric .v{font-family:var(--display);font-weight:500;font-size:22.5px;line-height:1;color:var(--paper);letter-spacing:0;font-variant-numeric:tabular-nums}
+.resultrow .rowmenu{position:relative;display:flex;align-items:center;justify-content:center;width:47px;border-left:1px solid var(--line-soft)}
+.resultrow .menubtn{background:transparent;border:none;color:var(--muted-2);font-size:19px;line-height:1;
+  width:30px;height:30px;border-radius:5px;cursor:pointer}
+.resultrow .menubtn:hover{color:var(--paper);background:var(--panel-2)}
+.resultrow .dropdown{display:none;position:absolute;top:calc(50% + 18px);right:8px;z-index:20;min-width:150px;
+  background:var(--panel-2);border:1px solid var(--line);border-radius:6px;padding:5px;
+  box-shadow:0 10px 30px rgba(0,0,0,.45)}
+.resultrow .dropdown.open{display:block}
+.resultrow .dropdown.up{top:auto;bottom:calc(50% + 18px)}
+.resultrow .dropdown button{display:block;width:100%;text-align:left;background:none;border:none;
+  color:var(--paper);font-family:var(--body);font-size:13px;padding:8px 10px;border-radius:4px;cursor:pointer}
+.resultrow .dropdown button:hover{background:var(--panel)}
+.resultrow .dropdown button.danger{color:var(--alert)}
+.resultrow .dropdown button.danger:hover{background:rgba(240,119,109,.1)}
+/* 11/10/2026 : avec la colonne GSD, le texte (nom, instrument, date) était trop serré sur une fenêtre moyenne :
+   colonnes de mesure et vignette resserrées entre 721 et 1100 px de large. */
+@media(max-width:1100px){
+  .resultrow .rowlink{grid-template-columns:88px 1fr 84px 84px 84px}
+  .resultshead{grid-template-columns:1fr 84px 84px 84px 47px}
+  .resultshead button{padding:4px 14px;font-size:11.5px;white-space:normal;line-height:1.15}
+  .resultrow .txt{padding:0 14px}
+  .resultrow .metric{padding:0 14px}
+  .resultrow .metric .v{font-size:19px}
+}
+@media(max-width:900px){
+  .resultrow .rowlink{grid-template-columns:72px 1fr 64px 64px 64px}
+  .resultshead{grid-template-columns:1fr 64px 64px 64px 47px}
+  .resultshead button{padding:4px 8px}
+  .resultrow .txt{padding:0 10px}
+  .resultrow .metric{padding:0 8px}
+  .resultrow .metric .v{font-size:17px}
+}
+@media(max-width:720px){
+  .resultrow .rowlink{grid-template-columns:56px 1fr 56px 56px 56px}
+  .resultshead{grid-template-columns:1fr 56px 56px 56px 47px}
+  .resultshead button{padding:4px 6px;font-size:10.5px}
+  .resultrow .txt{padding:0 10px}
+  .resultrow .name{font-size:16px}
+  .resultrow .metric{padding:0 6px}
+  .resultrow .metric .v{font-size:15px}
+}
+/* résultat dont l'instrument a été supprimé (ligne de la liste et page de détail) */
+
+/* 12/10/2026 : sélection multiple (suppression groupée) */
+.selbtn{background:none;border:1px solid var(--line);color:var(--muted);border-radius:4px;font-family:var(--mono);font-size:12px;padding:6px 11px;cursor:pointer}
+.selbtn:hover{border-color:var(--pixel);color:var(--pixel)}
+.selbtn.on{border-color:var(--pixel);color:var(--pixel)}
+.selbtn.danger:not(:disabled):hover{border-color:var(--alert);color:var(--alert)}
+.selbtn.danger:not(:disabled){border-color:var(--alert);color:var(--alert)}
+.selbtn:disabled{opacity:.45;cursor:not-allowed}
+.selbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 14px;padding:10px 12px;border:1px solid var(--line-soft);border-radius:6px;background:var(--panel)}
+.selbar[hidden]{display:none}
+.selbar .selcount{font-family:var(--mono);font-size:12px;color:var(--muted-2);margin-right:auto}
+.selbox{display:none;width:20px;height:20px;border:1.5px solid var(--line);border-radius:4px;align-items:center;justify-content:center;
+  font-size:13px;line-height:1;color:transparent;flex:none;background:var(--void)}
+.sel .selbox{background:var(--pixel);border-color:var(--pixel);color:var(--void)}
+.selmode .menubtn{display:none}
+.selmode .selbox{display:flex}
+.selmode .dropdown{display:none!important}
+.resultrow.sel{border-color:var(--pixel)}
+.resultrow .rowmenu .selbox{margin:0}
+.instgone{font-family:var(--mono);font-size:12px;color:var(--photon);
+  border:1px solid var(--photon);border-radius:3px;padding:1px 6px;white-space:nowrap;flex:none}
+.delbtn, .renbtn{background:none;border:1px solid var(--line);color:var(--muted);border-radius:4px;
+  font-family:var(--mono);font-size:12px;padding:5px 10px;cursor:pointer}
+.delbtn:hover{border-color:var(--alert);color:var(--alert)}
+.renbtn:hover{border-color:var(--pixel);color:var(--pixel)}
+/* 07/10/2026 — date du résultat sous son titre, en toutes lettres et à l'heure locale */
+.ressub{margin:0;font-family:var(--mono);font-size:12px;letter-spacing:.02em;color:var(--muted)}
+.resultsempty{color:var(--muted);font-size:13.5px;grid-column:1/-1;padding:30px 0}
+.resultsempty a{color:var(--pixel);text-decoration:none}
+
+.rpanel{background:var(--panel);border:1px solid var(--line-soft);border-radius:6px;padding:13px 15px;
+  margin-bottom:12px;flex:none}
+.rpanel h3{font-family:var(--mono);font-size:12px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 10px;display:flex;align-items:center;gap:8px}
+.rpanel h3 .chev{margin-left:auto;color:var(--muted-2)}
+
+.srcrow{display:flex;gap:12px}
+.srcrow .thumb{width:64px;height:64px;border-radius:4px;flex:none;overflow:hidden;border:1px solid var(--line-soft)}
+.srcrow .thumb img{width:100%;height:100%;object-fit:cover}
+.srcrow .info{font-size:12.5px;color:var(--muted);line-height:1.7}
+.srcrow .info b{color:var(--paper);font-weight:500}
+.srcbtn{width:100%;margin-top:12px;background:transparent;border:1px solid var(--line);color:var(--paper);
+  border-radius:5px;font-family:var(--mono);font-size:12px;padding:9px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:7px}
+.srcbtn:hover{border-color:var(--pixel);color:var(--pixel)}
+
+.comparenote{display:flex;gap:9px;font-size:12px;color:var(--muted);margin-top:12px;line-height:1.5}
+.comparenote svg{flex:none;width:14px;height:14px;margin-top:1px;color:var(--muted-2)}
+
+/* 06/10/2026 — fenêtre étroite : l'image et le panneau d'affichage passent
+   l'un sous l'autre. Avant, la zone image n'avait alors plus de hauteur et
+   disparaissait. Elle prend maintenant la forme d'un carré (les scènes sont
+   carrées), limité à la hauteur de l'écran, et la page défile. */
+@media(max-width:1100px){
+  .resgrid{grid-template-columns:1fr;flex:none}
+  .resgrid > div{overflow:visible;min-height:auto}
+  #viewerBox{flex:none;height:auto;min-height:0}
+  .comparewrap{width:min(100%, 78vh);height:auto;aspect-ratio:1/1;margin:0 auto}
+  #detailView, #detailView .tabpanel{flex:none;min-height:auto}
+  .wrap{flex:none}
+}
+/* ===================== Modal Paramètres ===================== */
+.modal-overlay{position:fixed;inset:0;background:rgba(5,8,11,.72);backdrop-filter:blur(2px);
+  display:none;align-items:center;justify-content:center;z-index:100;padding:24px}
+.modal-overlay.open{display:flex}
+
+.lightbox-overlay{position:fixed;inset:0;background:rgba(5,8,11,.92);display:none;
+  align-items:center;justify-content:center;z-index:200;padding:40px;cursor:zoom-out}
+.lightbox-overlay.open{display:flex}
+.lightbox-overlay img{max-width:100%;max-height:100%;border-radius:6px;cursor:default;
+  box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.lightbox-close{position:fixed;top:20px;right:24px;background:none;border:1px solid var(--line);
+  color:var(--paper);border-radius:6px;width:38px;height:38px;font-size:22px;line-height:1;
+  cursor:pointer}
+.lightbox-close:hover{border-color:var(--pixel);color:var(--pixel)}
+.modal{width:100%;max-width:820px;height:min(640px,88vh);background:var(--panel);
+  border:1px solid var(--line-soft);border-radius:10px;display:flex;flex-direction:column;overflow:hidden}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;
+  border-bottom:1px solid var(--line-soft);flex:none}
+.modal-head .htitle{display:flex;align-items:center;gap:11px}
+.modal-head .hicon{width:30px;height:30px;border-radius:7px;background:var(--panel-2);
+  border:1px solid var(--line-soft);color:var(--pixel);display:flex;align-items:center;justify-content:center;flex:none}
+.modal-head .hicon svg{width:16px;height:16px}
+.modal-head h2{font-family:var(--display);font-weight:600;font-size:16.5px;
+  margin:0;letter-spacing:0}
+.modal-close{background:transparent;border:none;color:var(--muted);font-size:19px;cursor:pointer;
+  line-height:1;padding:4px 6px;border-radius:4px}
+.modal-close:hover{color:var(--paper);background:var(--panel-2)}
+
+.modal-shell{flex:1;min-height:0;display:flex}
+.modal-rail{flex:none;width:190px;border-right:1px solid var(--line-soft);padding:14px 10px;
+  display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+.railbtn{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:6px;
+  background:transparent;border:none;color:var(--muted);font-family:var(--body);font-size:13.5px;
+  cursor:pointer;text-align:left;transition:background .14s,color .14s}
+.railbtn svg{flex:none;width:16px;height:16px;opacity:.85}
+.railbtn:hover{background:var(--panel-2);color:var(--paper)}
+.railbtn.active{background:rgba(95,220,208,.10);color:var(--pixel);box-shadow:inset 2px 0 0 var(--pixel)}
+.railbtn.active svg{opacity:1}
+
+.modal-content{flex:1;min-width:0;overflow-y:auto;padding:20px 22px 26px;
+  display:flex;flex-direction:column;gap:18px}
+
+.msection{background:var(--panel-2);border:1px solid var(--line-soft);border-radius:8px;
+  padding:16px 18px;scroll-margin-top:8px}
+.msection-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}
+.msection-head .htxt{display:flex;gap:11px;align-items:flex-start}
+.msection-head .sicon{width:32px;height:32px;border-radius:7px;background:var(--panel);
+  border:1px solid var(--line-soft);color:var(--pixel);display:flex;align-items:center;justify-content:center;flex:none}
+.msection-head .sicon svg{width:16px;height:16px}
+.msection-head h3{font-family:var(--display);font-weight:600;font-size:13.5px;
+  margin:0 0 2px;letter-spacing:0}
+.msection-head p{margin:0;font-size:12px;color:var(--muted);line-height:1.4}
+
+.msection-body{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line-soft)}
+.minfo-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;gap:12px;
+  padding:11px 0;border-bottom:1px solid var(--line-soft)}
+.minfo-row:last-child{border-bottom:none}
+.minfo-row .label{color:var(--muted)}
+.minfo-row .value{font-family:var(--mono);color:var(--paper);text-align:right}
+
+.planbadge{font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;
+  padding:3px 9px;border-radius:5px;background:var(--pixel);color:#0A1F1C;flex:none;font-weight:600}
+.planbadge.team{background:var(--photon);color:#2E1B04}
+
+.planrow{display:flex;align-items:center;gap:12px;padding:13px 0;flex-wrap:wrap}
+.planrow .ptxt{flex:1;min-width:160px}
+.planrow .ptxt .t1{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:0}
+.planrow .ptxt .t2{font-size:12px;color:var(--muted);margin-top:2px}
+.planrow .pstatus{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12px;
+  color:var(--ok);flex:none}
+.planrow .pstatus .sdot{width:6px;height:6px;border-radius:50%;background:var(--ok);flex:none}
+.planrow .pstatus.pending{color:var(--muted-2)}
+.planrow .pstatus.pending .sdot{background:var(--muted-2)}
+
+.msection-actions{display:flex;flex-direction:column;gap:8px;padding-top:14px;border-top:1px solid var(--line-soft);margin-top:2px}
+.mform-group{display:flex;flex-direction:column;gap:5px;padding:9px 0}
+.mform-group label{font-size:12.5px;color:var(--muted)}
+.mform-group input{background:var(--panel);border:1px solid var(--line-soft);border-radius:5px;
+  color:var(--paper);padding:9px 11px;font-family:var(--body);font-size:13.5px;width:100%}
+.mform-group input:focus{outline:none;border-color:var(--pixel)}
+.mbtn{border-radius:5px;padding:9px 15px;font-family:var(--mono);font-size:12px;font-weight:600;
+  letter-spacing:.03em;cursor:pointer;border:1px solid var(--line);background:transparent;
+  color:var(--paper);transition:border-color .14s,color .14s,background .14s;flex:none}
+.mbtn:hover{border-color:var(--pixel);color:var(--pixel)}
+.mbtn.primary{background:var(--photon);border-color:var(--photon);color:#0B1116}
+.mbtn.primary:hover{background:#FFBE72;border-color:#FFBE72;color:#0B1116}
+.mbtn.danger{border-color:var(--alert);color:var(--alert)}
+.mbtn.danger:hover{background:rgba(240,119,109,.12)}
+.mbtn:disabled{opacity:.5;cursor:default;border-color:var(--line);color:var(--muted)}
+.mbtn:disabled:hover{background:transparent}
+.mnote{font-size:12px;color:var(--muted-2);line-height:1.5;margin:0}
+.mnote.ok{color:var(--ok)}
+.mnote.err{color:var(--alert)}
+@media(max-width:640px){
+  .modal{max-width:100%;height:92vh}
+  .modal-shell{flex-direction:column}
+  .modal-rail{width:100%;flex-direction:row;border-right:none;border-bottom:1px solid var(--line-soft);
+    padding:8px 10px;overflow-x:auto}
+  .railbtn{white-space:nowrap}
+}
+
+/* 04/10/2026 — barre de gauche alignée sur espace-personnel.html : lien vers la démo */
+.navlist a.demolink{color:var(--photon)}
+.navlist a.demolink svg{color:var(--photon);opacity:1}
+.navlist a.demolink:hover{background:rgba(245,172,87,.1);color:#FFBE72}
+/* « à venir » ne se coupe pas en deux lignes dans le menu */
+.sidebar .navlist a em{white-space:nowrap}
+/* 06/10/2026 — téléphone : liste des résultats resserrée */
+@media(max-width:520px){
+  .wrap{padding:16px 14px 20px}
+  .resultrow .rowlink{grid-template-columns:54px 1fr 60px 60px}
+  .resultshead{grid-template-columns:1fr 60px 60px 40px}
+  .resultshead button{padding:4px 6px;font-size:12px}
+  .resultrow .txt{padding:8px 8px}
+  .resultrow .name{font-size:15px;white-space:normal}
+  .resultrow .namerow{flex-wrap:wrap;gap:4px 8px}   /* le nom ne disparaît plus derrière le badge */
+  .resultrow .metric{padding:0 6px}
+  .resultrow .metric .v{font-size:16px}
+}
+/* onglet Logs (administrateur) */
+.logspre{margin:10px 0 0;max-height:62vh;overflow:auto;white-space:pre-wrap;word-break:break-word;font-family:var(--mono);font-size:12px;line-height:1.5;
+  color:var(--muted);background:var(--panel-2);border:1px solid var(--line-soft);border-radius:6px;padding:12px 14px}
+.logsub{margin:14px 0 0;font-size:12px;font-weight:500;color:var(--photon);font-family:var(--mono);letter-spacing:.04em}
+/* fenêtre de signalement (07/10/2026) */
+.rptov{position:fixed;inset:0;z-index:90;background:rgba(5,8,11,.72);display:flex;align-items:center;justify-content:center;padding:20px}
+.rptov[hidden]{display:none}
+.rptbox{width:100%;max-width:520px;max-height:92vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:22px 24px;box-shadow:0 20px 60px rgba(0,0,0,.55)}
+.rptbox h3{margin:0 0 8px;font-family:var(--display);font-weight:500;font-size:18px;color:var(--paper)}
+.rptintro{margin:0 0 14px;font-size:13.5px;line-height:1.55;color:var(--muted)}
+.rptbox label{display:block;font-size:12.5px;color:var(--muted);margin:10px 0 6px}
+.rptbox textarea{width:100%;box-sizing:border-box;background:var(--panel-2);border:1px solid var(--line);color:var(--paper);border-radius:6px;padding:10px 12px;font-family:var(--body);font-size:14px;resize:vertical}
+.rptbox textarea:focus{outline:2px solid var(--pixel);outline-offset:1px}
+.rptbox .rptconsent{display:flex;gap:10px;align-items:flex-start;margin-top:14px;font-size:12.5px;line-height:1.55;color:var(--paper);cursor:pointer}
+.rptbox .rptconsent input{margin-top:3px;flex:none;width:16px;height:16px;accent-color:var(--pixel)}
+.rpterr{margin:10px 0 0;font-size:12.5px;color:var(--alert)}
+.rptactions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+.impbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 18px}
+.importmsg{font-size:12.5px;color:var(--muted)}
+.importmsg.err{color:var(--alert)}
+.reportbtn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:10px;padding:11px 16px;background:transparent;border:1px solid var(--photon);border-radius:6px;color:var(--photon);font-family:var(--body);font-size:14px;cursor:pointer;transition:border-color .15s,color .15s}
+.reportbtn:hover:not(:disabled){background:rgba(245,172,87,.12)}
+.reportbtn:disabled{opacity:.5;cursor:not-allowed}
+.rptbtn{font-family:var(--body);font-size:14px;line-height:1.2;min-height:42px;border-radius:6px;padding:10px 18px;cursor:pointer;border:1px solid var(--line);background:var(--panel-2);color:var(--paper)}
+.rptbtn:hover:not(:disabled){border-color:var(--pixel)}
+.rptbtn.primary{background:var(--pixel);border-color:var(--pixel);color:#06231F;font-weight:500;flex:1 1 200px}
+.rptbtn:disabled{opacity:.4;cursor:not-allowed}
+.rptbtn[hidden]{display:none}
+
+/* 16/10/2026 : mode invité (résultat pré-calculé en lecture seule) */
+.guestlock{opacity:.5;cursor:not-allowed}
+.g-tip{position:fixed;z-index:300;max-width:260px;padding:8px 11px;border-radius:6px;background:var(--panel-2);border:1px solid var(--pixel);color:var(--paper);font-size:12.5px;line-height:1.4;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.g-tip[hidden]{display:none}
+.g-overlay{position:fixed;inset:0;z-index:250;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(5,10,14,.72);backdrop-filter:blur(3px)}
+.g-overlay.open{display:flex}
+.g-modal{width:100%;max-width:440px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;box-shadow:0 18px 50px rgba(0,0,0,.5)}
+.g-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line)}
+.g-head h2{margin:0;font-size:16px;color:var(--paper)}
+.g-close{background:none;border:0;color:var(--muted);font-size:16px;cursor:pointer;padding:4px 8px}
+.g-close:hover{color:var(--paper)}
+.g-body{margin:0;padding:18px 20px 6px;font-size:14px;line-height:1.55;color:var(--paper)}
+.g-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;padding:14px 20px 20px}
+.g-btn{display:inline-block;font:inherit;font-size:13px;padding:9px 14px;border-radius:5px;border:1px solid var(--line);background:none;color:var(--paper);cursor:pointer;text-decoration:none}
+.g-btn.primary{background:var(--photon);border-color:var(--photon);color:#1a1208;font-weight:600}
+</style>
+</head>
+<body>
+<!-- Bandeau « version bêta » : se désactive dans beta.js (BETA_ACTIVE = false) -->
+<script src="beta.js"></script>
+<!-- 16/10/2026 : fenêtre d'invitation du mode invité -->
+<div class="g-overlay" id="guestOverlay">
+  <div class="g-modal" role="dialog" aria-modal="true" aria-labelledby="guestTitle">
+    <div class="g-head">
+      <h2 id="guestTitle" data-i18n="guest.invite.title">Créez votre compte gratuit</h2>
+      <button class="g-close" id="guestCloseBtn" type="button" aria-label="Fermer" data-i18n-aria="common.close">✕</button>
+    </div>
+    <p class="g-body" data-i18n="guest.invite.text">Avec un compte, vous créez vos propres instruments, lancez vos simulations et retrouvez vos résultats. C'est gratuit pendant la bêta.</p>
+    <div class="g-actions">
+      <button class="g-btn" id="guestLaterBtn" type="button" data-i18n="guest.invite.later">Plus tard</button>
+      <a class="g-btn primary" id="guestGoBtn" href="login.html?signup=1" data-i18n="guest.invite.go">Créer un compte gratuit</a>
+    </div>
+  </div>
+</div>
+<div class="g-tip" id="guestTip" role="tooltip" hidden></div>
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <!-- 05/10/2026 — logo Nysa : la fleur à six pétales -->
+      <span class="mark"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24.00" cy="13.70" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="32.92" cy="18.85" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="32.92" cy="29.15" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="24.00" cy="34.30" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="15.08" cy="29.15" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="15.08" cy="18.85" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="24" cy="24" r="5.3" fill="#FFB86B"/></svg></span>
+      <span>
+        <div class="name">Nysa</div>
+        <div class="tag">EO Imaging Engineering</div>
+      </span>
+    </div>
+    <ul class="navlist">
+      <li><a href="espace-personnel.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(-30 12 10)"><rect x="3.5" y="7" width="13" height="6" rx="1.2"/><path d="M16.5 8h3v4h-3M7.5 7v6"/></g><path d="M11.8 13.6 8 21M11.8 13.6V21M11.8 13.6 15.8 21"/></svg>
+        <span data-i18n="nav.instruments">Instruments</span></a></li>
+      <li><a class="soon" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="8" width="6" height="9" rx="1.2"/><rect x="1.5" y="9.5" width="6" height="6" rx=".6"/><rect x="16.5" y="9.5" width="6" height="6" rx=".6"/><path d="M4.5 9.5v6M19.5 9.5v6M7.5 12.5H9M15 12.5h1.5M12 8V5"/><circle cx="12" cy="3.9" r="1"/></svg>
+        <span data-i18n="nav.platform">Plateforme</span> <em style="font-style:normal;color:var(--muted-2);font-size:12px;margin-left:auto" data-i18n="nav.soon">à venir</em></a></li>
+      <li><a href="simulations.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 4l14 8-14 8V4z"/></svg>
+        <span data-i18n="nav.simulations">Simulations</span></a></li>
+      <li><a class="active" href="resultats.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
+        <span data-i18n="nav.results">Résultats</span></a></li>
+      <!-- 07/10/2026 : visible du seul compte administrateur (révélé par menu.js) ; la page elle-même est protégée par la base -->
+      <li id="navAdminItem" hidden><a href="admin.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6z"/><path d="M9.5 12l2 2 3.5-4"/></svg>
+        <span>Administration</span></a></li>
+    </ul>
+    <div class="sidebar-bottom">
+      <div data-lang-switch style="margin:0 0 10px 12px"></div>
+      <ul class="navlist">
+        <!-- 05/10/2026 — « Retour à la démo » retiré du menu connecté : la démo reste publique à l'adresse du site -->
+        <li><a href="mailto:contact@nysa-imaging.com" data-nysa-help="general">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.2 2.4c-.9.3-1.2.9-1.2 1.8"/><circle cx="12" cy="16.6" r=".4" fill="currentColor" stroke="none"/></svg>
+          <span data-i18n="nav.help">Aide</span></a></li>
+        <!-- 04/10/2026 : une seule fenêtre de paramètres, celle de l'espace personnel -->
+        <li><a href="espace-personnel.html?settings=1" id="settingsLink">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19.4 13.5a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V20a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.96 18.34a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.66 8.96a1.7 1.7 0 0 0-.34-1.87l-.06-.06A2 2 0 1 1 7.09 4.2l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.04 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.56 1.04z"/></svg>
+          <span data-i18n="nav.settings">Paramètres</span></a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <span class="userchip" id="userChip"><span class="avatar" id="userAvatar">…</span><span id="userEmail">-</span></span>
+      <button class="iconbtn" aria-label="Se déconnecter" data-i18n-aria="top.signout" type="button" id="signOutBtn" title="Se déconnecter" data-i18n-title="top.signout">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+      </button>
+    </div>
+
+    <div class="wrap">
+
+      <!-- ============ Vue liste (resultats.html sans ?id=) ============ -->
+      <div id="listView">
+        <p class="eyebrow" data-i18n="res.eyebrow">Résultats</p>
+        <h1 data-i18n="res.h1">Mes résultats</h1>
+        <p class="pagesub" style="margin-bottom:14px" data-i18n="res.sub">Retrouvez vos simulations sauvegardées.</p>
+        <div class="impbar">
+          <button type="button" class="renbtn" id="btnImport" data-i18n="res.import.btn">Importer un résultat</button>
+          <input type="file" id="importFile" accept=".json,application/json" hidden>
+          <span class="importmsg" id="importMsg" role="status" aria-live="polite"></span>
+        </div>
+        <!-- 04/10/2026 — en-tête de la liste : chaque intitulé trie la liste.
+             Les largeurs reprennent celles des colonnes d'une ligne. -->
+        <!-- 04/10/2026 — filtres sur les entrées de la simulation -->
+        <div class="resultsfilters" id="resultsFilters" hidden>
+          <input type="search" id="fSearch" placeholder="Rechercher un résultat, un instrument…" data-i18n-ph="res.search.ph" autocomplete="off">
+          <select id="fScene"><option value="" data-i18n="res.filter.all_scenes">Toutes les scènes</option></select>
+          <select id="fInst"><option value="" data-i18n="res.filter.all_inst">Tous les instruments</option></select>
+          <button type="button" class="selbtn" id="btnSelMode" data-i18n="sel.btn">Sélectionner</button>
+          <span class="count" id="fCount"></span>
+        </div>
+        <div class="selbar" id="selBar" hidden>
+          <button type="button" class="selbtn" id="selAll" data-i18n="sel.all">Tout sélectionner</button>
+          <span class="selcount" id="selCount"></span>
+          <button type="button" class="selbtn danger" id="selDelete" disabled>Supprimer (0)</button>
+          <button type="button" class="selbtn" id="selCancel" data-i18n="sel.cancel">Annuler</button>
+        </div>
+        <div class="resultshead" id="resultsHead" hidden>
+          <button type="button" data-sort="date"><span data-i18n="res.sort.date">Date</span></button>
+          <button type="button" data-sort="mtf"><span data-i18n="res.sort.mtf">MTF à Nyquist</span></button>
+          <button type="button" data-sort="snr"><span data-i18n="res.sort.snr">SNR</span></button>
+          <button type="button" data-sort="gsd"><span>GSD (m)</span></button>
+          <span></span>
+        </div>
+        <div id="resultsGrid" class="resultslist"></div>
+      </div>
+
+      <!-- ============ Vue détail (resultats.html?id=<uuid>) ============ -->
+      <div id="detailView" style="display:none">
+      <div class="pageheadrow">
+        <a class="backlink" href="resultats.html" style="margin:0" data-i18n="res.back">← Retour aux résultats</a>
+        <div style="display:flex;flex-direction:column;align-items:flex-start;gap:3px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <h1 id="resTitle">Résultat</h1>
+            <button type="button" id="btnRenameResult" class="renbtn" style="flex:none" data-i18n="inst.menu.rename">Renommer</button>
+            <button type="button" id="btnExportResult" class="renbtn" style="flex:none" data-i18n="res.export.btn">Exporter</button>
+          </div>
+          <p class="ressub" id="resSub"></p>
+        </div>
+      </div>
+
+      <div class="restabs" id="restabsHost"></div>
+
+      <!-- ============ Onglet Image ============ -->
+      <div class="tabpanel current" data-tab="image">
+        <div class="resgrid">
+          <div>
+            <div class="viewerbox" id="viewerBox">
+              <span class="cornerlabel src" data-i18n="res.img.source">Image source</span>
+              <span class="cornerlabel sim" data-i18n="res.img.sim">Image simulée</span>
+              <div class="viewer-tools">
+                <button type="button" title="Plein écran" data-i18n-title="res.fullscreen" id="fullscreenBtn">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 9V5a1 1 0 0 1 1-1h4M20 9V5a1 1 0 0 0-1-1h-4M4 15v4a1 1 0 0 0 1 1h4M20 15v4a1 1 0 0 1-1 1h-4"/></svg>
+                </button>
+              </div>
+              <span class="scalebar" id="scalebar" style="visibility:hidden"><span class="sbar" id="scalebarBar"></span><span class="slab" id="scalebarLab"></span></span>
+
+              <div class="comparewrap" id="compareWrap">
+                <img class="compareimg left" id="imgSrc" alt="Image source" data-i18n-alt="res.img.source">
+                <img class="compareimg right" id="imgSim" alt="Image simulée" data-i18n-alt="res.img.sim">
+                <div class="comparehandle" id="compareHandle"><span class="grip">‹›</span></div>
+              </div>
+            </div>
+
+            <div class="viewercaption">
+              <span class="viewerhint" data-i18n="res.hint">Glissez sur l'image pour comparer</span>
+            </div>
+
+            <div class="bandsrow">
+              <h3 data-i18n="res.bands">Bandes spectrales</h3>
+              <div class="bandthumbs" id="bandThumbs"></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="rpanel apanel">
+              <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 20h8M12 17v3"/></svg><span data-i18n="res.display">Affichage</span></h3>
+
+              <div class="afield">
+                <label><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 15l5-5 4 4 4-6 5 7"/></svg><span data-i18n="res.render">Rendu de l'image</span></label>
+                <select id="renderSel">
+                  <option value="none" data-i18n="res.render.none">Brut</option>
+                  <option value="wb" data-i18n="res.render.wb">Brut avec balance des blancs</option>
+                  <option value="p2p98" selected data-i18n="res.render.p2p98">Percentile p2/p98 (avec balance des blancs)</option>
+                </select>
+              </div>
+
+              <div class="satwrap">
+                <label class="checkrow" id="satRow"><input type="checkbox" id="satChk"> <span data-i18n="res.sat">Afficher les pixels saturés (magenta)</span></label>
+                <button type="button" class="sathelp" id="satHelp" aria-expanded="false" aria-controls="satHint" aria-label="?">?</button>
+                <p class="sathint" id="satHint" role="note" hidden></p>
+              </div>
+
+              <div class="apanelbtns">
+                <button class="srcbtn" type="button" id="whitePointBtn" style="margin-top:0">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+                  <span data-i18n="res.whitepoint">Choisir un point blanc sur l'image</span></button>
+                <button class="srcbtn" type="button" id="resetDisplayBtn" style="margin-top:0">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5"/></svg>
+                  <span data-i18n="res.reset">Réinitialiser l'affichage</span></button>
+              </div>
+
+              <div class="satwrap dlwrap">
+                <div class="dlmenu">
+                  <button class="downloadbtn" type="button" id="downloadBtn" style="margin-top:0" aria-haspopup="menu" aria-expanded="false">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v13M7 11l5 5 5-5M4 20h16"/></svg>
+                    <span id="downloadLabel">Télécharger l'image RGB</span>
+                    <svg class="dlchev" id="dlChev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg></button>
+                  <div class="dlmenulist" id="dlMenu" role="menu" hidden>
+                    <button type="button" role="menuitem" data-mode="raw" data-i18n="res.dl.mode.raw">Valeurs brutes (DN)</button>
+                    <button type="button" role="menuitem" data-mode="tiff32" data-when="tiff" data-i18n="res.dl.mode.tiff32">TIFF 32 bits (DN exacts)</button>
+                    <button type="button" role="menuitem" data-mode="wb" data-for="rgb" data-i18n="res.dl.mode.wb">Brut avec balance des blancs</button>
+                    <button type="button" role="menuitem" data-mode="pct" data-for="rgb" data-i18n="res.dl.mode.pct">Percentile p2/p98 (avec balance des blancs)</button>
+                    <button type="button" role="menuitem" data-mode="scaled" data-for="band" data-i18n="res.dl.mode.scaled">Mis à l'échelle sur le maximum de l'image</button>
+                  </div>
+                </div>
+                <button type="button" class="sathelp" id="noteHelp" aria-expanded="false" aria-controls="noteHint" aria-label="?">?</button>
+                <p class="sathint up" id="noteHint" role="note" hidden data-i18n="res.note">Ces réglages n'affectent que l'affichage dans ce navigateur : le téléchargement fournit les valeurs de l'instrument (DN), au nombre de bits de son électronique, en pleine résolution. En RGB, trois formes au choix : brut, avec balance des blancs, ou avec étirement percentile.</p>
+              </div>
+              <button type="button" class="reportbtn" id="btnReport" disabled>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>
+                <span data-i18n="res.report.btn">Signaler un problème</span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ Onglet MTF ============ -->
+      <div class="tabpanel" data-tab="mtf">
+        <div id="mtfContent"></div>
+      </div>
+
+      <!-- ============ Onglet SNR ============ -->
+      <div class="tabpanel" data-tab="snr">
+        <div id="snrContent"></div>
+      </div>
+
+      <!-- ============ Onglet Entrées ============ -->
+      <!-- 07/10/2026 : onglet réservé à l'administrateur (le bouton de l'onglet n'est créé que pour lui) -->
+      <div class="tabpanel" data-tab="logs">
+        <div class="rpanel">
+          <h3 data-i18n="res.logs.title">Journaux du calcul</h3>
+          <div id="admInputs" hidden>
+            <h4 class="logsub" data-i18n="res.logs.inputs">Entrées admin de ce calcul</h4>
+            <pre class="logspre" id="admInputsPre"></pre>
+          </div>
+          <button type="button" class="renbtn" id="copyLogsBtn" data-i18n="res.logs.copy">Copier les journaux</button>
+          <pre class="logspre" id="logsPre"></pre>
+        </div>
+      </div>
+
+      <div class="tabpanel" data-tab="entrees">
+        <div class="rpanel">
+          <h3 data-i18n="field.scene">Scène</h3>
+          <div class="srcrow">
+            <span class="thumb"><img id="entSceneImg" alt=""></span>
+            <div class="info"><span data-i18n="res.ent.scene_label">Scène :</span> <b id="entSceneName">-</b></div>
+          </div>
+        </div>
+        <div class="rpanel">
+          <h3 data-i18n="sim.sum.instrument">Instrument</h3>
+          <div class="info" style="font-size:12.5px;color:var(--muted);margin-bottom:12px">
+            <span data-i18n="res.ent.name_label">Nom :</span> <b id="entInstName" style="color:var(--paper)">-</b>
+          </div>
+          <div id="entInstConfig" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px 14px"></div>
+        </div>
+        <div class="rpanel">
+          <h3 data-i18n="sim.steps.conditions">Conditions d'acquisition</h3>
+          <div id="entConditions" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px"></div>
+        </div>
+      </div>
+
+      <!-- 05/10/2026 — l'onglet Logs est retiré de l'interface. Les logs du
+           serveur restent enregistrés avec chaque résultat (colonne
+           saved_results.logs), consultables dans Supabase pour le diagnostic. -->
+
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<div class="lightbox-overlay" id="lightboxOverlay">
+  <button type="button" class="lightbox-close" id="lightboxClose" aria-label="Fermer" data-i18n-aria="common.close">×</button>
+  <img id="lightboxImg" alt="">
+</div>
+
+<!-- 07/10/2026 : fenêtre de signalement d'un résultat. L'envoi n'est possible qu'avec la case de consentement cochée. -->
+<div class="rptov" id="reportOverlay" hidden>
+  <div class="rptbox" role="dialog" aria-modal="true" aria-labelledby="rptTitle">
+    <div id="rptForm">
+      <h3 id="rptTitle" data-i18n="res.report.title">Signaler un problème avec ce résultat</h3>
+      <p class="rptintro" data-i18n="res.report.intro"></p>
+      <label for="rptMsg" data-i18n="res.report.msg_label">Que s'est-il passé ?</label>
+      <textarea id="rptMsg" rows="5" maxlength="2000" data-i18n-ph="res.report.msg_ph"></textarea>
+      <label class="rptconsent"><input type="checkbox" id="rptConsent"><span id="rptConsentText" data-i18n="res.report.consent"></span></label>
+      <p class="rpterr" id="rptErr" hidden></p>
+      <div class="rptactions">
+        <button type="button" class="rptbtn" id="rptCancel" data-i18n="res.report.cancel">Annuler</button>
+        <button type="button" class="rptbtn primary" id="rptSend" disabled data-i18n="res.report.send">Envoyer le signalement</button>
+      </div>
+    </div>
+    <div id="rptDone" hidden>
+      <h3 data-i18n="res.report.done_title">Merci, c'est envoyé</h3>
+      <p class="rptintro" id="rptDoneText" data-i18n="res.report.done_text"></p>
+      <div class="rptactions">
+        <button type="button" class="rptbtn" id="rptWithdraw" data-i18n="res.report.withdraw">Retirer ce signalement</button>
+        <button type="button" class="rptbtn primary" id="rptClose" data-i18n="res.report.close">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bibliothèque Supabase hébergée avec le site (dossier vendor/), version figée. -->
+<script src="vendor/supabase.js"></script>
+<script src="supabase-client.js"></script>
+<script>
+// Textes par défaut des éléments que ce script met ensuite à jour lui-même :
+// ils ne portent pas d'attribut data-i18n, qui écraserait la valeur calculée.
+document.getElementById("resTitle").textContent = t("res.title_default");
+
+// ===================== Mode invité (16/10/2026) =====================
+// L'invité ne voit que les résultats pré-calculés (demo/<scène>/result.json) des scènes qu'il a « simulées » dans
+// cet onglet (sessionStorage), en lecture seule : aucun appel à Supabase. Les images se lisent par leur chemin relatif.
+var guest = false;
+function lockForGuest(el){
+  el.classList.add("guestlock");
+  el.setAttribute("aria-disabled", "true");
+  el.setAttribute("data-guest-tip", t("guest.tip"));
+}
+async function guestFetchResult(id){
+  var slug = String(id || "").replace(/^demo-/, "");
+  if(!/^[a-z]{2,20}$/.test(slug)) return null;
+  try {
+    var resp = await fetch("demo/" + slug + "/result.json");
+    if(!resp.ok) return null;
+    var r = await resp.json();
+    var at = null;
+    try { (JSON.parse(sessionStorage.getItem("nysa_guest_results") || "[]")).forEach(function(x){ if(x.slug === slug) at = x.at; }); } catch(e){}
+    r.id = "demo-" + slug;
+    r.created_at = new Date(at || Date.now()).toISOString();
+    var snapName = r.instrument_snapshot && r.instrument_snapshot.name;
+    r.instruments = { name: (snapName && typeof snapName === "object") ? (snapName[nysaLang()] || snapName.en) : snapName, deleted_at: null };
+    return r;
+  } catch(e){ console.warn("Résultat de démonstration illisible :", e); return null; }
+}
+async function guestResults(){
+  var kept = [];
+  try { kept = JSON.parse(sessionStorage.getItem("nysa_guest_results") || "[]"); } catch(e){}
+  var out = [];
+  for(var i = 0; i < kept.length; i++){
+    var r = await guestFetchResult("demo-" + kept[i].slug);
+    if(r) out.push(r);
+  }
+  return out.sort(function(a, b){ return new Date(b.created_at) - new Date(a.created_at); });
+}
+function setupGuestUI(){
+  var overlay = document.getElementById("guestOverlay"), tip = document.getElementById("guestTip"), lastFocus = null;
+  function openInvite(){
+    lastFocus = document.activeElement; tip.hidden = true;
+    overlay.classList.add("open");
+    document.getElementById("guestGoBtn").focus();
+  }
+  function closeInvite(){
+    overlay.classList.remove("open");
+    if(lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  document.getElementById("guestCloseBtn").addEventListener("click", closeInvite);
+  document.getElementById("guestLaterBtn").addEventListener("click", closeInvite);
+  overlay.addEventListener("click", function(e){ if(e.target === overlay) closeInvite(); });
+  document.addEventListener("keydown", function(e){
+    if(!overlay.classList.contains("open")) return;
+    if(e.key === "Escape"){ e.stopPropagation(); closeInvite(); return; }
+    if(e.key === "Tab"){
+      var f = [document.getElementById("guestCloseBtn"), document.getElementById("guestLaterBtn"), document.getElementById("guestGoBtn")];
+      var i = f.indexOf(document.activeElement);
+      e.preventDefault();
+      f[(i + (e.shiftKey ? f.length - 1 : 1)) % f.length].focus();
+    }
+  }, true);
+  function show(el){
+    tip.textContent = el.getAttribute("data-guest-tip"); tip.hidden = false;
+    var r = el.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+    tip.style.left = Math.max(8, Math.min(window.innerWidth - w - 8, r.left + r.width / 2 - w / 2)) + "px";
+    var y = r.bottom + 8; if(y + h > window.innerHeight - 8) y = Math.max(8, r.top - h - 8);
+    tip.style.top = y + "px";
+  }
+  function target(e){ return e.target.closest && e.target.closest("[data-guest-tip]"); }
+  document.addEventListener("mouseover", function(e){ var el = target(e); if(el) show(el); else tip.hidden = true; });
+  document.addEventListener("focusin", function(e){ var el = target(e); if(el) show(el); else tip.hidden = true; });
+  document.addEventListener("focusout", function(){ tip.hidden = true; });
+  window.addEventListener("scroll", function(){ tip.hidden = true; }, true);
+  // Un clic sur un bouton grisé ouvre l'invitation et ne fait rien d'autre.
+  document.addEventListener("click", function(e){
+    var el = e.target.closest && e.target.closest(".guestlock");
+    if(!el) return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    openInvite();
+  }, true);
+  ["btnImport", "btnSelMode", "btnRenameResult", "btnReport"].forEach(function(id){ lockForGuest(document.getElementById(id)); });
+}
+// ===================== Lightbox (zoom plein écran sur les graphes) =====================
+// Global (pas dans une fonction async plus bas) — utilisée depuis
+// buildDiagPanel (onglets Graphes MTF/SNR) pour agrandir un graphique au
+// clic. Fermeture : clic sur le fond, sur le bouton ×, ou touche Échap.
+function openLightbox(url){
+  document.getElementById("lightboxImg").src = url;
+  document.getElementById("lightboxOverlay").classList.add("open");
+}
+function closeLightbox(){
+  document.getElementById("lightboxOverlay").classList.remove("open");
+  document.getElementById("lightboxImg").src = "";
+}
+document.getElementById("lightboxOverlay").addEventListener("click", closeLightbox);
+document.getElementById("lightboxImg").addEventListener("click", function(e){ e.stopPropagation(); });
+document.getElementById("lightboxClose").addEventListener("click", closeLightbox);
+document.addEventListener("keydown", function(e){
+  if(e.key === "Escape") closeLightbox();
+});
+
+// Migration SQL nécessaire si la colonne n'existe pas encore sur
+// "saved_results" (nom de simulation optionnel, éditable via "Renommer" —
+// cf. renameResult ci-dessous ; repli sur le nom de la scène si absent) :
+//   alter table saved_results add column if not exists name text;
+// ===================== Filtres de la liste (04/10/2026) =====================
+// Trois filtres cumulables : texte libre (nom du résultat, instrument, scène,
+// cas WFE), scène, instrument. Ils masquent les lignes sans rien recharger.
+// Les listes déroulantes sont remplies avec les valeurs réellement présentes.
+function fillResultFilters(){
+  function fill(selectId, values, allLabel, display){   // display : nom affiché d'une valeur (la valeur filtrée reste celle de la base)
+    var sel = document.getElementById(selectId), previous = sel.value;
+    sel.innerHTML = "";
+    var first = document.createElement("option"); first.value = ""; first.textContent = allLabel; sel.appendChild(first);
+    values.filter(function(v, i){ return v && values.indexOf(v) === i; }).sort().forEach(function(v){
+      var o = document.createElement("option"); o.value = v; o.textContent = display ? display(v) : v; sel.appendChild(o);
+    });
+    sel.value = previous; // conserve le choix après un renommage ou une suppression
+    if(sel.value !== previous) sel.value = "";
+  }
+  fill("fScene", resultRowEls.map(function(el){ return el._filter.scene; }), t("res.filter.all_scenes"), tScene);
+  fill("fInst", resultRowEls.map(function(el){ return el._filter.inst; }), t("res.filter.all_inst"));
+  document.getElementById("resultsFilters").hidden = false;
+}
+function applyResultFilters(){
+  var q = document.getElementById("fSearch").value.trim().toLowerCase();
+  var scene = document.getElementById("fScene").value, inst = document.getElementById("fInst").value;
+  var shown = 0;
+  resultRowEls.forEach(function(el){
+    var ok = (!q || el._filter.text.indexOf(q) >= 0)
+      && (!scene || el._filter.scene === scene)
+      && (!inst || el._filter.inst === inst);
+    el.hidden = !ok;
+    if(ok) shown++;
+  });
+  var total = resultRowEls.length, count = document.getElementById("fCount");
+  count.textContent = (shown === total)
+    ? t(total > 1 ? "res.count_many" : "res.count_one", { n: total })
+    : t("res.count_of", { shown: shown, total: total });
+  if(q || scene || inst){
+    var reset = document.createElement("button");
+    reset.type = "button"; reset.className = "reset"; reset.textContent = t("res.filter.clear");
+    reset.addEventListener("click", function(){
+      document.getElementById("fSearch").value = "";
+      document.getElementById("fScene").value = "";
+      document.getElementById("fInst").value = "";
+      applyResultFilters();
+    });
+    count.appendChild(reset);
+  }
+  if(selMode) refreshSel();   // la sélection ne compte que les lignes visibles
+}
+["fSearch", "fScene", "fInst"].forEach(function(id){
+  document.getElementById(id).addEventListener("input", applyResultFilters);
+});
+
+// ===================== Détail des entrées d'un résultat (04/10/2026) =====================
+// Affiché sous la ligne, sans quitter la liste. Les valeurs viennent de la
+// copie de l'instrument gardée avec le résultat (instrument_snapshot.config)
+// et des conditions d'acquisition (conditions) : ce sont les entrées de CETTE
+// simulation, même si l'instrument a été modifié ou supprimé depuis. Seules
+// les valeurs renseignées sont listées.
+function inputsHtml(r){
+  var c = (r.instrument_snapshot && r.instrument_snapshot.config) || {};
+  var k = r.conditions || {};
+  function has(v){ return v !== undefined && v !== null && v !== ""; }
+  function esc(t){ var d = document.createElement("div"); d.textContent = String(t); return d.innerHTML; }
+  function num(v){ return Number(Number(v).toPrecision(4)); }
+  function line(label, v, unit){
+    return has(v) ? "<dt>" + label + "</dt><dd>" + esc(isNaN(Number(v)) ? v : num(v)) + (unit ? " " + unit : "") + "</dd>" : "";
+  }
+  // Transmission / rendement : valeur constante, ou courbe saisie point par point.
+  function spectral(label, modeKey, arrKey, valKey, scalarKey){
+    var pts = (c[arrKey] || []).filter(function(p){ return has(p.wl) && has(p[valKey]); });
+    var mode = c[modeKey] || (pts.length >= 2 ? "curve" : "constant");
+    if(mode === "curve" && pts.length >= 2) return "<dt>" + label + "</dt><dd>" + t("res.in.curve", { n: pts.length }) + "</dd>";
+    return line(label, c[scalarKey]);
+  }
+  function block(title, body){ return body ? "<div><h4>" + title + "</h4><dl>" + body + "</dl></div>" : ""; }
+  var MODES = { detailed: t("res.in.mode.detailed"), datasheet: t("res.in.mode.datasheet"), full_scale: t("res.in.mode.full_scale") };
+
+  var gsd = (has(c.I) && has(k.H)) ? num(Number(c.I) * 1e-6 * Number(k.H) * 1000) : null;
+  var cond = line(t("field.scene"), tScene(r.scene)) + line(t("field.H"), k.H, "km") + line(t("res.in.gsd"), gsd, "m") +
+    line(t("field.S"), k.S, "°") + line(t("field.TI"), k.TI, "µs") + line(t("field.TDI"), k.TDI) +
+    line(t("field.wfe_case"), k.wfeCaseName || t("res.in.simplified"));
+  var opt = line(t("field.I"), c.I, "µrad") + line(t("field.D"), c.D, "m") + line(t("field.E"), c.E, "m") +
+    (Number(c.E) > 0 && Number(c.NSUP) > 0 ? line(t("res.in.supports"), num(c.NSUP) + " × " + num(c.ESUP), "m") : "") +
+    spectral(t("res.in.transmission"), "T_mode", "tSpectral", "t", "T") + line(t("field.W"), c.W, "nm");
+  var det = line(t("field.PX"), c.PX, "µm") + spectral(t("field.QE"), "QE_mode", "qeSpectral", "qe", "QE") +
+    line(t("field.P"), c.P, "%") + line(t("field.K"), c.K, "e⁻/s") +
+    line("DSNU", c.dsnu_1288, "e⁻") + line(t("res.in.dsnu_tref"), c.dsnu_T_ref, "s");
+  var elec = line(t("field.ADC"), c.ADC, "bits") + line(t("field.FW"), c.FW, "e⁻") + line(t("field.R"), c.R, "e⁻") +
+    line(t("res.in.mode"), MODES[c.electronics_mode]) +
+    (c.electronics_mode === "detailed"
+      ? line(t("res.in.cvf"), c.CVF_uV_per_e, "µV/e⁻") + line(t("res.in.pga"), c.G_PGA) + line(t("res.in.adc_range"), c.V_range, "V") : "") +
+    (c.electronics_mode === "datasheet" ? line(t("res.in.cwf"), c.CWF, "DN/e⁻") : "") +
+    line(t("res.in.black"), c.DN0, "DN") + line(t("res.in.tdi_acc"), c.bits_TDI, "bits");
+
+  var blocks = block(t("sim.sum.conditions"), cond) + block(t("block.optics"), opt) + block(t("block.detector"), det) + block(t("block.electronics"), elec);
+  return blocks +
+    "<div class='openfull'><a href='resultats.html?id=" + encodeURIComponent(r.id) + "'>" + t("res.open_full") + "</a></div>";
+}
+
+// ===================== Tri de la liste des résultats (04/10/2026) =====================
+// Les lignes sont construites une fois (renderResultsList), puis seulement
+// réordonnées ici : pas de nouvelle requête à chaque tri. Un clic sur un
+// intitulé trie sur cette colonne, du plus grand au plus petit (du plus
+// récent au plus ancien pour la date) ; un second clic inverse. Les
+// résultats sans mesure restent toujours en bas.
+var resultRowEls = [];
+var resultSort = { key: "date", dir: "desc" };
+function drawResultRows(){
+  var grid = document.getElementById("resultsGrid");
+  var k = resultSort.key, sign = resultSort.dir === "desc" ? -1 : 1;
+  resultRowEls.slice().sort(function(a, b){
+    var va = a._sort[k], vb = b._sort[k];
+    if(va == null && vb == null) return b._sort.date - a._sort.date;
+    if(va == null) return 1;
+    if(vb == null) return -1;
+    if(va === vb) return b._sort.date - a._sort.date;
+    return (va - vb) * sign;
+  }).forEach(function(el){ grid.appendChild(el); }); // déplace les lignes existantes
+  document.querySelectorAll("#resultsHead button").forEach(function(btn){
+    var on = btn.getAttribute("data-sort") === k;
+    btn.classList.toggle("on", on);
+    var arrow = btn.querySelector(".arrow");
+    if(arrow) arrow.remove();
+    if(on){
+      var s = document.createElement("span");
+      s.className = "arrow";
+      s.textContent = resultSort.dir === "desc" ? "▼" : "▲";
+      btn.appendChild(s);
+    }
+  });
+}
+document.querySelectorAll("#resultsHead button").forEach(function(btn){
+  btn.addEventListener("click", function(){
+    var key = btn.getAttribute("data-sort");
+    if(resultSort.key === key) resultSort.dir = resultSort.dir === "desc" ? "asc" : "desc";
+    else resultSort = { key: key, dir: "desc" };
+    drawResultRows();
+  });
+});
+
+// ===================== Sélection multiple et suppression groupée (12/10/2026) =====================
+// « Sélectionner » remplace le menu ⋮ de chaque ligne par une case ; un clic sur la ligne la coche
+// (le détail ne se déplie plus). « Tout sélectionner » ne prend que les lignes visibles (filtres
+// compris), et la suppression ne touche que les lignes visibles cochées. Une seule confirmation.
+var selMode = false, selIds = {};
+function selectedRows(){ return resultRowEls.filter(function(el){ return !el.hidden && selIds[el._res.id]; }); }
+function refreshSel(){
+  resultRowEls.forEach(function(el){ el.classList.toggle("sel", !!selIds[el._res.id]); });
+  var vis = resultRowEls.filter(function(el){ return !el.hidden; }), sel = selectedRows();
+  document.getElementById("selCount").textContent = t(sel.length === 1 ? "sel.count_one" : "sel.count_many", { n: sel.length });
+  var del = document.getElementById("selDelete");
+  del.textContent = t("sel.delete", { n: sel.length }); del.disabled = sel.length === 0;
+  var all = document.getElementById("selAll");
+  all.textContent = (vis.length > 0 && sel.length === vis.length) ? t("sel.none") : t("sel.all");
+  all.disabled = vis.length === 0;
+}
+function setSelMode(on){
+  selMode = on; selIds = {};
+  document.getElementById("resultsGrid").classList.toggle("selmode", on);
+  document.getElementById("selBar").hidden = !on;
+  document.getElementById("btnSelMode").classList.toggle("on", on);
+  document.querySelectorAll(".resultrow .dropdown.open").forEach(function(o){ o.classList.remove("open"); });
+  if(on) refreshSel();
+}
+document.getElementById("btnSelMode").addEventListener("click", function(){ setSelMode(!selMode); });
+document.getElementById("selCancel").addEventListener("click", function(){ setSelMode(false); });
+document.getElementById("selAll").addEventListener("click", function(){
+  var vis = resultRowEls.filter(function(el){ return !el.hidden; });
+  var allOn = vis.length > 0 && vis.every(function(el){ return selIds[el._res.id]; });
+  vis.forEach(function(el){ if(allOn) delete selIds[el._res.id]; else selIds[el._res.id] = true; });
+  refreshSel();
+});
+// En phase de capture : le clic coche la ligne avant que le dépliage du détail ne le voie.
+document.getElementById("resultsGrid").addEventListener("click", function(e){
+  if(!selMode) return;
+  var row = e.target.closest(".resultrow");
+  if(!row || !row._res || e.target.closest(".inputs")) return;
+  e.preventDefault(); e.stopPropagation();
+  if(selIds[row._res.id]) delete selIds[row._res.id]; else selIds[row._res.id] = true;
+  refreshSel();
+}, true);
+document.addEventListener("keydown", function(e){ if(e.key === "Escape" && selMode) setSelMode(false); });
+document.getElementById("selDelete").addEventListener("click", async function(){
+  var rows = selectedRows(), n = rows.length;
+  if(!n) return;
+  if(!confirm(t(n === 1 ? "sel.confirm.results_one" : "sel.confirm.results_many", { n: n }))) return;
+  var btn = this, ok = 0, fail = 0;
+  document.querySelectorAll("#selBar button").forEach(function(b){ b.disabled = true; });
+  for(var i = 0; i < n; i++){
+    btn.textContent = t("sel.progress", { i: i + 1, n: n });
+    var err = await removeResult(rows[i]._res);
+    if(err){ console.error("Suppression groupée, échec :", err); fail++; } else ok++;
+  }
+  setSelMode(false);
+  await renderResultsList();
+  document.querySelectorAll("#selBar button").forEach(function(b){ b.disabled = false; });
+  if(fail) alert(t("sel.partial", { ok: ok, fail: fail }));
+});
+
+// Ferme le menu ⋮ d'une ligne de résultat quand on clique ailleurs.
+document.addEventListener("click", function(){
+  document.querySelectorAll(".resultrow .dropdown.open").forEach(function(o){ o.classList.remove("open"); });
+});
+
+async function renderResultsList(){
+  var grid = document.getElementById("resultsGrid");
+  document.getElementById("resultsHead").hidden = true; // réaffiché plus bas s'il y a des résultats
+  document.getElementById("resultsFilters").hidden = true;
+  // "instruments(name)" : jointure vers l'instrument vivant, absente si
+  // supprimé depuis (cf. migration ON DELETE SET NULL) — on retombe alors
+  // sur instrument_snapshot.name, sauvegardé au moment du résultat.
+  // 11/10/2026 : colonnes listées au lieu de « * » : la liste n'utilise jamais les journaux de calcul (logs),
+  // volumineux et présents sur chaque résultat. Ils restent lus par la page de détail (select("*") plus bas).
+  var results, error = null;
+  if(guest){
+    results = await guestResults();
+  } else {
+    var listRes = await supabaseClient
+      .from("saved_results")
+      .select("id, created_at, name, scene, image_path, source_image_path, conditions, diagnostics, instrument_snapshot, instruments(name, deleted_at)")
+      .order("created_at", { ascending: false });
+    results = listRes.data; error = listRes.error;
+  }
+
+  if(error){
+    console.error("Erreur chargement des résultats :", error);
+    grid.innerHTML = "<p class='resultsempty'>" + t("res.load_error") + "</p>";
+    return;
+  }
+  if(!results || results.length === 0){
+    grid.innerHTML = "<p class='resultsempty'>" + t("res.empty.a") +
+      "<a href='simulations.html'>" + t("res.empty.link") + "</a>" + t("res.empty.b") + "</p>";
+    return;
+  }
+
+  // 11/10/2026 : les URLs signées de toutes les vignettes sont demandées EN UNE FOIS (createSignedUrls) avant
+  // de construire les lignes. Avant : un aller-retour vers Supabase par résultat, l'un après l'autre, et
+  // aucune ligne n'apparaissait avant la fin. Si l'appel groupé échoue, chaque ligne retombe sur l'appel
+  // unitaire d'avant (même résultat, plus lent).
+  var thumbUrls = {};
+  var thumbPaths = results.map(function(x){ return x.image_path; }).filter(Boolean);
+  if(guest){
+    thumbPaths.forEach(function(p){ thumbUrls[p] = p; });   // invité : chemins relatifs, pas d'URL signée
+  } else if(thumbPaths.length){
+    try{
+      var { data: thumbBatch, error: thumbBatchErr } = await supabaseClient.storage.from("results").createSignedUrls(thumbPaths, 3600);
+      if(thumbBatchErr || !thumbBatch) throw thumbBatchErr || new Error("réponse vide");
+      thumbBatch.forEach(function(it){ if(it && it.path && it.signedUrl) thumbUrls[it.path] = it.signedUrl; });
+    }catch(e){
+      console.warn("URLs signées groupées indisponibles (liste), repli appel par appel :", e);
+    }
+  }
+
+  grid.innerHTML = "";
+  resultRowEls = [];
+  for(var i = 0; i < results.length; i++){
+    var r = results[i];
+    var thumbUrl = "";
+    if(r.image_path){
+      thumbUrl = thumbUrls[r.image_path] || "";
+      if(!thumbUrl){
+        var { data: signed } = await supabaseClient.storage.from("results").createSignedUrl(r.image_path, 3600);
+        if(signed) thumbUrl = signed.signedUrl;
+      }
+    }
+    // 07/10/2026 — date et heure, à l'heure locale du navigateur (« 7 oct. 2026, 11:20 »)
+    var dateLabel = new Date(r.created_at).toLocaleString(nysaLocale(), {day:"numeric", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit"});
+    var instName = (r.instruments && r.instruments.name) || (r.instrument_snapshot && r.instrument_snapshot.name) || t("sim.sum.instrument");
+    // 04/10/2026 — un résultat survit à son instrument : on le signale sur
+    // la carte. « Supprimé » = marqué deleted_at (suppression douce) ou
+    // absent (purgé, lien instrument_id vidé par la base). Le nom vient
+    // alors de la copie gardée dans le résultat (instrument_snapshot).
+    var instGone = !r.instruments || !!r.instruments.deleted_at;
+
+    // Résumé des métriques — moyenne sur les bandes disponibles (RGB/NIR),
+    // pour donner un ordre de grandeur sur la carte sans avoir à ouvrir
+    // chaque résultat. Valeur absente si le résultat n'a pas de
+    // diagnostics par bande (ex. très ancien résultat, avant leur ajout).
+    var bands = (r.diagnostics && r.diagnostics.bands) || {};
+    var mtfVals = [], snrVals = [];
+    for(var bandName in bands){
+      if(bands[bandName].mtf_at_nyquist != null) mtfVals.push(bands[bandName].mtf_at_nyquist);
+      if(bands[bandName].snr_mean != null) snrVals.push(bands[bandName].snr_mean);
+    }
+    var avg = function(arr){ return arr.length ? arr.reduce(function(a,b){return a+b;}, 0) / arr.length : null; };
+    var mtfAvg = avg(mtfVals), snrAvg = avg(snrVals);
+
+    var wfeCaseName = (r.conditions && r.conditions.wfeCaseName) || null;
+    var displayName = r.name || tScene(r.scene); // "name" optionnel (cf. rename) — replie sur la scène si absent
+    // 11/10/2026 : GSD (m au sol) en colonne triable de la liste, comme MTF et SNR, même formule que le bloc « entrées » :
+    // iFoV (µrad) x altitude (km). Absente si l'une des deux valeurs manque (très anciens résultats).
+    var rowCfg = (r.instrument_snapshot && r.instrument_snapshot.config) || {}, rowCond = r.conditions || {};
+    var rowGsd = (rowCfg.I != null && rowCfg.I !== "" && rowCond.H != null && rowCond.H !== "" && !isNaN(Number(rowCfg.I)) && !isNaN(Number(rowCond.H)))
+      ? Number((Number(rowCfg.I) * 1e-6 * Number(rowCond.H) * 1000).toPrecision(4)) : null;
+
+    // 04/10/2026 — une ligne par résultat. Les noms saisis par l'utilisateur
+    // (résultat, instrument, cas WFE) sont insérés en texte, pas en HTML.
+    function esc(t){ var d = document.createElement("div"); d.textContent = t == null ? "" : String(t); return d.innerHTML; }
+    var card = document.createElement("div");
+    card.className = "resultrow";
+    card.dataset.id = r.id;   // repère de la ligne (utilisé par le test automatique du parcours)
+    card.innerHTML =
+      "<div class='rowlink' role='button' tabindex='0' aria-expanded='false'>"+
+        "<span class='thumb' style='background-image:url(\"" + thumbUrl + "\")'></span>"+
+        "<div class='txt'>"+
+          "<div class='namerow'><span class='name'>" + esc(displayName) + "</span>"+
+            (instGone ? "<span class='instgone'>" + t("res.inst_gone") + "</span>" : "")+"</div>"+
+          "<div class='sub'><span>" + esc(instName) + "</span><span class='date'>" + dateLabel + "</span>"+
+            (wfeCaseName ? "<span class='wfebadge'>" + t("sim.sum.wfe_line", { name: esc(wfeCaseName) }) + "</span>" : "")+
+            "<span class='more'>" + t("res.inputs_closed") + "</span></div>"+
+        "</div>"+
+        "<div class='metric'><div class='v'>" + (mtfAvg != null ? mtfAvg.toFixed(2) : "-") + "</div></div>"+
+        "<div class='metric'><div class='v'>" + (snrAvg != null ? snrAvg.toFixed(1) : "-") + "</div></div>"+
+        "<div class='metric'><div class='v'>" + (rowGsd != null ? rowGsd : "-") + "</div></div>"+
+      "</div>"+
+      "<div class='rowmenu'>"+
+        "<button type='button' class='menubtn' aria-label='" + t("inst.menu.options") + "'>⋮</button>"+
+        "<span class='selbox' aria-hidden='true'>✓</span>"+
+        "<div class='dropdown'>"+
+          "<button type='button' data-act='rename'>" + t("inst.menu.rename") + "</button>"+
+          "<button type='button' class='danger' data-act='delete'>" + t("inst.menu.delete") + "</button>"+
+        "</div>"+
+      "</div>"+
+      "<div class='inputs' hidden></div>";
+    (function(resultRow, cardEl){
+      // 04/10/2026 — un clic sur la ligne déplie le détail des entrées, sans
+      // quitter la liste ; le résultat complet s'ouvre par le bouton du
+      // détail. Le contenu n'est construit qu'à la première ouverture.
+      var link = cardEl.querySelector(".rowlink"), panel = cardEl.querySelector(".inputs");
+      function toggleInputs(){
+        var open = panel.hidden;
+        if(open && !panel.innerHTML) panel.innerHTML = inputsHtml(resultRow);
+        panel.hidden = !open;
+        cardEl.classList.toggle("open", open);
+        link.setAttribute("aria-expanded", open ? "true" : "false");
+        cardEl.querySelector(".more").textContent = open ? t("res.inputs_open") : t("res.inputs_closed");
+      }
+      link.addEventListener("click", toggleInputs);
+      link.addEventListener("keydown", function(e){
+        if(e.key === "Enter" || e.key === " "){ e.preventDefault(); toggleInputs(); }
+      });
+      var dd = cardEl.querySelector(".dropdown");
+      cardEl.querySelector(".menubtn").addEventListener("click", function(e){
+        e.stopPropagation();
+        var wasOpen = dd.classList.contains("open");
+        document.querySelectorAll(".resultrow .dropdown.open").forEach(function(o){ o.classList.remove("open"); });
+        if(!wasOpen){
+          dd.classList.add("open");
+          // 12/10/2026 : sur les dernières lignes le menu dépassait de la liste et était coupé ; il s'ouvre alors vers le haut
+          dd.classList.remove("up");
+          var lv = document.getElementById("listView").getBoundingClientRect();
+          if(dd.getBoundingClientRect().bottom > lv.bottom){
+            dd.classList.add("up");
+            if(dd.getBoundingClientRect().top < lv.top) dd.classList.remove("up");
+          }
+        }
+      });
+      dd.querySelector("[data-act='rename']").addEventListener("click", function(){
+        dd.classList.remove("open"); renameResult(resultRow, cardEl);
+      });
+      dd.querySelector("[data-act='delete']").addEventListener("click", function(){
+        dd.classList.remove("open"); deleteResult(resultRow);
+      });
+    })(r, card);
+    // Valeurs de tri de cette ligne (cf. drawResultRows).
+    card._res = r;
+    card._sort = { date: new Date(r.created_at).getTime(), mtf: mtfAvg, snr: snrAvg, gsd: rowGsd };
+    // Valeurs de filtre de cette ligne (cf. applyResultFilters).
+    card._filter = { scene: r.scene || "", inst: instName,
+      text: [displayName, instName, r.scene, wfeCaseName].join(" ").toLowerCase() };
+    resultRowEls.push(card);
+  }
+  document.getElementById("resultsHead").hidden = false;
+  fillResultFilters();
+  drawResultRows();
+  applyResultFilters();
+  if(guest) document.querySelectorAll(".resultrow .dropdown button").forEach(lockForGuest);
+}
+
+async function renameResult(r, cardEl){
+  var newName = prompt(t("res.prompt.name"), r.name || tScene(r.scene));
+  if(newName === null || !newName.trim()) return;
+  newName = newName.trim();
+  var { error } = await supabaseClient.from("saved_results").update({ name: newName }).eq("id", r.id);
+  if(error){
+    console.error("Erreur renommage résultat :", error);
+    alert(t("home.err.rename", { msg: error.message }));
+    return;
+  }
+  r.name = newName;
+  var nameEl = cardEl.querySelector(".name");
+  if(nameEl) nameEl.textContent = newName;
+}
+
+// Supprime les fichiers puis la ligne d'un résultat ; renvoie l'erreur de la base (ou null). Sert à la
+// suppression d'un résultat et à la suppression groupée.
+async function removeResult(r){
+  // Rassemble tous les chemins de fichiers liés (image principale + tous
+  // les graphiques de diagnostic par bande) pour ne rien laisser d'orphelin
+  // dans le bucket une fois la ligne supprimée.
+  var paths = [];
+  if(r.image_path) paths.push(r.image_path);
+  // 07/10/2026 : l'image source du crop (source_image_path) était oubliée ici : elle restait stockée après
+  // la suppression du résultat. Trouvé par le test automatique, qui voyait le stockage grossir.
+  if(r.source_image_path) paths.push(r.source_image_path);
+  if(r.diagnostics && r.diagnostics.dn && r.diagnostics.dn.rgb_path) paths.push(r.diagnostics.dn.rgb_path);
+  if(r.diagnostics && r.diagnostics.dn && r.diagnostics.dn.tiff_path) paths.push(r.diagnostics.dn.tiff_path);
+  var bands = (r.diagnostics && r.diagnostics.bands) || {};
+  for(var bandName in bands){
+    for(var key in bands[bandName]){
+      if(key.endsWith("_path")) paths.push(bands[bandName][key]);
+    }
+  }
+
+  if(paths.length > 0){
+    var { error: rmErr } = await supabaseClient.storage.from("results").remove(paths);
+    if(rmErr) console.error("Erreur suppression fichiers du bucket :", rmErr);
+    // on continue quand même vers la suppression de la ligne — mieux vaut
+    // une ligne supprimée avec quelques fichiers orphelins qu'une ligne
+    // bloquée indéfiniment par un souci de stockage
+  }
+
+  var { error: delErr } = await supabaseClient.from("saved_results").delete().eq("id", r.id);
+  return delErr || null;
+}
+
+async function deleteResult(r){
+  if(!confirm(t("res.confirm.delete", { scene: tScene(r.scene) }))) return;
+  var delErr = await removeResult(r);
+  if(delErr){
+    alert(t("home.err.delete", { msg: delErr.message }));
+    return;
+  }
+  renderResultsList();
+}
+
+// 04/10/2026 — l'ancienne fenêtre de paramètres de cette page (antérieure à
+// Stripe) est retirée : le lien « Paramètres » ouvre celle de l'espace
+// personnel (espace-personnel.html?settings=1), seule à jour.
+
+
+(async function(){
+  var session = await requireAuth();
+  if(!session) return;
+
+  // ===== Export / import d'un résultat entre comptes (08/10/2026) =====
+  // Un seul fichier JSON : paramètres, diagnostics et images (en base64). Les journaux de calcul
+  // n'y figurent que si le compte exportateur est administrateur.
+  var FILE_RE = /^[A-Za-z0-9_.-]{1,120}\.(png|tif)$/;
+  var MAX_IMPORT = 400 * 1024 * 1024;   // 23/10/2026 : 80 -> 400 Mo (le TIFF 32 bits est volumineux)
+  function blobToB64(blob){
+    return new Promise(function(res, rej){
+      var fr = new FileReader();
+      fr.onload = function(){ res(String(fr.result).split(",")[1] || ""); };
+      fr.onerror = function(){ rej(fr.error); };
+      fr.readAsDataURL(blob);
+    });
+  }
+  function b64ToBlob(b64, type){
+    var bin = atob(b64), arr = new Uint8Array(bin.length);
+    for(var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    return new Blob([arr], { type: type || "image/png" });
+  }
+  async function exportResult(r){
+    var files = {}, diag = JSON.parse(JSON.stringify(r.diagnostics || {}));
+    async function grab(path){
+      if(!path) return null;
+      var base = path.split("/").pop();
+      if(files[base]) return base;
+      if(guest){
+        var gr = await fetch(path);
+        if(!gr.ok) return null;
+        files[base] = await blobToB64(await gr.blob());
+        return base;
+      }
+      var { data, error } = await supabaseClient.storage.from("results").download(path);
+      if(error || !data) return null;
+      files[base] = await blobToB64(data);
+      return base;
+    }
+    var mainKey = await grab(r.image_path), srcKey = await grab(r.source_image_path);
+    if(diag.dn && diag.dn.rgb_path) diag.dn.rgb_path = await grab(diag.dn.rgb_path);
+    if(diag.dn && diag.dn.tiff_path) diag.dn.tiff_path = await grab(diag.dn.tiff_path);
+    var bands = diag.bands || {};
+    for(var bn in bands) for(var k in bands[bn]){
+      if(k.endsWith("_path") && bands[bn][k]) bands[bn][k] = await grab(bands[bn][k]);
+    }
+    var admin = (!guest && typeof isAdminAccount === "function") ? await isAdminAccount() : false;
+    if(admin && typeof simulatedPlan === "function" && await simulatedPlan()) admin = false;   // 09/10/2026 : pas de journaux pendant une simulation de plan
+    var out = { format: "nysa-result", version: 1, exported_at: new Date().toISOString(),
+      result: { name: r.name || null, scene: r.scene, conditions: r.conditions, instrument_snapshot: r.instrument_snapshot,
+        diagnostics: diag, logs: admin ? (r.logs || "") : "", created_at: r.created_at, image: mainKey, source_image: srcKey },
+      files: files };
+    var blob = new Blob([JSON.stringify(out)], { type: "application/json" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    // 12/10/2026 : nom du fichier = nom de la simulation (s'il y en a un), scène, date et heure de création, comme les images.
+    var slug = function(x){ return String(x || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Za-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60); };
+    var cd = r.created_at ? new Date(r.created_at) : null, z2 = function(n){ return String(n).padStart(2, "0"); };
+    var dateTxt = cd && !isNaN(cd) ? cd.getFullYear() + "-" + z2(cd.getMonth() + 1) + "-" + z2(cd.getDate()) + "_" + z2(cd.getHours()) + z2(cd.getMinutes()) : "";
+    var nameParts = [slug(r.name), slug(tScene(r.scene)), dateTxt].filter(Boolean);
+    a.download = (nameParts.length ? nameParts.join("_") : "nysa-" + String(r.id).slice(0, 8)) + ".nysa-result.json";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 5000);
+  }
+  async function importResult(file, uid){
+    if(file.size > MAX_IMPORT) throw new Error("big");
+    var data;
+    try{ data = JSON.parse(await file.text()); }catch(e){ throw new Error("format"); }
+    if(!data || data.format !== "nysa-result" || data.version !== 1 || !data.result || !data.result.scene || !data.files) throw new Error("format");
+    var R = data.result, id = crypto.randomUUID(), base = uid + "/" + id + "/", sent = [];
+    try{
+      async function put(key){
+        if(!key) return null;
+        if(!FILE_RE.test(key) || typeof data.files[key] !== "string") throw new Error("format");
+        var isTif = /\.tif$/.test(key), ctype = isTif ? "image/tiff" : "image/png";
+        var { error } = await supabaseClient.storage.from("results").upload(base + key, b64ToBlob(data.files[key], ctype), { contentType: ctype });
+        if(error) throw error;
+        sent.push(base + key);
+        return base + key;
+      }
+      var imagePath = await put(R.image);
+      if(!imagePath) throw new Error("format");
+      var srcPath = await put(R.source_image);
+      var diag = JSON.parse(JSON.stringify(R.diagnostics || {})), bands = diag.bands || {};
+      for(var bn in bands) for(var k in bands[bn]){
+        if(k.endsWith("_path")) bands[bn][k] = await put(bands[bn][k]);
+      }
+      // DN bruts : PNG 16 bits RVB et TIFF 32 bits (23/10/2026 : ils n'étaient pas réimportés)
+      if(diag.dn){
+        if(diag.dn.rgb_path) diag.dn.rgb_path = await put(diag.dn.rgb_path);
+        if(diag.dn.tiff_path) diag.dn.tiff_path = await put(diag.dn.tiff_path);
+      }
+      var cond = Object.assign({}, R.conditions || {}, { imported: true });
+      var { error: insErr } = await supabaseClient.from("saved_results").insert({
+        id: id, account_id: uid, instrument_id: null, name: R.name || null,
+        instrument_snapshot: R.instrument_snapshot || {}, scene: String(R.scene), conditions: cond,
+        image_path: imagePath, source_image_path: srcPath, diagnostics: diag, logs: String(R.logs || "") });
+      if(insErr) throw insErr;
+      return id;
+    }catch(e){
+      if(sent.length) await supabaseClient.storage.from("results").remove(sent);
+      throw e;
+    }
+  }
+  (function(){
+    var btn = document.getElementById("btnImport"), inp = document.getElementById("importFile"), msg = document.getElementById("importMsg");
+    if(!btn || !inp) return;
+    btn.addEventListener("click", function(){ inp.click(); });
+    inp.addEventListener("change", async function(){
+      var f = inp.files && inp.files[0]; inp.value = "";
+      if(!f) return;
+      msg.className = "importmsg"; msg.textContent = t("res.import.busy"); btn.disabled = true;
+      try{
+        var newId = await importResult(f, session.user.id);
+        msg.textContent = t("res.import.done");
+        await renderResultsList();
+        window.location.href = "resultats.html?id=" + newId;
+      }catch(e){
+        var m = (e && e.message) || String(e);
+        msg.className = "importmsg err";
+        if(m === "format") msg.textContent = t("res.import.err_format");
+        else if(m === "big") msg.textContent = t("res.import.err_big");
+        else if(m.indexOf("Limite de") >= 0) msg.textContent = (nysaLang() === "fr" ? m : t("sim.save.limit"));
+        else msg.textContent = t("res.import.fail", { msg: m });
+      }finally{ btn.disabled = false; }
+    });
+  })();
+
+  guest = !!session.guest;
+  if(guest){
+    document.getElementById("userEmail").textContent = t("guest.name");
+    document.getElementById("userAvatar").textContent = "?";
+    var soBtn = document.getElementById("signOutBtn");
+    soBtn.removeAttribute("data-i18n-aria"); soBtn.removeAttribute("data-i18n-title");
+    soBtn.removeAttribute("aria-label"); soBtn.removeAttribute("title");
+    soBtn.className = "g-btn primary";
+    soBtn.textContent = t("guest.create");
+    soBtn.addEventListener("click", function(){ window.location.href = "login.html?signup=1"; });
+    setupGuestUI();
+  } else {
+    document.getElementById("userEmail").textContent = session.user.email || "";
+    document.getElementById("userAvatar").textContent = (session.user.email || "").slice(0, 2).toUpperCase();
+    document.getElementById("signOutBtn").addEventListener("click", signOut);
+  }
+
+  var params = new URLSearchParams(window.location.search);
+  var resultId = params.get("id");
+
+  if(!resultId){
+    await renderResultsList();
+    return; // pas de ?id= -> vue liste uniquement, on s'arrête là
+  }
+  document.getElementById("listView").style.display = "none";
+  document.getElementById("detailView").style.display = "flex";
+  // La vue détaillée (comparaison d'images) garde sa largeur d'origine ; la
+  // liste, elle, a la même largeur que les pages Instruments et Simulations.
+  document.querySelector(".wrap").style.maxWidth = "1400px";
+
+  // ===================== Chargement du résultat (?id=<uuid>) =====================
+  var result = null;
+
+  if(resultId && guest){
+    result = await guestFetchResult(resultId);
+  } else if(resultId){
+    var { data, error } = await supabaseClient
+      .from("saved_results")
+      .select("*, instruments(name, deleted_at)")
+      .eq("id", resultId)
+      .single();
+    if(error) console.error("Erreur chargement résultat :", error);
+    else result = data;
+  }
+
+  var sceneName = (result && result.scene) || "-";
+  var instName = (result && ((result.instruments && result.instruments.name) ||
+    (result.instrument_snapshot && result.instrument_snapshot.name))) || "-";
+  var cond = (result && result.conditions) || {};
+
+  // Le bucket "results" est privé — image_path est un CHEMIN, pas une URL
+  // utilisable directement : on génère une URL signée temporaire (1h,
+  // largement suffisant pour la durée d'une visite de cette page).
+  //
+  // 11/10/2026 — TOUTES les URLs signées de la page (images, graphiques MTF/SNR, cartes de saturation)
+  // sont demandées EN UNE SEULE FOIS (createSignedUrls) puis lues dans urlCache. Avant, chaque graphique
+  // coûtait un aller-retour vers Supabase, l'un après l'autre (une trentaine d'appels successifs) : c'est ce
+  // qui rendait l'ouverture d'un résultat longue. Si l'appel groupé échoue, signedUrl() retombe sur l'appel
+  // unitaire d'avant : le comportement reste le même, seulement plus lent.
+  var diagBands = (result && result.diagnostics && result.diagnostics.bands) || {};
+  var GRAPH_KEYS_MTF = ["psf_png_b64", "mtf_png_b64", "pupil_png_b64"];
+  var GRAPH_KEYS_SNR = ["snr_regimes_png_b64", "snr_noise_budget_png_b64", "snr_map_png_b64",
+    "snr_noise_maps_sim_png_b64", "snr_image_compare_png_b64", "snr_histogram_png_b64"];
+  var urlCache = {};   // chemin dans le bucket "results" -> URL signée
+  async function prefetchSignedUrls(paths){
+    if(guest) return;   // invité : chemins relatifs, rien à signer
+    var todo = [];
+    paths.forEach(function(p){ if(p && !urlCache[p] && todo.indexOf(p) < 0) todo.push(p); });
+    if(!todo.length) return;
+    try{
+      var { data: batch, error: batchErr } = await supabaseClient.storage.from("results").createSignedUrls(todo, 3600);
+      if(batchErr || !batch) throw batchErr || new Error("réponse vide");
+      batch.forEach(function(it){ if(it && it.path && it.signedUrl) urlCache[it.path] = it.signedUrl; });
+    }catch(e){
+      console.warn("URLs signées groupées indisponibles, repli appel par appel :", e);
+    }
+  }
+  var pathsToSign = [];
+  if(result){
+    pathsToSign.push(result.image_path, result.source_image_path);
+    for(var pbn in diagBands){
+      var pd = diagBands[pbn];
+      GRAPH_KEYS_MTF.concat(GRAPH_KEYS_SNR).forEach(function(k){ pathsToSign.push(pd[k.replace("_b64", "_path")]); });
+      pathsToSign.push(pd.saturated_mask_png_path);
+    }
+  }
+  await prefetchSignedUrls(pathsToSign);
+
+  var imgUrl = "assets/scenes/port_thumb.jpg"; // repli si pas de résultat/erreur
+  if(result && result.image_path){
+    var signedImg = await signedUrl(result.image_path);
+    if(signedImg) imgUrl = signedImg;
+    else console.error("Erreur génération URL signée :", result.image_path);
+  }
+
+  // Image SOURCE réelle (vrai crop plein résolution utilisé en entrée du
+  // calcul, cf. source_image_path/source_preview_b64 dans
+  // main.py + simulations.html) — même mécanisme d'URL signée que
+  // l'image simulée. Repli sur l'ancienne vignette générique par scène
+  // UNIQUEMENT pour les résultats sauvegardés avant ce changement (pas de
+  // source_image_path enregistré) — ce n'est alors ni le bon crop ni la
+  // pleine résolution, juste pour éviter un vide dans le comparateur.
+  var SCENE_THUMBS = {
+    "Ville": "assets/scenes/aix_thumb.jpg",
+    "Avion": "assets/scenes/avion_thumb.jpg",
+    "Port": "assets/scenes/port_thumb.jpg",
+  };
+  var sourceUrl = SCENE_THUMBS[sceneName] || "assets/scenes/port_thumb.jpg";
+  if(result && result.source_image_path){
+    var signedSrc = await signedUrl(result.source_image_path);
+    if(signedSrc) sourceUrl = signedSrc;
+    else console.error("Erreur génération URL signée (source) :", result.source_image_path);
+  }
+
+  // 11/10/2026 — copie hors-DOM des images simulée et source (base de tous les retraitements, cf. plus bas) :
+  // leur téléchargement démarre ICI, dès que les deux URLs sont connues, au lieu d'attendre la fin du reste
+  // de la page (panneaux MTF/SNR, rôle admin...). Elles chargent ainsi pendant que la page se construit.
+  var simImgObj = new Image();
+  simImgObj.crossOrigin = "anonymous";
+  var srcImgObj = new Image();
+  srcImgObj.crossOrigin = "anonymous";
+  var simLoaded = new Promise(function(res){ simImgObj.onload = res; simImgObj.onerror = res; simImgObj.src = imgUrl; });
+  var srcLoaded = new Promise(function(res){ srcImgObj.onload = res; srcImgObj.onerror = res; srcImgObj.src = sourceUrl; });
+
+  var resultLogs = (result && result.logs) || "";
+
+  // 07/10/2026 — le titre ne porte plus la date entre parenthèses (« essai 1 (2026-10-07_0920) ») :
+  // le nom est affiché seul, et la date est écrite en clair dessous, à l'heure locale du navigateur.
+  // (L'ancien format était en heure UTC : il affichait deux heures de moins en France l'été.)
+  var createdDate = result ? new Date(result.created_at) : null;
+  function p2(n){ return String(n).padStart(2, "0"); }
+  // horodatage pour le nom du fichier téléchargé : 2026-10-07_1120, à l'heure locale
+  var createdLabel = createdDate
+    ? createdDate.getFullYear() + "-" + p2(createdDate.getMonth() + 1) + "-" + p2(createdDate.getDate()) + "_" + p2(createdDate.getHours()) + p2(createdDate.getMinutes())
+    : "-";
+  var createdNice = createdDate ? createdDate.toLocaleString(nysaLocale(), { dateStyle: "long", timeStyle: "short" }) : "";
+  var displayName = (result && result.name) || tScene(sceneName); // "name" optionnel — replie sur la scène si absent
+
+  function renderResultHead(){
+    document.getElementById("resTitle").textContent = (result && result.name) || tScene(sceneName);
+    // la scène est rappelée sous le titre dès que le titre est un nom choisi (sinon il la montre déjà)
+    var parts = [];
+    if(createdNice) parts.push(createdNice);
+    if(result && result.name) parts.push(tScene(sceneName));
+    document.getElementById("resSub").textContent = parts.join(" · ");
+  }
+  renderResultHead();
+  var btnRename = document.getElementById("btnRenameResult");
+  var btnExport = document.getElementById("btnExportResult");
+  if(!result){
+    btnExport.style.display = "none";
+  } else {
+    btnExport.addEventListener("click", async function(){
+      var old = btnExport.textContent; btnExport.disabled = true; btnExport.textContent = t("res.export.busy");
+      try{ await exportResult(result); }
+      catch(e){ alert(t("res.export.fail", { msg: (e && e.message) || String(e) })); }
+      finally{ btnExport.disabled = false; btnExport.textContent = old; }
+    });
+  }
+  if(!result){
+    btnRename.style.display = "none";
+  } else {
+    btnRename.addEventListener("click", async function(){
+      var newName = prompt(t("res.prompt.name"), result.name || tScene(sceneName));
+      if(newName === null || !newName.trim()) return;
+      newName = newName.trim();
+      var { error } = await supabaseClient.from("saved_results").update({ name: newName }).eq("id", result.id);
+      if(error){
+        console.error("Erreur renommage résultat :", error);
+        alert(t("home.err.rename", { msg: error.message }));
+        return;
+      }
+      result.name = newName;
+      renderResultHead();
+    });
+  }
+  // 11/10/2026 : crossOrigin posé AVANT src, comme sur les copies hors-DOM (simImgObj / srcImgObj) : le
+  // navigateur voit alors la même requête et ne télécharge qu'une fois chaque fichier, au lieu de deux.
+  document.getElementById("imgSim").crossOrigin = "anonymous";
+  document.getElementById("imgSim").src = imgUrl;
+  document.getElementById("imgSrc").crossOrigin = "anonymous";
+  document.getElementById("imgSrc").src = sourceUrl;
+
+  // ===================== Onglet Entrées (scène / instrument / conditions) =====================
+  var Z_LABELS = {none:t("res.z.none"), defoc:t("res.z.defoc"), astig:t("res.z.astig"), coma:t("res.z.coma"),
+    spher:t("res.z.spher"), trefo:t("res.z.trefo")};
+  // Libellés réels des paramètres instrument — mêmes clés/unités que dans
+  // le schéma Optique/Détecteur/Électronique de creer-instrument.html.
+  // Libellé et unité de chaque paramètre d'instrument affiché dans l'onglet Entrées.
+  // 06/10/2026 — liste complétée (électronique, DSNU), et deux unités corrigées :
+  // le rendement quantique et la transmission sont des fractions, pas des %.
+  var INST_FIELD_LABELS = {
+    I:   {label:t("field.I"), unit:" µrad"},
+    D:   {label:t("field.D"), unit:" m"},
+    E:   {label:t("field.E"), unit:" m"},
+    NSUP: {label:t("field.NSUP"), unit:""},
+    ESUP: {label:t("field.ESUP"), unit:" m"},
+    T:   {label:t("field.T"), unit:""},
+    W:   {label:t("field.W"), unit:" nm"},
+    PX:  {label:t("field.PX"), unit:" µm"},
+    QE:  {label:t("field.QE"), unit:""},
+    P:   {label:t("field.P"), unit:" %"},
+    K:   {label:t("field.K"), unit:" e⁻/s"},
+    dsnu_1288:  {label:"DSNU", unit:" e⁻"},
+    dsnu_T_ref: {label:t("res.in.dsnu_tref"), unit:" s"},
+    ADC: {label:t("field.ADC"), unit:" bits"},
+    FW:  {label:t("field.FW"), unit:" e⁻"},
+    R:   {label:t("field.R"), unit:" e⁻"},
+    electronics_mode: {label:t("res.in.mode"), unit:""},
+    CVF_uV_per_e: {label:t("res.in.cvf"), unit:" µV/e⁻", only:"detailed"},
+    G_PGA:   {label:t("res.in.pga"), unit:"", only:"detailed"},
+    V_range: {label:t("res.in.adc_range"), unit:" V", only:"detailed"},
+    CWF:     {label:t("res.in.cwf"), unit:" DN/e⁻", only:"datasheet"},
+    DN0:      {label:t("res.in.black"), unit:" DN"},
+    bits_TDI: {label:t("res.in.tdi_acc"), unit:" bits"}
+  };
+  var INST_FIELD_ORDER = ["I","D","E","NSUP","ESUP","T","W","PX","QE","P","K","dsnu_1288","dsnu_T_ref",
+                          "ADC","FW","R","electronics_mode","CVF_uV_per_e","G_PGA","V_range","CWF","DN0","bits_TDI"];
+  var ELEC_MODE_NAMES = { detailed: t("res.in.mode.detailed"), datasheet: t("res.in.mode.datasheet"), full_scale: t("res.in.mode.full_scale") };
+  function entTile(label, value){
+    return "<div><div style='font-family:var(--mono);font-size:12px;color:var(--muted-2);text-transform:uppercase'>"+
+      label + "</div><div style='font-family:var(--mono);font-size:15px;color:var(--paper)'>" + escH(value) + "</div></div>";
+  }
+  document.getElementById("entSceneImg").crossOrigin = "anonymous";   // même requête que l'image source : pas de 3e téléchargement
+  document.getElementById("entSceneImg").src = sourceUrl;
+  document.getElementById("entSceneName").textContent = tScene(sceneName);
+  document.getElementById("entInstName").textContent = instName;
+  // Même signalement dans le détail d'un résultat.
+  if(result && (!result.instruments || result.instruments.deleted_at)){
+    var gone = document.createElement("span");
+    gone.className = "instgone";
+    gone.textContent = t("res.inst_gone");
+    gone.style.marginLeft = "8px";
+    document.getElementById("entInstName").appendChild(gone);
+  }
+
+  var instConfig = (result && result.instrument_snapshot && result.instrument_snapshot.config) || {};
+  var instConfigHtml = "";
+  // Les paramètres connus, dans l'ordre du formulaire. Les clés internes
+  // (marqueurs, modes de saisie) ne sont pas affichées.
+  INST_FIELD_ORDER.forEach(function(ck){
+    var meta = INST_FIELD_LABELS[ck], v = instConfig[ck];
+    if(meta.only && instConfig.electronics_mode !== meta.only) return;     // champ d'un autre mode d'électronique
+    // Transmission ou rendement saisis en courbe : on l'indique au lieu d'une valeur unique.
+    var curve = (ck === "T" && instConfig.T_mode === "spectral") ? instConfig.tSpectral
+              : (ck === "QE" && instConfig.QE_mode === "spectral") ? instConfig.qeSpectral : null;
+    if(Array.isArray(curve)){
+      instConfigHtml += entTile(meta.label, t("res.in.curve", { n: curve.length }));
+      return;
+    }
+    if(v == null || v === "" || typeof v === "object") return;
+    if(ck === "electronics_mode") v = ELEC_MODE_NAMES[v] || v;
+    instConfigHtml += entTile(meta.label, v + meta.unit);
+  });
+  document.getElementById("entInstConfig").innerHTML = instConfigHtml ||
+    "<span style='color:var(--muted);font-size:12.5px'>" + t("res.ent.no_config") + "</span>";
+
+  var condHtml = "";
+  if(cond.H != null) condHtml += entTile(t("field.H"), cond.H + " km");
+  if(cond.S != null) condHtml += entTile(t("field.S"), cond.S + "°");
+  if(cond.TI != null) condHtml += entTile(t("field.TI"), cond.TI + " µs");
+  if(cond.TDI != null) condHtml += entTile(t("field.TDI"), cond.TDI);
+  // Cas WFE actif : remplace le mode d'aberration (sans objet dans ce cas,
+  // cf. simulations.html/toggleAberrationField) — absent des résultats
+  // sauvegardés avant l'ajout des cas WFE nommés (cf. échange du
+  // 16/09/2026), on retombe alors sur le mode d'aberration comme avant.
+  if(cond.wfeCaseName){
+    condHtml += entTile(t("field.wfe_case"), cond.wfeCaseName);
+  } else if(cond.Z != null){
+    condHtml += entTile(t("res.z.label"), Z_LABELS[cond.Z] || cond.Z);
+  }
+  document.getElementById("entConditions").innerHTML = condHtml ||
+    "<span style='color:var(--muted);font-size:12.5px'>" + t("res.ent.no_cond") + "</span>";
+
+  if(!result){
+    document.querySelector(".comparewrap").innerHTML =
+      "<p style='padding:40px;color:var(--muted);text-align:center'>" + t("res.notfound.a") + "<a href='resultats.html' style='color:var(--pixel)'>" + t("res.notfound.link") + "</a>.</p>";
+  }
+
+
+  // ===================== MTF / SNR (réel, par bande) =====================
+  var BAND_COLORS = {Rouge:"#F0776D", Vert:"#7FD88F", Bleu:"#5FDCD0"};
+
+  // URL signée d'un fichier : lue dans urlCache (rempli d'un coup par prefetchSignedUrls, plus haut) ;
+  // sinon appel unitaire, comme avant.
+  async function signedUrl(path){
+    if(!path) return null;
+    if(guest) return path;
+    if(urlCache[path]) return urlCache[path];
+    var { data, error } = await supabaseClient.storage.from("results").createSignedUrl(path, 3600);
+    if(error) return null;
+    urlCache[path] = data.signedUrl;
+    return data.signedUrl;
+  }
+
+  async function buildDiagPanel(title, valueRows, graphKeys){
+    var html = "";
+    for(var bandName in diagBands){
+      var d = diagBands[bandName];
+      var color = BAND_COLORS[bandName] || "var(--pixel)";
+      html += "<div class='rpanel'><h3 style='color:" + color + "'>" + title + " · " + tBand(bandName) + "</h3>";
+      html += "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px'>";
+      valueRows.forEach(function(r){
+        var v = d[r.key];
+        if(v == null) return;
+        html += "<div><div style='font-family:var(--mono);font-size:12px;color:var(--muted-2);text-transform:uppercase'>"+
+          r.label + "</div><div style='font-family:var(--mono);font-size:15px;color:var(--paper)'>"+
+          (typeof v === "number" ? v.toFixed(r.dec != null ? r.dec : 2) : v) + (r.unit || "") + "</div></div>";
+      });
+      html += "</div><div style='display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start'>";
+      for(var gi = 0; gi < graphKeys.length; gi++){
+        var pathKey = graphKeys[gi].replace("_b64", "_path");
+        var path = d[pathKey];
+        if(!path) continue;
+        var url = await signedUrl(path);
+        if(url) html += "<img src='" + url + "' onclick=\"openLightbox('" + url + "')\" "+
+          "style='display:block;width:320px;height:auto;border:1px solid var(--line-soft);border-radius:4px;cursor:zoom-in'>";
+      }
+      html += "</div></div>";
+    }
+    return html || "<div class='rpanel'><p class='comparenote' style='margin-top:0'>"+
+      "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.6'><circle cx='12' cy='12' r='9'/><path d='M12 8h.01M11 12h1v5h1'/></svg>"+
+      "<span>" + t("res.no_diag") + "</span></p></div>";
+  }
+
+  // 11/10/2026 : GSD et pipeline de convolution par bande, dans l'onglet MTF. Le pipeline est lu dans les logs du
+  // calcul (« Band : Rouge » puis « Pipeline A » ou « Pipeline B ») : il explique pourquoi la PSF « rebinnée » du
+  // graphique est identique à la PSF oversamplée en pipeline A (la PSF y est calculée à la GSD source), et
+  // différente en pipeline B (rebinnée à la GSD cible).
+  var enLang = (typeof nysaLang === "function" && nysaLang() === "en");
+  var mtfCfg = (result && result.instrument_snapshot && result.instrument_snapshot.config) || {}, mtfCond = (result && result.conditions) || {};
+  var mtfGsd = (mtfCfg.I != null && mtfCfg.I !== "" && mtfCond.H != null && mtfCond.H !== "" && !isNaN(Number(mtfCfg.I)) && !isNaN(Number(mtfCond.H)))
+    ? Number((Number(mtfCfg.I) * 1e-6 * Number(mtfCond.H) * 1000).toPrecision(4)) : null;
+  var pipeByBand = {}, curLogBand = null;
+  resultLogs.split("\n").forEach(function(line){
+    var mb = line.match(/^Band\s*:\s*(\S+)/);
+    if(mb){ curLogBand = mb[1]; return; }
+    var mp = line.match(/Pipeline\s+([AB])\b/);
+    if(mp && curLogBand && !pipeByBand[curLogBand]) pipeByBand[curLogBand] = mp[1];
+  });
+  var anyPipe = false;
+  for(var gb in diagBands){
+    if(mtfGsd != null) diagBands[gb].gsd_txt = String(mtfGsd);
+    var pp = pipeByBand[gb];
+    if(pp){
+      anyPipe = true;
+      diagBands[gb].psf_txt = pp === "A" ? (enLang ? "A: source GSD grid" : "A : grille GSD source")
+                                          : (enLang ? "B: target GSD grid" : "B : grille GSD cible");
+    }
+  }
+  document.getElementById("mtfContent").innerHTML = await buildDiagPanel(
+    "MTF",
+    [{key:"mtf_at_nyquist", label:t("res.sort.mtf"), dec:3},
+     {key:"gsd_txt", label:"GSD", unit:" m"},
+     {key:"psf_txt", label:"PSF"}],
+    GRAPH_KEYS_MTF,
+  ) + (anyPipe
+    ? "<p style='font-size:12.5px;color:var(--muted-2);margin:10px 2px 0'>" + (enLang
+        ? "Pipeline A: the PSF is computed directly at the source GSD, so the \"rebinned\" PSF is identical to the oversampled one. Pipeline B: it is rebinned to the target GSD (the instrument pixel)."
+        : "Pipeline A : la PSF est calculée directement à la GSD source, la PSF « rebinnée » est donc identique à la PSF oversamplée. Pipeline B : elle est rebinnée à la GSD cible (le pixel de l'instrument).") + "</p>"
+    : "");
+  // Saturation (09/10/2026) : valeurs à plat pour les lignes du panneau SNR (résultats récents seulement).
+  for(var sbn in diagBands){
+    var sd = diagBands[sbn].saturation;
+    if(sd){
+      diagBands[sbn].sat_pct = sd.pct; diagBands[sbn].sat_fw = sd.n_sat_full_well;
+      diagBands[sbn].sat_adc = sd.n_sat_adc; diagBands[sbn].sat_tdi = sd.n_sat_tdi;
+    }
+  }
+  document.getElementById("snrContent").innerHTML = await buildDiagPanel(
+    "SNR",
+    [
+      {key:"snr_mean", label:t("res.snr_mean"), dec:1},
+      {key:"fill_pct", label:t("res.fill"), unit:"%", dec:1},
+      {key:"sat_pct", label:t("res.satpct"), unit:" %", dec:2},
+      {key:"sat_fw", label:t("res.sat.fw"), dec:0},
+      {key:"sat_adc", label:t("res.sat.adc"), dec:0},
+      {key:"sat_tdi", label:t("res.sat.tdi"), dec:0},
+      {key:"S_ref_e", label:"S_ref", unit:" e⁻", dec:0},
+    ],
+    GRAPH_KEYS_SNR,
+  );
+
+  // ===================== Onglets Image/MTF/SNR/Entrées/Logs =====================
+  var TABS = [
+    {id:"image", label:t("res.tab.image")},
+    {id:"mtf", label:t("res.tab.mtf")},
+    {id:"snr", label:t("res.tab.snr")},
+    {id:"entrees", label:t("res.tab.inputs")}
+  ];
+  // 07/10/2026 : onglet « Logs » pour l'administrateur seul. Les journaux sont enregistrés avec chaque
+  // résultat (colonne logs) ; ils contiennent les paramètres de l'instrument, d'où cette restriction.
+  var isAdmin = (!guest && typeof isAdminAccount === "function") ? await isAdminAccount() : false;
+  if(isAdmin && typeof simulatedPlan === "function" && await simulatedPlan()) isAdmin = false;   // 09/10/2026 : pas d'onglet Logs pendant une simulation de plan
+  if(isAdmin){
+    TABS.push({id:"logs", label:t("res.tab.logs")});
+    document.getElementById("logsPre").textContent = (result && result.logs) ? String(result.logs) : t("res.logs.empty");
+    var admIn = result && result.conditions && result.conditions.admin;
+    if(admIn){
+      document.getElementById("admInputsPre").textContent = JSON.stringify({ paramFileName: admIn.paramFileName, perfoCsvName: admIn.perfoCsvName, paramFile: admIn.paramFile }, null, 2);
+      document.getElementById("admInputs").hidden = false;
+    }
+    document.getElementById("copyLogsBtn").addEventListener("click", function(){
+      var btn = this, txt = document.getElementById("logsPre").textContent;
+      navigator.clipboard.writeText(txt).then(function(){
+        var old = btn.textContent; btn.textContent = t("res.logs.copied");
+        setTimeout(function(){ btn.textContent = old; }, 1500);
+      });
+    });
+  }
+  // ===================== Signalement d'un problème (07/10/2026) =====================
+  // L'utilisateur décrit le problème et DOIT cocher la case de consentement : une copie du résultat (conditions,
+  // instrument, diagnostics, journaux, images) est alors placée dans result_reports et dans le bucket « reports »,
+  // lisibles de lui et de l'administrateur seulement. Tant que ce n'est pas fait, personne d'autre ne voit ce résultat.
+  (function(){
+    var ov = document.getElementById("reportOverlay"), msgEl = document.getElementById("rptMsg"),
+        consentEl = document.getElementById("rptConsent"), sendBtn = document.getElementById("rptSend"),
+        errEl = document.getElementById("rptErr"), form = document.getElementById("rptForm"), done = document.getElementById("rptDone");
+    var lastReport = null;      // { id, files } du signalement tout juste envoyé, pour pouvoir le retirer
+    function refresh(){ sendBtn.disabled = !(consentEl.checked && msgEl.value.trim().length >= 10); }
+    function openReport(){
+      msgEl.value = ""; consentEl.checked = false; errEl.hidden = true; form.hidden = false; done.hidden = true;
+      sendBtn.textContent = t("res.report.send"); refresh(); ov.hidden = false; msgEl.focus();
+    }
+    function closeReport(){ ov.hidden = true; }
+    document.getElementById("btnReport").addEventListener("click", openReport);
+    document.getElementById("btnReport").disabled = false;      // grisé jusqu'ici : un clic plus tôt ne ferait rien (la page charge encore)
+    document.getElementById("rptCancel").addEventListener("click", closeReport);
+    document.getElementById("rptClose").addEventListener("click", closeReport);
+    ov.addEventListener("click", function(e){ if(e.target === ov) closeReport(); });
+    document.addEventListener("keydown", function(e){ if(e.key === "Escape" && !ov.hidden) closeReport(); });
+    msgEl.addEventListener("input", refresh); consentEl.addEventListener("change", refresh);
+
+    sendBtn.addEventListener("click", async function(){
+      errEl.hidden = true;
+      var msg = msgEl.value.trim();
+      if(msg.length < 10){ errEl.textContent = t("res.report.err_short"); errEl.hidden = false; return; }
+      sendBtn.disabled = true; sendBtn.textContent = t("res.report.sending");
+      var reportId = crypto.randomUUID(), copied = [], uid = null;
+      try{
+        var { data: sd } = await supabaseClient.auth.getSession();
+        var sess = sd.session; if(!sess) throw new Error("session");
+        uid = sess.user.id;
+        // fichiers du résultat : image, image source, graphiques par bande
+        var paths = [];
+        if(result.image_path) paths.push(result.image_path);
+        if(result.source_image_path) paths.push(result.source_image_path);
+        if(result.diagnostics && result.diagnostics.dn && result.diagnostics.dn.rgb_path) paths.push(result.diagnostics.dn.rgb_path);
+        if(result.diagnostics && result.diagnostics.dn && result.diagnostics.dn.tiff_path) paths.push(result.diagnostics.dn.tiff_path);
+        var bands = (result.diagnostics && result.diagnostics.bands) || {};
+        for(var bn in bands) for(var k in bands[bn]) if(k.endsWith("_path") && bands[bn][k]) paths.push(bands[bn][k]);
+        var failed = 0;
+        await Promise.all(paths.map(async function(src){
+          var dst = uid + "/" + reportId + "/" + src.split("/").pop();
+          var r = await supabaseClient.storage.from("results").copy(src, dst, { destinationBucket: "reports" });
+          if(r.error) failed++; else copied.push({ from: src, to: dst });
+        }));
+        var snapshot = { scene: result.scene, conditions: result.conditions, instrument_snapshot: result.instrument_snapshot,
+          diagnostics: result.diagnostics, logs: result.logs || "", created_at: result.created_at,
+          lang: nysaLang(), filesFailed: failed, userAgent: navigator.userAgent.slice(0, 200) };
+        var { error } = await supabaseClient.from("result_reports").insert({
+          id: reportId, account_id: uid, result_id: result.id, contact_email: sess.user.email, message: msg, consent: true,
+          consent_text: t("res.report.consent"), snapshot: snapshot, files: copied });
+        if(error) throw error;
+        lastReport = { id: reportId, files: copied };
+        form.hidden = true; done.hidden = false;
+      }catch(e){
+        if(copied.length) await supabaseClient.storage.from("reports").remove(copied.map(function(f){ return f.to; }));   // rien ne reste si l'envoi échoue
+        errEl.textContent = t("res.report.err_send", { msg: (e && e.message) || String(e) }); errEl.hidden = false;
+        sendBtn.textContent = t("res.report.send"); refresh();
+      }
+    });
+    document.getElementById("rptWithdraw").addEventListener("click", async function(){
+      if(!lastReport) return;
+      if(lastReport.files.length) await supabaseClient.storage.from("reports").remove(lastReport.files.map(function(f){ return f.to; }));
+      await supabaseClient.from("result_reports").delete().eq("id", lastReport.id);
+      lastReport = null;
+      document.getElementById("rptDoneText").textContent = t("res.report.withdrawn");
+      document.getElementById("rptWithdraw").hidden = true;
+    });
+  })();
+
+  var tabsHost = document.getElementById("restabsHost");
+  TABS.forEach(function(tab, i){   // « tab » et non « t » : t() est la fonction de traduction
+    var b = document.createElement("button");
+    b.className = "restab"; b.type = "button";
+    b.dataset.tab = tab.id;   // repère stable pour le tutoriel d'accueil (onboarding.js)
+    b.setAttribute("aria-selected", i === 0 ? "true" : "false");
+    b.textContent = tab.label;
+    b.addEventListener("click", function(){
+      tabsHost.querySelectorAll(".restab").forEach(function(x){ x.setAttribute("aria-selected", "false"); });
+      b.setAttribute("aria-selected", "true");
+      document.querySelectorAll(".tabpanel").forEach(function(p){
+        p.classList.toggle("current", p.dataset.tab === tab.id);
+      });
+    });
+    tabsHost.appendChild(b);
+  });
+
+  // ===================== Comparateur glissant (source à gauche, simulée à
+  // droite — même orientation que le simulateur public) =====================
+  var handle = document.getElementById("compareHandle");
+  var wrap = document.getElementById("compareWrap");
+  var imgSrcRight = document.getElementById("imgSrc"); // couche de base, jamais clippée
+  var imgSimClip = document.getElementById("imgSim");  // couche recouvrante, clip piloté par le curseur
+  var dragging = false;
+
+  // 06/10/2026 — déplacement fluide du curseur de comparaison :
+  //  - une seule mise à jour par image affichée (requestAnimationFrame),
+  //    quel que soit le nombre de mouvements de souris reçus entre-temps ;
+  //  - la position du cadre est lue une fois au début du geste, pas à
+  //    chaque mouvement ;
+  //  - le pointeur est « capturé » : le geste continue même si la souris
+  //    sort de l'image, et le navigateur ne lance plus de glisser-déposer.
+  var splitPct = 50, splitRaf = 0, dragRect = null;
+  function applySplit(){
+    splitRaf = 0;
+    handle.style.transform = "translateX(" + (splitPct / 100 * wrap.clientWidth) + "px)";
+    imgSimClip.style.clipPath = "inset(0 0 0 " + splitPct + "%)";
+  }
+  function setSplit(pct){
+    splitPct = Math.max(0, Math.min(100, pct));
+    if(!splitRaf) splitRaf = requestAnimationFrame(applySplit);
+  }
+  setSplit(50);
+  // Le cadre change de taille (affichage du détail, plein écran, fenêtre) :
+  // la poignée est replacée, puisqu'elle est positionnée en pixels.
+  if(window.ResizeObserver) new ResizeObserver(function(){ setSplit(splitPct); }).observe(wrap);
+  else window.addEventListener("resize", function(){ setSplit(splitPct); });
+
+  function splitFromEvent(e){
+    var rect = dragRect || wrap.getBoundingClientRect();
+    if(rect.width) setSplit(((e.clientX - rect.left) / rect.width) * 100);
+  }
+  // Clic ou glissé n'importe où sur l'image (pas seulement sur la poignée)
+  // déplace le curseur de comparaison — sauf en mode "point blanc" (géré
+  // plus bas), qui a priorité sur ce clic.
+  wrap.addEventListener("pointerdown", function(e){
+    if(pickingWhite) return;
+    if(e.pointerType === "mouse" && e.button !== 0) return;
+    dragging = true;
+    dragRect = wrap.getBoundingClientRect();
+    try { wrap.setPointerCapture(e.pointerId); } catch(err){ /* sans gravité */ }
+    splitFromEvent(e);
+    e.preventDefault();
+  });
+  wrap.addEventListener("pointermove", function(e){
+    if(dragging) splitFromEvent(e);
+  });
+  ["pointerup", "pointercancel"].forEach(function(evName){
+    wrap.addEventListener(evName, function(e){
+      dragging = false; dragRect = null;
+      try { if(wrap.hasPointerCapture(e.pointerId)) wrap.releasePointerCapture(e.pointerId); } catch(err){ /* sans gravité */ }
+    });
+  });
+  // Au clavier : flèches gauche et droite, comme sur la démo.
+  wrap.tabIndex = 0;
+  wrap.addEventListener("keydown", function(e){
+    if(e.key === "ArrowLeft"){ setSplit(splitPct - 2); e.preventDefault(); }
+    if(e.key === "ArrowRight"){ setSplit(splitPct + 2); e.preventDefault(); }
+  });
+
+  // ===================== Contrôles d'affichage (panneau "Affichage") =====================
+  var imgSim = document.getElementById("imgSim");
+  var CHANNEL_IDX = {R:0, G:1, B:2};
+  var BAND_COLOR = {RGB:"var(--pixel)", R:"#F0776D", G:"#7FD88F", B:"#5FDCD0"};
+
+  // État des réglages d'affichage — purement côté navigateur, ne touche
+  // jamais à l'image sauvegardée en base ni au fichier téléchargé. Ils ne
+  // s'appliquent qu'à l'image SIMULÉE — la source reste toujours brute.
+  var adj = {
+    // 05/10/2026 — le rendu par défaut est l'étirement p2/p98 (avant :
+    // « Aucun (brut) »). Le rendu brut reste disponible dans la liste.
+    band:"RGB", render:"p2p98", showSat:false,
+    whitePointSim:null,
+    whitePointXY:null,   // emplacement du point blanc choisi (fractions de l'image), pour le refaire sur les DN au téléchargement
+  };
+
+  // Copie hors-DOM des images simulée ET source, chargées une fois pour
+  // servir de base à tous les retraitements sans re-décoder à chaque
+  // changement. La bande sélectionnée s'applique désormais aux DEUX
+  // images (comparaison honnête) — contraste/étirement/point blanc
+  // restent réservés à l'image simulée (cf. applyCssFilters), la source
+  // reste la donnée brute pour ces réglages-là.
+  // (simImgObj / srcImgObj sont créés et leur chargement démarré plus haut, dès que les URLs sont connues.)
+  // Cartes des pixels saturés, une par bande (renvoyées par le serveur, 09/10/2026) : la saturation ne se lit
+  // pas sur l'image 8 bits (étirée p2/p98). Absentes des résultats lancés avant ce changement.
+  var satMasks = {};   // indice de canal (0 R, 1 G, 2 B) -> { w, h, data }
+  var SAT_BAND_NAMES = ["Rouge", "Vert", "Bleu"];
+  function loadSatMask(channel){
+    var d = diagBands[SAT_BAND_NAMES[channel]];
+    var path = d && d.saturated_mask_png_path;
+    if(!path) return Promise.resolve();
+    return signedUrl(path).then(function(url){
+      if(!url) return;
+      return new Promise(function(res){
+        var im = new Image(); im.crossOrigin = "anonymous";
+        im.onload = function(){
+          try{
+            var c = document.createElement("canvas"); c.width = im.naturalWidth; c.height = im.naturalHeight;
+            var cx = c.getContext("2d"); cx.drawImage(im, 0, 0);
+            satMasks[channel] = { w: c.width, h: c.height, data: cx.getImageData(0, 0, c.width, c.height).data };
+          }catch(e){ console.error("Carte de saturation illisible :", e); }
+          res();
+        };
+        im.onerror = function(){ res(); };
+        im.src = url;
+      });
+    });
+  }
+  var imagesReady = Promise.all([
+    simLoaded,
+    srcLoaded,
+    loadSatMask(0), loadSatMask(1), loadSatMask(2),
+  ]);
+
+  // ---- Étirement de contraste p2/p98 : calcule les percentiles 2/98 par
+  // canal sur l'image entière, puis remappe linéairement vers [0,255].
+  function computeP2P98(d){
+    var histR = new Array(256).fill(0), histG = new Array(256).fill(0), histB = new Array(256).fill(0);
+    var n = 0;
+    for(var i = 0; i < d.length; i += 4){ histR[d[i]]++; histG[d[i+1]]++; histB[d[i+2]]++; n++; }
+    function pct(hist, p){
+      var target = n * p, cum = 0;
+      for(var v = 0; v < 256; v++){ cum += hist[v]; if(cum >= target) return v; }
+      return 255;
+    }
+    return {
+      r:{lo:pct(histR,0.02), hi:pct(histR,0.98)},
+      g:{lo:pct(histG,0.02), hi:pct(histG,0.98)},
+      b:{lo:pct(histB,0.02), hi:pct(histB,0.98)},
+    };
+  }
+  function stretchVal(v, s){
+    if(s.hi <= s.lo) return v;
+    return Math.max(0, Math.min(255, (v - s.lo) / (s.hi - s.lo) * 255));
+  }
+
+  // rad : demi-côté de la fenêtre moyennée (0 = un seul pixel, comme avant).
+  function samplePixel(imgEl, relX, relY, rad){
+    var c = document.createElement("canvas");
+    c.width = imgEl.naturalWidth; c.height = imgEl.naturalHeight;
+    var ctx = c.getContext("2d");
+    ctx.drawImage(imgEl, 0, 0);
+    var x = Math.min(c.width - 1, Math.max(0, Math.round(relX * c.width)));
+    var y = Math.min(c.height - 1, Math.max(0, Math.round(relY * c.height)));
+    rad = rad || 0;
+    var x0 = Math.max(0, x - rad), y0 = Math.max(0, y - rad);
+    var x1 = Math.min(c.width - 1, x + rad), y1 = Math.min(c.height - 1, y + rad);
+    var p = ctx.getImageData(x0, y0, x1 - x0 + 1, y1 - y0 + 1).data, n = p.length / 4, r = 0, g = 0, b = 0;
+    for(var i = 0; i < p.length; i += 4){ r += p[i]; g += p[i+1]; b += p[i+2]; }
+    return {r:Math.round(r / n), g:Math.round(g / n), b:Math.round(b / n)};
+  }
+
+  // ---- Point blanc par défaut de chaque scène (12/10/2026) ----
+  // Même liste que SCENE_WHITE_POINT_FRAC dans eo_adapter.py, clés « aix / avion / port » côté serveur (repères relevés à la main le 01/09/2026, en
+  // fraction de l'image 200 m). Côté serveur, l'image 8 bits enregistrée est déjà corrigée avec ce point ; les DN
+  // bruts, eux, ne le sont pas. Si la liste change dans eo_adapter.py, la mettre à jour ici aussi.
+  // En RGB (jamais sur une bande séparée), le rendu « Aucun (brut) » et le téléchargement l'appliquent tant que
+  // l'utilisateur n'a pas choisi son propre point blanc.
+  // Clés = nom de la scène tel qu'enregistré dans le résultat (« Ville », « Avion », « Port », cf. SCENE_THUMBS).
+  var SCENE_WHITE_POINT_FRAC = {
+    "Ville": { x: 0.36, y: 0.56 },   // bus blanc (aix côté serveur)
+    "Avion": { x: 0.44, y: 0.46 },   // fuselage
+    "Port":  { x: 0.92, y: 0.50 }    // superstructure du navire
+  };
+  var DEFAULT_WP_RADIUS = 2;       // moyenne sur 5 × 5 pixels : un seul pixel d'une image bruitée serait trop aléatoire
+  // Emplacement du point blanc à appliquer : celui choisi, sinon celui de la scène (ou null).
+  function activeWhiteXY(){ return adj.whitePointXY || SCENE_WHITE_POINT_FRAC[sceneName] || null; }
+  var defaultWpCache = { img: null, wp: null };
+  function defaultWhitePointFor(imgEl){
+    var xy = SCENE_WHITE_POINT_FRAC[sceneName];
+    if(!xy || !imgEl) return null;
+    if(defaultWpCache.img !== imgEl){ defaultWpCache = { img: imgEl, wp: samplePixel(imgEl, xy.x, xy.y, DEFAULT_WP_RADIUS) }; }
+    return defaultWpCache.wp;
+  }
+
+  // ---- Retraitement pixel par pixel : point blanc -> étirement -> bande -> pixels saturés.
+  function processImage(imgEl, opts){
+    try{
+      var canvas = document.createElement("canvas");
+      canvas.width = imgEl.naturalWidth; canvas.height = imgEl.naturalHeight;
+      var ctx = canvas.getContext("2d");
+      ctx.drawImage(imgEl, 0, 0);
+      var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      var d = imageData.data;
+
+      var gains = null;
+      if(opts.whitePoint){
+        var wp = opts.whitePoint;
+        var maxc = Math.max(wp.r, wp.g, wp.b, 1);
+        gains = { r: maxc / Math.max(wp.r, 1), g: maxc / Math.max(wp.g, 1), b: maxc / Math.max(wp.b, 1) };
+      }
+      var stretch = opts.p2p98 ? computeP2P98(d) : null;
+
+      for(var i = 0; i < d.length; i += 4){
+        var r = d[i], g = d[i+1], b = d[i+2];
+        // Saturation mesurée sur l'image brute, AVANT point blanc et étirement : l'étirement p2/p98 ramène
+        // par construction les 2 % de pixels les plus clairs à 255, ce qui les aurait tous affichés en magenta.
+        // Seulement sur une bande séparée (sur le RGB, « saturé » ne veut rien dire). Le pixel est saturé quand le
+        // serveur l'a marqué (puits, ADC ou accumulateur TDI) : l'image 8 bits étirée ne permet pas de le déduire.
+        var saturated = false;
+        if(opts.showSaturated && opts.channel != null){
+          var sm = satMasks[opts.channel];
+          saturated = !!sm && sm.w === canvas.width && sm.h === canvas.height && sm.data[i] > 127;
+        }
+        if(gains){ r = Math.min(255, r * gains.r); g = Math.min(255, g * gains.g); b = Math.min(255, b * gains.b); }
+        if(stretch){ r = stretchVal(r, stretch.r); g = stretchVal(g, stretch.g); b = stretchVal(b, stretch.b); }
+        if(opts.channel != null){ var v = [r,g,b][opts.channel]; r = g = b = v; }
+        if(saturated){ r = 255; g = 0; b = 255; }
+        d[i] = r; d[i+1] = g; d[i+2] = b;
+      }
+      ctx.putImageData(imageData, 0, 0);
+      return canvas.toDataURL("image/png");
+    }catch(e){
+      console.error("Retraitement d'image impossible (CORS ?) :", e);
+      return null;
+    }
+  }
+
+  // ---- Rendu « Aucun (brut) » : les vrais DN de l'instrument (11/10/2026) ----
+  // Avant, « brut » affichait le PNG 8 bits enregistré, DÉJÀ étiré par le serveur (bornes lo/hi du log
+  // « diag-stretch ») : le choix n'avait donc presque aucun effet. Maintenant, on relit le PNG 16 bits des DN
+  // (dn.rgb_path, sorti de l'électronique : sans gain, sans étirement) et on le ramène à 8 bits en PLEINE
+  // ÉCHELLE du convertisseur (0 .. 2^bits - 1 -> 0 .. 255). Une scène saturée apparaît donc blanche, une scène
+  // sombre reste sombre. Le navigateur ne sait pas lire le 16 bits sans le tronquer à 4 bits utiles (le canvas
+  // garde l'octet de poids fort : 4095 -> 15), d'où le décodage PNG fait ici, filtres PNG compris.
+  // Chargé seulement quand on choisit « brut ». Si les DN ne sont pas disponibles (anciens résultats,
+  // navigateur sans DecompressionStream), l'image enregistrée reste affichée, comme avant.
+  async function decodePng16(buf){
+    var dv = new DataView(buf.buffer, buf.byteOffset, buf.byteLength);
+    var pos = 8, idat = [], w = 0, h = 0, ct = 0, bd = 0;
+    while(pos + 12 <= buf.length){
+      var len = dv.getUint32(pos), type = String.fromCharCode(buf[pos+4], buf[pos+5], buf[pos+6], buf[pos+7]);
+      if(type === "IHDR"){ w = dv.getUint32(pos + 8); h = dv.getUint32(pos + 12); bd = buf[pos + 16]; ct = buf[pos + 17]; }
+      else if(type === "IDAT") idat.push(buf.subarray(pos + 8, pos + 8 + len));
+      pos += 12 + len;
+    }
+    if(bd !== 16 || (ct !== 0 && ct !== 2)) throw new Error("PNG de DN inattendu (profondeur " + bd + ", type " + ct + ")");
+    var total = 0; idat.forEach(function(d){ total += d.length; });
+    var z = new Uint8Array(total), o = 0; idat.forEach(function(d){ z.set(d, o); o += d.length; });
+    var raw = await inflateZlib(z);
+    var ch = ct === 2 ? 3 : 1, bpp = ch * 2, row = w * bpp;
+    var out = new Uint8Array(h * row);
+    for(var y = 0; y < h; y++){
+      var ft = raw[y * (row + 1)], src = y * (row + 1) + 1, dst = y * row;
+      for(var i = 0; i < row; i++){
+        var x = raw[src + i];
+        var a = i >= bpp ? out[dst + i - bpp] : 0;
+        var b = y > 0 ? out[dst - row + i] : 0;
+        var c = (y > 0 && i >= bpp) ? out[dst - row + i - bpp] : 0;
+        var v;
+        if(ft === 0) v = x;
+        else if(ft === 1) v = x + a;
+        else if(ft === 2) v = x + b;
+        else if(ft === 3) v = x + ((a + b) >> 1);
+        else {
+          var p = a + b - c, pa = Math.abs(p - a), pb = Math.abs(p - b), pc = Math.abs(p - c);
+          v = x + ((pa <= pb && pa <= pc) ? a : (pb <= pc ? b : c));
+        }
+        out[dst + i] = v & 255;
+      }
+    }
+    return { w: w, h: h, ch: ch, bytes: out };
+  }
+  var rawImgObj = null, rawPromise = null;
+  function ensureRaw(){
+    if(rawPromise) return rawPromise;
+    rawPromise = (async function(){
+      try{
+        var dn = result && result.diagnostics && result.diagnostics.dn;
+        if(!dn || !dn.rgb_path || typeof DecompressionStream === "undefined") return;
+        if(dn.dn_scale != null && Number(dn.dn_scale) !== 1) return;      // échelle inconnue : on ne devine pas
+        var bits = Number(dn.bits_tdi || dn.bits_adc);
+        if(!(bits >= 1 && bits <= 16)) return;
+        var url = await signedUrl(dn.rgb_path);
+        if(!url) return;
+        var resp = await fetch(url);
+        if(!resp.ok) return;
+        var dec = await decodePng16(new Uint8Array(await resp.arrayBuffer()));
+        if(dec.ch !== 3) return;
+        var fullScale = Math.pow(2, bits) - 1;
+        var cv = document.createElement("canvas"); cv.width = dec.w; cv.height = dec.h;
+        var cx = cv.getContext("2d"), id = cx.createImageData(dec.w, dec.h), d = id.data, n = dec.w * dec.h;
+        for(var k = 0; k < n; k++){
+          for(var c = 0; c < 3; c++){
+            var s = (3 * k + c) * 2;
+            d[4*k + c] = Math.min(255, Math.round(((dec.bytes[s] << 8) | dec.bytes[s + 1]) * 255 / fullScale));
+          }
+          d[4*k + 3] = 255;
+        }
+        cx.putImageData(id, 0, 0);
+        var im = new Image();
+        await new Promise(function(res){ im.onload = res; im.onerror = res; im.src = cv.toDataURL("image/png"); });
+        if(im.naturalWidth) rawImgObj = im;
+      }catch(e){
+        console.warn("DN bruts illisibles, l'image enregistrée reste affichée :", e);
+      }
+    })();
+    return rawPromise;
+  }
+  // Image de base des retraitements : les DN bruts en mode « brut » (une fois chargés), sinon l'image enregistrée.
+  // Rendus « Brut » et « Brut avec balance des blancs » : les DN lus tels quels (une fois chargés), sinon l'image enregistrée.
+  function baseImg(){ return ((adj.render === "none" || adj.render === "wb") && rawImgObj) ? rawImgObj : simImgObj; }
+
+  function updateDisplay(){
+    // Étirement/pixels saturés/point blanc ne s'appliquent qu'à
+    // l'image SIMULÉE (cf. applyCssFilters) — mais la bande sélectionnée
+    // s'applique aux DEUX images : sans ça, comparer par exemple la bande
+    // Rouge simulée à une source restée en RGB ne veut rien dire.
+    var channelIdx = adj.band === "RGB" ? null : CHANNEL_IDX[adj.band];
+    // 12/10/2026 : mêmes trois rendus que le téléchargement RGB. « Brut » : aucun réglage. « Brut avec balance des
+    // blancs » : le point blanc de la scène (ou celui choisi) est appliqué sur les DN. « Percentile » : l'image
+    // enregistrée, déjà équilibrée par le serveur au point blanc de la scène, puis étirée p2/p98. Pas de balance
+    // des blancs par défaut sur une bande séparée.
+    var whiteForView = adj.whitePointSim;
+    if(!whiteForView && channelIdx == null && adj.render === "wb" && rawImgObj) whiteForView = defaultWhitePointFor(rawImgObj);
+    var opts = { channel: channelIdx, p2p98: adj.render === "p2p98", showSaturated: adj.showSat && adj.band !== "RGB",
+      whitePoint: whiteForView };
+    var simUrl = processImage(baseImg(), opts);
+    if(simUrl) imgSim.src = simUrl;
+
+    // 11/10/2026 : en RGB, la source n'a AUCUN retraitement (ni étirement, ni point blanc, ni saturation) :
+    // le passage par le canvas (boucle sur tous les pixels + ré-encodage PNG) donnait une copie identique, pour
+    // un coût élevé. On réaffiche directement le fichier d'origine. Le canvas ne sert plus que pour extraire
+    // un canal (bandes Rouge / Vert / Bleu).
+    var imgSrcEl = document.getElementById("imgSrc");
+    if(channelIdx == null){
+      if(imgSrcEl.getAttribute("src") !== sourceUrl) imgSrcEl.src = sourceUrl;
+    } else {
+      var srcUrl2 = processImage(srcImgObj, { channel: channelIdx, p2p98: false, showSaturated: false, whitePoint: null });
+      if(srcUrl2) imgSrcEl.src = srcUrl2;
+    }
+
+  }
+
+  // ---- Bandes spectrales (miniatures cliquables) ----
+  var bandThumbs = document.getElementById("bandThumbs");
+  var bandThumbEls = {};
+  var BANDS = [
+    {key:"RGB", name:"RGB", color:BAND_COLOR.RGB},
+    {key:"R", name:tBand("Rouge"), color:BAND_COLOR.R},
+    {key:"G", name:tBand("Vert"), color:BAND_COLOR.G},
+    {key:"B", name:tBand("Bleu"), color:BAND_COLOR.B},
+  ];
+  // La case « pixels saturés » n'a de sens que sur une bande séparée : désactivée (et décochée) sur le RGB.
+  function syncSatControl(){
+    var chk = document.getElementById("satChk"), row = document.getElementById("satRow"), hint = document.getElementById("satHint");
+    var rgb = adj.band === "RGB";
+    var noMask = Object.keys(satMasks).length === 0;   // résultat lancé avant l'ajout des cartes de saturation
+    var off = rgb || noMask;
+    if(off){ chk.checked = false; adj.showSat = false; }
+    chk.disabled = off;
+    row.classList.toggle("disabled", off);
+    hint.textContent = t(rgb ? "res.sat.hint" : (noMask ? "res.sat.nomask" : "res.sat.hint"));
+  }
+  // Bulle « ? » : s'ouvre au clic, se ferme au clic ailleurs ou sur Échap
+  function bubble(btnId, hintId){
+    var b = document.getElementById(btnId), h = document.getElementById(hintId);
+    function setOpen(o){ h.hidden = !o; b.setAttribute("aria-expanded", o ? "true" : "false"); }
+    b.addEventListener("click", function(e){ e.stopPropagation(); setOpen(h.hidden); });
+    document.addEventListener("click", function(e){ if(!h.hidden && !h.contains(e.target)) setOpen(false); });
+    document.addEventListener("keydown", function(e){ if(e.key === "Escape") setOpen(false); });
+  }
+  bubble("satHelp", "satHint");
+  bubble("noteHelp", "noteHint");
+  function selectBand(key){
+    adj.band = key;
+    syncSatControl();
+    updateDownloadLabel();
+    bandThumbs.querySelectorAll(".bandthumb").forEach(function(x){
+      x.classList.toggle("selected", x.dataset.key === key);
+    });
+    updateDisplay();
+  }
+  syncSatControl();   // état initial : RGB, donc case désactivée
+  BANDS.forEach(function(b){
+    var d = document.createElement("div");
+    d.className = "bandthumb" + (b.key === "RGB" ? " selected" : "");
+    d.dataset.key = b.key;
+    d.innerHTML = "<img src='" + imgUrl + "' alt=''>"+
+      "<div class='lab'><i style='background:" + b.color + "'></i>" + b.name + "</div>";
+    d.addEventListener("click", function(){ selectBand(b.key); });
+    bandThumbs.appendChild(d);
+    bandThumbEls[b.key] = d.querySelector("img");
+  });
+
+  // Vignettes par bande en niveaux de gris, précalculées une fois les images chargées.
+  imagesReady.then(function(){
+    ["R","G","B"].forEach(function(key){
+      var url = processImage(simImgObj, { channel: CHANNEL_IDX[key], p2p98:false, showSaturated:false, whitePoint:null });
+      if(url && bandThumbEls[key]) bandThumbEls[key].src = url;
+    });
+  });
+
+  // ---- Rendu (étirement p2/p98) et pixels saturés ----
+  document.getElementById("renderSel").addEventListener("change", function(e){
+    adj.render = e.target.value;
+    updateDisplay();
+    if(adj.render === "none" || adj.render === "wb"){
+      ensureRaw().then(function(){ if((adj.render === "none" || adj.render === "wb") && rawImgObj) updateDisplay(); });
+    }
+  });
+  document.getElementById("satChk").addEventListener("change", function(e){
+    adj.showSat = e.target.checked;
+    updateDisplay();
+  });
+
+  // ---- Point blanc : clic sur l'image pour recalibrer la balance des couleurs ----
+  var pickingWhite = false;
+  document.getElementById("whitePointBtn").addEventListener("click", function(){
+    pickingWhite = true;
+    wrap.style.cursor = "crosshair";
+  });
+  wrap.addEventListener("click", function(e){
+    if(!pickingWhite) return;
+    pickingWhite = false;
+    wrap.style.cursor = "";
+    var rect = wrap.getBoundingClientRect();
+    var relX = (e.clientX - rect.left) / rect.width;
+    var relY = (e.clientY - rect.top) / rect.height;
+    adj.whitePointSim = samplePixel(baseImg(), relX, relY);
+    adj.whitePointXY = { x: relX, y: relY };
+    updateDisplay();
+  });
+
+  // ---- Réinitialiser l'affichage ----
+  document.getElementById("resetDisplayBtn").addEventListener("click", function(){
+    adj = { band:"RGB", render:"p2p98",   // retour au rendu par défaut
+      showSat:false, whitePointSim:null, whitePointXY:null };
+    document.getElementById("renderSel").value = "p2p98";
+    document.getElementById("satChk").checked = false;
+    syncSatControl();
+    bandThumbs.querySelectorAll(".bandthumb").forEach(function(x){ x.classList.toggle("selected", x.dataset.key === "RGB"); });
+    updateDownloadLabel();
+    updateDisplay();
+  });
+
+  // ---- Téléchargement (07/10/2026) ----
+  // Le bouton télécharge ce qui est sélectionné dans les vignettes : la composition RGB ou une bande.
+  //   - résultats récents : PNG 16 bits contenant les DN bruts de l'électronique de l'instrument (valeur numérique
+  //     = code du convertisseur, sans gain ni étirement), le nombre de bits réel étant indiqué dans le nom du fichier ;
+  //   - anciens résultats (sans DN enregistrés) : repli sur l'image 8 bits étirée du serveur (RGB tel quel, bande = canal).
+  // Nom : bande, nom du résultat, date, bits, par exemple Rouge_essai-1_2026-10-07_1120_DN12bit.png.
+  function bandDisplayName(key){ return key === "RGB" ? "RGB" : tBand({R:"Rouge", G:"Vert", B:"Bleu"}[key]); }
+  function updateDownloadLabel(){
+    var key = adj.band || "RGB";
+    var info = dnInfo(key);
+    // 12/10/2026 : avec plusieurs étages TDI, le fichier a plus de bits que l'ADC (la somme de n étages de 12 bits en
+    // demande 12 + log2(n)). Le libellé dit d'où vient le chiffre, pour ne pas laisser croire à une erreur.
+    var dnDiag = result && result.diagnostics && result.diagnostics.dn, nTdi = result && result.conditions && Number(result.conditions.TDI);
+    var sumNote = !!(info && dnDiag && dnDiag.bits_adc && Number(info.bits) !== Number(dnDiag.bits_adc) && nTdi > 1);
+    var lblVars = { band: bandDisplayName(key), bits: info ? info.bits : "", adc: dnDiag ? dnDiag.bits_adc : "", tdi: nTdi };
+    document.getElementById("dlChev").style.display = info ? "" : "none";   // menu seulement si les DN existent
+    document.getElementById("downloadLabel").textContent = info
+      ? (key === "RGB" ? t(sumNote ? "res.download.rgb_dn_tdi" : "res.download.rgb_dn", lblVars) : t(sumNote ? "res.download.band_dn_tdi" : "res.download.band_dn", lblVars))
+      : (key === "RGB" ? t("res.download.rgb") : t("res.download.band", { band: bandDisplayName(key) }));
+  }
+  // Fichier DN brut disponible pour la sélection courante ? (chemin + nombre de bits ADC)
+  function dnInfo(key){
+    var dn = result && result.diagnostics && result.diagnostics.dn;
+    if(key === "RGB"){
+      if(dn && dn.rgb_path) return { path: dn.rgb_path, bits: dn.bits_tdi || dn.bits_adc };
+      return null;
+    }
+    var bd = diagBands[SAT_BAND_NAMES[CHANNEL_IDX[key]]];
+    if(bd && bd.dn_png16_path) return { path: bd.dn_png16_path, bits: bd.dn_bits || (dn && (dn.bits_tdi || dn.bits_adc)) };
+    return null;
+  }
+  function fileSlug(s){
+    return String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Za-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60);
+  }
+  var DL_NAME_SUFFIX = { raw: "_brut", scaled: "_echelle-max", wb: "_balance-blancs", pct: "_p2-p98", tiff32: "_tiff32" };
+  function downloadName(key, mode){
+    var name = fileSlug((result && result.name) || tScene(sceneName)) || "resultat";
+    var info = dnInfo(key);
+    return fileSlug(bandDisplayName(key)) + "_" + name + "_" + createdLabel + (info && mode ? "_DN" + info.bits + "bit" + (DL_NAME_SUFFIX[mode] || "_brut") : "") + (mode === "tiff32" ? ".tif" : ".png");
+  }
+  var CRC_TABLE = null;
+  function crc32(buf){
+    if(!CRC_TABLE){
+      CRC_TABLE = new Uint32Array(256);
+      for(var n = 0; n < 256; n++){ var c = n; for(var k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1); CRC_TABLE[n] = c >>> 0; }
+    }
+    var crc = 0xFFFFFFFF;
+    for(var i = 0; i < buf.length; i++) crc = CRC_TABLE[(crc ^ buf[i]) & 0xFF] ^ (crc >>> 8);
+    return (crc ^ 0xFFFFFFFF) >>> 0;
+  }
+  function pngChunk(type, data){
+    var out = new Uint8Array(12 + data.length), dv = new DataView(out.buffer);
+    dv.setUint32(0, data.length);
+    for(var i = 0; i < 4; i++) out[4 + i] = type.charCodeAt(i);
+    out.set(data, 8);
+    dv.setUint32(8 + data.length, crc32(out.subarray(4, 8 + data.length)));
+    return out;
+  }
+  async function deflateZlib(bytes){
+    var stream = new Blob([bytes]).stream().pipeThrough(new CompressionStream("deflate"));
+    return new Uint8Array(await new Response(stream).arrayBuffer());
+  }
+  async function encodeGrayPng(gray, w, h){
+    if(typeof CompressionStream === "undefined"){
+      // navigateur ancien : PNG RGBA sans perte via le canvas (le gris est répété sur les trois canaux)
+      var cv = document.createElement("canvas"); cv.width = w; cv.height = h;
+      var ctx = cv.getContext("2d"), im = ctx.createImageData(w, h);
+      for(var i = 0; i < w * h; i++){ im.data[4*i] = im.data[4*i+1] = im.data[4*i+2] = gray[i]; im.data[4*i+3] = 255; }
+      ctx.putImageData(im, 0, 0);
+      return await new Promise(function(res){ cv.toBlob(res, "image/png"); });
+    }
+    var raw = new Uint8Array(h * (w + 1));                       // chaque ligne : octet de filtre (0) puis les pixels
+    for(var y = 0; y < h; y++){ raw[y * (w + 1)] = 0; raw.set(gray.subarray(y * w, (y + 1) * w), y * (w + 1) + 1); }
+    var idat = await deflateZlib(raw);
+    var ihdr = new Uint8Array(13), dv = new DataView(ihdr.buffer);
+    dv.setUint32(0, w); dv.setUint32(4, h); ihdr[8] = 8; ihdr[9] = 0;   // 8 bits, niveaux de gris
+    var sig = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
+    return new Blob([sig, pngChunk("IHDR", ihdr), pngChunk("IDAT", idat), pngChunk("IEND", new Uint8Array(0))], { type: "image/png" });
+  }
+  async function extractBandPng(blob, channel){
+    var bmp;
+    try{ bmp = await createImageBitmap(blob, { premultiplyAlpha: "none", colorSpaceConversion: "none" }); }
+    catch(e){ bmp = await createImageBitmap(blob); }
+    var cv = document.createElement("canvas"); cv.width = bmp.width; cv.height = bmp.height;
+    var ctx = cv.getContext("2d", { willReadFrequently: true });
+    ctx.drawImage(bmp, 0, 0);
+    var rgba = ctx.getImageData(0, 0, cv.width, cv.height).data, n = cv.width * cv.height, gray = new Uint8Array(n);
+    for(var i = 0, j = channel; i < n; i++, j += 4) gray[i] = rgba[j];
+    return encodeGrayPng(gray, cv.width, cv.height);
+  }
+  function saveBlob(blob, filename){
+    var url = URL.createObjectURL(blob), a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  }
+  // Mode « mis à l'échelle » : tous les codes sont multipliés par un même facteur 65535 / (maximum de l'image), de sorte que
+  // le pixel le plus brillant vaut 65535. Aucun étirement de contraste : la relation entre pixels reste linéaire, et le
+  // facteur est inscrit dans le fichier (métadonnée tEXt) pour retrouver les DN d'origine. Pour le RGB, un seul facteur
+  // pour les trois canaux (le maximum global), afin de ne pas modifier les rapports entre bandes.
+  // Mode « brut » : les codes tels que l'électronique les produit.
+  function dlScaled(mode){ return mode === "scaled"; }
+  async function inflateZlib(bytes){
+    var stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate"));
+    return new Uint8Array(await new Response(stream).arrayBuffer());
+  }
+  async function scalePng16(blob){
+    var buf = new Uint8Array(await blob.arrayBuffer()), dv = new DataView(buf.buffer);
+    var pos = 8, chunks = [], idat = [], w = 0, h = 0, ct = 0;
+    while(pos < buf.length){
+      var len = dv.getUint32(pos), type = String.fromCharCode(buf[pos+4], buf[pos+5], buf[pos+6], buf[pos+7]);
+      var data = buf.subarray(pos + 8, pos + 8 + len);
+      if(type === "IHDR"){ w = dv.getUint32(pos + 8); h = dv.getUint32(pos + 12); ct = buf[pos + 8 + 9]; chunks.push([type, data]); }
+      else if(type === "IDAT") idat.push(data);
+      else if(type !== "IEND") chunks.push([type, data]);
+      pos += 12 + len;
+    }
+    var total = 0; idat.forEach(function(d){ total += d.length; });
+    var z = new Uint8Array(total), o = 0; idat.forEach(function(d){ z.set(d, o); o += d.length; });
+    var raw = await inflateZlib(z), ch = ct === 2 ? 3 : 1, row = w * ch * 2, mx = 0;
+    for(var y = 0; y < h; y++){
+      var base = y * (row + 1);
+      if(raw[base] !== 0) throw new Error("filtre PNG inattendu");
+      for(var i = base + 1; i < base + 1 + row; i += 2){
+        var v0 = (raw[i] << 8) | raw[i + 1];
+        if(v0 > mx) mx = v0;
+      }
+    }
+    var factor = mx > 0 ? 65535 / mx : 1;
+    for(var y2 = 0; y2 < h; y2++){
+      var base2 = y2 * (row + 1);
+      for(var i2 = base2 + 1; i2 < base2 + 1 + row; i2 += 2){
+        var v = Math.min(65535, Math.round(((raw[i2] << 8) | raw[i2 + 1]) * factor));
+        raw[i2] = (v >> 8) & 255; raw[i2 + 1] = v & 255;
+      }
+    }
+    var parts = [new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])];
+    chunks.forEach(function(c){ parts.push(pngChunk(c[0], c[1])); });
+    var meta = new TextEncoder().encode("DN_display\u0000scaled by " + factor.toFixed(6) + " (max DN = " + mx + "; raw DN = value / " + factor.toFixed(6) + ")");
+    parts.push(pngChunk("tEXt", meta));
+    parts.push(pngChunk("IDAT", await deflateZlib(raw)));
+    parts.push(pngChunk("IEND", new Uint8Array(0)));
+    return new Blob(parts, { type: "image/png" });
+  }
+  // ---- RGB téléchargé : trois formes, toujours au nombre de bits de l'ADC ou du sommeur TDI (12/10/2026) ----
+  //   - « Brut » : les codes de l'instrument, sans aucun réglage.
+  //   - « Brut avec balance des blancs » : gains = maximum / canal, mesurés sur les codes au point blanc (celui
+  //     choisi, sinon celui de la scène, moyenné sur 5 × 5 pixels). Le canal le plus fort garde le gain 1, les autres
+  //     sont relevés, écrêtés à la pleine échelle 2^bits - 1. Même formule que l'affichage.
+  //   - « Percentile » : balance des blancs, puis étirement p2/p98 canal par canal sur les codes (p2 -> 0, p98 -> pleine
+  //     échelle), le fichier gardant son nombre de bits.
+  // Tout est refait sur les codes 16 bits eux-mêmes, jamais sur l'image 8 bits affichée, qui a perdu la résolution.
+  // Les gains et les bornes sont écrits dans le fichier (métadonnée tEXt).
+  async function encodePng16Rgb(w, h, bytes, text){
+    var row = w * 6, raw = new Uint8Array(h * (row + 1));
+    for(var y = 0; y < h; y++){ raw[y * (row + 1)] = 0; raw.set(bytes.subarray(y * row, (y + 1) * row), y * (row + 1) + 1); }
+    var ihdr = new Uint8Array(13), dv = new DataView(ihdr.buffer);
+    dv.setUint32(0, w); dv.setUint32(4, h); ihdr[8] = 16; ihdr[9] = 2;     // 16 bits, RGB
+    var parts = [new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]), pngChunk("IHDR", ihdr)];
+    if(text) parts.push(pngChunk("tEXt", new TextEncoder().encode(text)));
+    parts.push(pngChunk("IDAT", await deflateZlib(raw)));
+    parts.push(pngChunk("IEND", new Uint8Array(0)));
+    return new Blob(parts, { type: "image/png" });
+  }
+  // percentile : true -> étirement p2/p98 après la balance des blancs. Retourne le nouveau fichier, ou null si rien n'est à appliquer.
+  async function adjustRgbDn(blob, bits, percentile){
+    var dec = await decodePng16(new Uint8Array(await blob.arrayBuffer()));
+    if(dec.ch !== 3) return null;
+    var full = Math.pow(2, bits) - 1, gains = [1, 1, 1], xy = activeWhiteXY(), wpTxt = "none";
+    if(xy){
+      var cx = Math.min(dec.w - 1, Math.max(0, Math.round(xy.x * dec.w))), cy = Math.min(dec.h - 1, Math.max(0, Math.round(xy.y * dec.h)));
+      var x0 = Math.max(0, cx - DEFAULT_WP_RADIUS), x1 = Math.min(dec.w - 1, cx + DEFAULT_WP_RADIUS);
+      var y0 = Math.max(0, cy - DEFAULT_WP_RADIUS), y1 = Math.min(dec.h - 1, cy + DEFAULT_WP_RADIUS);
+      var sum = [0, 0, 0], cnt = 0;
+      for(var yy = y0; yy <= y1; yy++) for(var xx = x0; xx <= x1; xx++){
+        var q = (yy * dec.w + xx) * 6;
+        for(var c = 0; c < 3; c++) sum[c] += (dec.bytes[q + 2*c] << 8) | dec.bytes[q + 2*c + 1];
+        cnt++;
+      }
+      var wp = sum.map(function(s){ return Math.max(s / cnt, 1); });
+      var mx = Math.max(wp[0], wp[1], wp[2]);
+      gains = wp.map(function(v){ return mx / v; });
+      wpTxt = (adj.whitePointXY ? "chosen" : "scene default") + " at x=" + xy.x.toFixed(3) + " y=" + xy.y.toFixed(3) +
+        " (DN " + wp.map(function(v){ return v.toFixed(1); }).join("/") + ", gains " + gains.map(function(g){ return g.toFixed(4); }).join("/") + ")";
+    }
+    if(!xy && !percentile) return null;
+    var b = dec.bytes, n = dec.w * dec.h * 3, vals = new Uint16Array(n);
+    for(var i = 0; i < n; i++){
+      var s0 = 2 * i, v = ((b[s0] << 8) | b[s0 + 1]) * gains[i % 3];
+      vals[i] = Math.round(v > full ? full : v);
+    }
+    var stTxt = "none";
+    if(percentile){
+      var hist = [new Uint32Array(full + 1), new Uint32Array(full + 1), new Uint32Array(full + 1)], npx = dec.w * dec.h;
+      for(var i2 = 0; i2 < n; i2++) hist[i2 % 3][vals[i2]]++;
+      var lo = [0, 0, 0], hi = [full, full, full];
+      for(var c2 = 0; c2 < 3; c2++){
+        var cum = 0, t2 = npx * 0.02, t98 = npx * 0.98, gotLo = false;
+        for(var u = 0; u <= full; u++){
+          cum += hist[c2][u];
+          if(!gotLo && cum >= t2){ lo[c2] = u; gotLo = true; }
+          if(cum >= t98){ hi[c2] = u; break; }
+        }
+      }
+      for(var i3 = 0; i3 < n; i3++){
+        var cc = i3 % 3, span = hi[cc] - lo[cc];
+        if(span > 0){ var w2 = (vals[i3] - lo[cc]) / span * full; vals[i3] = Math.round(w2 < 0 ? 0 : (w2 > full ? full : w2)); }
+      }
+      stTxt = "p2/p98 per channel, low " + lo.join("/") + ", high " + hi.join("/");
+    }
+    for(var i4 = 0; i4 < n; i4++){ var s4 = 2 * i4; b[s4] = (vals[i4] >> 8) & 255; b[s4 + 1] = vals[i4] & 255; }
+    var txt = "Nysa_adjustments\u0000white balance: " + wpTxt + "; stretch: " + stTxt + "; full scale: " + full + " (" + bits + " bits)";
+    return encodePng16Rgb(dec.w, dec.h, b, txt);
+  }
+  updateDownloadLabel();
+  // Un clic sur le bouton ouvre le menu (mis à l'échelle ou valeurs brutes) ; sans DN enregistrés (anciens
+  // résultats), il télécharge directement l'image du serveur.
+  var dlMenuEl = document.getElementById("dlMenu"), dlBtnEl = document.getElementById("downloadBtn");
+  function closeDlMenu(){ dlMenuEl.hidden = true; dlBtnEl.setAttribute("aria-expanded", "false"); }
+  dlBtnEl.addEventListener("click", function(e){
+    e.stopPropagation();
+    var key = adj.band || "RGB";
+    if(!dnInfo(key)){ doDownload(null); return; }
+    var open = dlMenuEl.hidden;
+    // entrées propres au RGB (balance des blancs, percentile) ou aux bandes séparées (mise à l'échelle)
+    dlMenuEl.querySelectorAll("button[data-for]").forEach(function(btn){ btn.hidden = btn.dataset.for !== (key === "RGB" ? "rgb" : "band"); });
+    // entrées selon la profondeur de l'accumulateur (PNG remis à l'échelle au-delà de 16 bits) et la présence du TIFF
+    var dnD = (result && result.diagnostics && result.diagnostics.dn) || {};
+    var over16 = Number(dnD.bits_tdi || dnD.bits_adc || 0) > 16;
+    // un seul bouton « brut » (data-mode="raw") : seul son libellé change au-delà de 16 bits
+    var rawBtn = dlMenuEl.querySelector("button[data-mode='raw']"), rawKey = over16 ? "res.dl.mode.raw16" : "res.dl.mode.raw";
+    rawBtn.setAttribute("data-i18n", rawKey);
+    rawBtn.textContent = t(rawKey);
+    dlMenuEl.querySelectorAll("button[data-when='tiff']").forEach(function(btn){ btn.hidden = !tiffPath(); });
+    dlMenuEl.hidden = !open;
+    dlBtnEl.setAttribute("aria-expanded", open ? "true" : "false");
+    if(open) dlMenuEl.querySelector("button:not([hidden])").focus();
+  });
+  dlMenuEl.addEventListener("click", function(e){
+    var it = e.target.closest("button[data-mode]");
+    if(!it) return;
+    closeDlMenu();
+    doDownload(it.dataset.mode);
+  });
+  document.addEventListener("click", function(e){ if(!dlMenuEl.hidden && !e.target.closest(".dlmenu")) closeDlMenu(); });
+  document.addEventListener("keydown", function(e){ if(e.key === "Escape" && !dlMenuEl.hidden){ closeDlMenu(); dlBtnEl.focus(); } });
+  // ---- TIFF 32 bits (23/10/2026) ----
+  // Le serveur écrit une pile non compressée (uint32, une page par bande : Rouge, Vert, Bleu), stockée une seule fois.
+  // RGB : la pile est téléchargée telle quelle. Une bande : on en extrait la page et on réécrit un TIFF d'une seule page.
+  function tiffPath(){
+    var dn = result && result.diagnostics && result.diagnostics.dn;
+    return dn && dn.tiff_path ? dn.tiff_path : null;
+  }
+  async function extractTiffBand(blob, idx, bandName){
+    var buf = await blob.arrayBuffer(), dv = new DataView(buf);
+    var le = dv.getUint16(0) === 0x4949;
+    if(dv.getUint16(2, le) !== 42) throw new Error("TIFF non reconnu");
+    var ifd = dv.getUint32(4, le), desc = "";
+    // la description (JSON : bandes, bits, DN0) n'est écrite que dans la première page
+    var n0 = dv.getUint16(ifd, le);
+    for(var i0 = 0; i0 < n0; i0++){
+      var e0 = ifd + 2 + i0 * 12;
+      if(dv.getUint16(e0, le) === 270){
+        var c0 = dv.getUint32(e0 + 4, le), a0 = c0 <= 4 ? e0 + 8 : dv.getUint32(e0 + 8, le);
+        desc = new TextDecoder().decode(new Uint8Array(buf, a0, c0)).replace(/\0+$/, "");
+      }
+    }
+    try{ var dj = JSON.parse(desc); dj.pages = [bandName]; desc = JSON.stringify(dj); }catch(eJ){}
+    for(var p = 0; p < idx; p++){
+      var nPrev = dv.getUint16(ifd, le);
+      ifd = dv.getUint32(ifd + 2 + nPrev * 12, le);
+      if(!ifd) throw new Error("page absente");
+    }
+    var n = dv.getUint16(ifd, le), tags = {};
+    for(var i = 0; i < n; i++){
+      var e = ifd + 2 + i * 12, tag = dv.getUint16(e, le), typ = dv.getUint16(e + 2, le), cnt = dv.getUint32(e + 4, le);
+      var sz = ({1: 1, 2: 1, 3: 2, 4: 4})[typ] || 1, at = cnt * sz <= 4 ? e + 8 : dv.getUint32(e + 8, le);
+      tags[tag] = { typ: typ, cnt: cnt, at: at };
+    }
+    function vals(t){
+      var o = [];
+      for(var j = 0; j < t.cnt; j++) o.push(t.typ === 3 ? dv.getUint16(t.at + 2 * j, le) : dv.getUint32(t.at + 4 * j, le));
+      return o;
+    }
+    var w = vals(tags[256])[0], h = vals(tags[257])[0];
+    var offs = vals(tags[273]), cnts = vals(tags[279]);
+    var total = 0; for(var q = 0; q < cnts.length; q++) total += cnts[q];
+    var pix = new Uint8Array(total), pos = 0;
+    for(var s2 = 0; s2 < offs.length; s2++){ pix.set(new Uint8Array(buf, offs[s2], cnts[s2]), pos); pos += cnts[s2]; }
+    var descB = new TextEncoder().encode(desc + "\0");
+    var entries = [[256, 4, 1, w], [257, 4, 1, h], [258, 3, 1, 32], [259, 3, 1, 1], [262, 3, 1, 1], [270, 2, descB.length, null],
+                   [273, 4, 1, null], [277, 3, 1, 1], [278, 4, 1, h], [279, 4, 1, total], [339, 3, 1, 1]];
+    var ifdSize = 2 + entries.length * 12 + 4, descOff = 8 + ifdSize, pixOff = descOff + descB.length + (descB.length % 2);
+    var out = new Uint8Array(pixOff + total), od = new DataView(out.buffer);
+    od.setUint16(0, 0x4949, true); od.setUint16(2, 42, true); od.setUint32(4, 8, true);
+    od.setUint16(8, entries.length, true);
+    entries.forEach(function(en, k){
+      var a = 10 + k * 12;
+      od.setUint16(a, en[0], true); od.setUint16(a + 2, en[1], true); od.setUint32(a + 4, en[2], true);
+      var v = en[0] === 270 ? descOff : (en[0] === 273 ? pixOff : en[3]);
+      if(en[1] === 3 && en[2] === 1) od.setUint16(a + 8, v, true); else od.setUint32(a + 8, v, true);
+    });
+    od.setUint32(10 + entries.length * 12, 0, true);
+    out.set(descB, descOff); out.set(pix, pixOff);
+    return new Blob([out], { type: "image/tiff" });
+  }
+  async function downloadTiff32(key){
+    var path = tiffPath();
+    var sg = guest ? { data: { signedUrl: path } } : await supabaseClient.storage.from("results").createSignedUrl(path, 600);
+    if(sg.error || !sg.data) throw new Error("lien TIFF");
+    var tb = await (await fetch(sg.data.signedUrl)).blob();
+    if(key !== "RGB") tb = await extractTiffBand(tb, CHANNEL_IDX[key], ["Rouge", "Vert", "Bleu"][CHANNEL_IDX[key]]);
+    saveBlob(tb, downloadName(key, "tiff32"));
+  }
+  async function doDownload(mode){
+    var key = adj.band || "RGB";
+    try{
+      if(mode === "tiff32" && tiffPath()){ await downloadTiff32(key); return; }
+      var info = dnInfo(key);
+      if(info){
+        var sg = guest ? { data: { signedUrl: info.path } } : await supabaseClient.storage.from("results").createSignedUrl(info.path, 600);
+        if(!sg.error && sg.data){
+          var dnBlob = await (await fetch(sg.data.signedUrl)).blob();
+          var fileMode = mode;
+          if(key === "RGB" && (mode === "wb" || mode === "pct")){
+            try{
+              if(typeof DecompressionStream === "undefined" || typeof CompressionStream === "undefined") throw new Error("navigateur sans compression");
+              var adjusted = await adjustRgbDn(dnBlob, Number(info.bits), mode === "pct");
+              if(adjusted) dnBlob = adjusted; else fileMode = "raw";
+            }catch(e3){ console.error("Réglages impossibles sur les DN, fichier brut fourni :", e3); fileMode = "raw"; }
+          }
+          if(dlScaled(mode) && typeof DecompressionStream !== "undefined" && typeof CompressionStream !== "undefined"){
+            try{ dnBlob = await scalePng16(dnBlob); }
+            catch(e2){ console.error("Mise à l'échelle impossible, fichier brut fourni :", e2); }
+          }
+          saveBlob(dnBlob, downloadName(key, fileMode));
+          return;
+        }
+      }
+      var blob = await (await fetch(imgUrl)).blob();
+      saveBlob(key === "RGB" ? blob : await extractBandPng(blob, CHANNEL_IDX[key]), downloadName(key));
+    }catch(e){
+      console.error("Téléchargement impossible :", e);
+      window.open(imgUrl, "_blank");
+    }
+  }
+
+  imagesReady.then(function(){ syncSatControl(); updateDisplay(); });
+
+  // ===================== Échelle graphique (05/10/2026) =====================
+  // L'image simulée couvre toujours la même emprise au sol : 200 m de large
+  // (CORE_FOOTPRINT_M dans eo_adapter.py). Elle est affichée en « cover » :
+  // agrandie jusqu'à remplir le cadre, quitte à dépasser sur un côté. Le
+  // nombre de mètres par pixel d'écran dépend donc de la taille du cadre, et
+  // l'échelle est recalculée à chaque changement de taille (fenêtre, plein
+  // écran). Tant que les dimensions de l'image sont inconnues, l'échelle
+  // reste masquée plutôt que d'afficher une valeur fausse.
+  var RESULT_FOOTPRINT_M = 200;
+  function niceScaleMeters(x){
+    var exp = Math.floor(Math.log10(x));
+    var f = x / Math.pow(10, exp);
+    var nf = f < 1.5 ? 1 : (f < 3.5 ? 2 : (f < 7.5 ? 5 : 10));
+    return nf * Math.pow(10, exp);
+  }
+  function updateScaleBar(){
+    var box = document.getElementById("scalebar");
+    var bar = document.getElementById("scalebarBar"), lab = document.getElementById("scalebarLab");
+    var nw = simImgObj.naturalWidth || imgSim.naturalWidth, nh = simImgObj.naturalHeight || imgSim.naturalHeight;
+    var bw = wrap.clientWidth, bh = wrap.clientHeight;
+    if(!nw || !nh || !bw || !bh){ box.style.visibility = "hidden"; return; }
+    var scale = Math.max(bw / nw, bh / nh);              // object-fit: cover
+    var mPerPx = RESULT_FOOTPRINT_M / (nw * scale);      // mètres au sol par pixel d'écran
+    var meters = niceScaleMeters(bw * mPerPx * 0.2);     // valeur ronde, environ 1/5 de la largeur visible
+    var px = (meters / mPerPx).toFixed(1) + "px";
+    bar.style.width = px; lab.style.width = px;
+    lab.textContent = meters >= 1000 ? (meters / 1000) + " km" : meters + " m";
+    box.style.visibility = "visible";
+  }
+  imagesReady.then(updateScaleBar);
+  if(window.ResizeObserver) new ResizeObserver(updateScaleBar).observe(wrap);
+  else window.addEventListener("resize", updateScaleBar);
+
+  // 06/10/2026 — les boutons de zoom « Ajusté / ×2 / ×4 » sont retirés de
+  // cette page. Le plein écran reste disponible.
+  document.getElementById("fullscreenBtn").addEventListener("click", function(){
+    if(document.fullscreenElement) document.exitFullscreen();
+    else document.getElementById("viewerBox").requestFullscreen();
+  });
+})();
+</script>
+<script src="aide.js"></script>
+<!-- Menu de gauche repliable sur petit écran -->
+<script src="menu.js"></script>
+<script src="onboarding.js"></script>
+</body>
+</html>

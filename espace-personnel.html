@@ -1,0 +1,1617 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-i18n="home.doc_title">Espace personnel | Nysa</title>
+<!-- Traduction FR / EN : textes et moteur dans i18n.js -->
+<script src="i18n.js"></script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2048%2048%22%3E%3Ccircle%20cx%3D%2224.00%22%20cy%3D%2213.70%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2232.92%22%20cy%3D%2218.85%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2232.92%22%20cy%3D%2229.15%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2224.00%22%20cy%3D%2234.30%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2215.08%22%20cy%3D%2229.15%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2215.08%22%20cy%3D%2218.85%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2224%22%20cy%3D%2224%22%20r%3D%225.3%22%20fill%3D%22%23FFB86B%22/%3E%3C/svg%3E">
+<!-- Polices hébergées avec le site (dossier fonts/) : aucun appel à Google. -->
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+:root{
+  --void:#090E13; --panel:#131E27; --panel-2:#1A2833;
+  --line:#2E4152; --line-soft:#22323F;
+  --paper:#C4D6D4; --muted:#9BADBD; --muted-2:#8497AA;
+  --photon:#F5AC57; --pixel:#5FDCD0; --alert:#F0776D; --ok:#7FD88F;
+  --display:"Montserrat","IBM Plex Sans",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{background:var(--void);color:var(--paper);font-family:var(--body);
+  font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+
+.app{display:flex;height:100vh;overflow:hidden}
+
+.sidebar{flex:none;width:220px;background:var(--panel);border-right:1px solid var(--line-soft);
+  display:flex;flex-direction:column;padding:16px 14px;overflow-y:auto}
+/* 05/10/2026 — logo en disposition centrée (variante 1 de la charte) : la
+   signature y est lisible, ce qu'elle n'était pas à côté du nom. */
+.brand{display:flex;flex-direction:column;align-items:center;text-align:center;gap:9px;padding:10px 8px 18px;border-bottom:1px solid var(--line-soft);
+  margin-bottom:12px}
+.brand .mark{flex:none;width:46px;height:46px;display:block}
+.brand .mark svg{width:100%;height:100%;display:block}
+.brand .name{font-family:var(--display);font-weight:500;font-size:22px;letter-spacing:.06em;line-height:1.05}
+.brand .tag{font-family:var(--display);font-weight:400;font-size:12px;letter-spacing:.13em;color:var(--muted);margin-top:5px;white-space:nowrap}
+
+.navlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.navlist a{display:flex;align-items:center;gap:11px;padding:8px 12px;border-radius:4px;
+  text-decoration:none;color:var(--muted);font-size:14.5px;transition:background .14s,color .14s}
+.navlist a svg{flex:none;width:18px;height:18px;opacity:.85}
+.navlist a:hover{background:var(--panel-2);color:var(--paper)}
+.navlist a.active{background:rgba(95,220,208,.10);color:var(--pixel);
+  box-shadow:inset 2px 0 0 var(--pixel)}
+.navlist a.active svg{opacity:1}
+
+.sidebar-bottom{margin-top:auto;padding-top:14px;border-top:1px solid var(--line-soft)}
+
+.main{flex:1;min-width:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+.topbar{display:flex;justify-content:flex-end;align-items:center;gap:16px;flex:none;
+  padding:11px 26px;border-bottom:1px solid var(--line-soft)}
+.iconbtn{width:34px;height:34px;border-radius:50%;border:1px solid var(--line-soft);
+  background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center;
+  cursor:pointer}
+.iconbtn:hover{border-color:var(--line);color:var(--paper)}
+.userchip{display:flex;align-items:center;gap:10px;font-family:var(--mono);
+  font-size:13px;color:var(--muted)}
+.userchip .avatar{width:30px;height:30px;border-radius:50%;background:var(--panel-2);
+  border:1px solid var(--pixel);color:var(--pixel);display:flex;align-items:center;
+  justify-content:center;font-family:var(--display);font-size:12px;font-weight:600;letter-spacing:0}
+
+.wrap{max-width:1180px;margin:0 auto;padding:20px 26px 20px;width:100%}
+
+.pageheader{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;
+  flex-wrap:wrap;margin-bottom:16px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 6px}
+h1{font-family:var(--display);font-weight:500;font-size:clamp(21px,2.4vw,27.5px);
+  line-height:1.18;margin:0 0 4px;letter-spacing:-.012em}
+.pagesub{margin:0;color:var(--muted);font-size:13.5px}
+.simbtn{border:1px solid var(--photon);background:var(--photon);color:#0B1116;
+  font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.04em;
+  padding:11px 20px;border-radius:5px;cursor:pointer;text-decoration:none;
+  display:inline-flex;align-items:center;gap:8px;flex:none;
+  box-shadow:0 2px 10px rgba(245,172,87,.28);transition:background .14s,border-color .14s}
+.simbtn:hover{background:#FFBE72;border-color:#FFBE72}
+/* 09/10/2026 : « Créer un instrument » en turquoise (couleur « pixel »), avec un léger soulèvement au survol.
+   L'orange reste la couleur des actions qui font avancer (Suivant, Lancer). */
+.createbtn{border-color:var(--pixel);background:var(--pixel);box-shadow:0 2px 12px rgba(95,220,208,.30);
+  transition:background .14s,border-color .14s,transform .14s,box-shadow .14s}
+.createbtn:hover{background:#7CE8DE;border-color:#7CE8DE;transform:translateY(-2px);box-shadow:0 6px 18px rgba(95,220,208,.38)}
+.createbtn:active{transform:translateY(0)}
+@media (prefers-reduced-motion:reduce){.createbtn,.createbtn:hover{transform:none}}
+.resultsfilters{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:16px}
+.resultsfilters[hidden]{display:none}
+.resultsfilters input,.resultsfilters select{background:var(--panel);border:1px solid var(--line-soft);color:var(--paper);
+  border-radius:5px;padding:8px 11px;font-family:var(--body);font-size:13px}
+.resultsfilters input{flex:1;min-width:220px;max-width:360px}
+.resultsfilters input:focus,.resultsfilters select:focus{outline:none;border-color:var(--pixel)}
+.resultsfilters .count{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--muted-2)}
+.navlist a.demolink{color:var(--photon)}
+.navlist a.demolink svg{color:var(--photon);opacity:1}
+.navlist a.demolink:hover{background:rgba(245,172,87,.1);color:#FFBE72}
+.navlist a.soon{cursor:default;opacity:.45;pointer-events:none}
+.navlist a.soon:hover{color:inherit;background:transparent}
+
+.instcar{position:relative;margin-bottom:20px}
+/* Carrousel : une rangée de cartes, on fait défiler (flèches, doigt, molette latérale). */
+.instgrid{--per:3;display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;
+  scrollbar-width:none;padding:4px 2px 6px;margin:-4px -2px 0;scroll-behavior:smooth}
+.instgrid::-webkit-scrollbar{display:none}
+.instgrid .instcard{flex:0 0 calc((100% - 14px*(var(--per) - 1)) / var(--per));scroll-snap-align:start;min-width:0}
+.instgrid .instcard.empty{flex:1 1 100%}
+@media(max-width:1000px){.instgrid{--per:2}}
+@media(max-width:640px){.instgrid{--per:1}}
+.cardnav{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:12px}
+.cardnav:has(.cardots:empty){display:none}
+.carbtn{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:var(--panel-2);
+  color:var(--paper);font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;transition:border-color .14s,color .14s,opacity .14s}
+.carbtn:hover:not(:disabled){border-color:var(--pixel);color:var(--pixel)}
+.carbtn:disabled{opacity:.35;cursor:default}
+.cardots{display:flex;justify-content:center;gap:8px}
+.cardots button{width:8px;height:8px;border-radius:50%;border:none;padding:0;cursor:pointer;
+  background:var(--line);transition:background .14s,transform .14s}
+.cardots button.on{background:var(--pixel);transform:scale(1.25)}
+.instcard{display:flex;flex-direction:column;text-decoration:none;color:var(--paper);
+  background:var(--panel);border:1px solid var(--line-soft);border-radius:6px;overflow:hidden;
+  transition:border-color .14s,transform .14s}
+.instcard:hover{border-color:var(--pixel);transform:translateY(-2px)}
+.instcard .body{padding:12px 16px 14px;display:flex;flex-direction:column;gap:9px;flex:1}
+.instcard .titlerow{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.instcard .name{font-family:var(--display);font-weight:600;font-size:14.5px;
+  line-height:1.15;letter-spacing:0}
+.instcard .type{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);margin-top:2px}
+.instcard .type i{width:6px;height:6px;border-radius:50%;background:var(--pixel);flex:none}
+.instcard .menuwrap{position:relative;flex:none}
+.instcard .menubtn{flex:none;background:transparent;border:none;color:var(--muted-2);
+  cursor:pointer;font-size:16px;padding:2px 6px;line-height:1}
+.instcard .menubtn:hover{color:var(--paper)}
+.instcard .dropdown{display:none;position:absolute;top:26px;right:0;z-index:20;
+  background:var(--panel-2);border:1px solid var(--line-soft);border-radius:6px;
+  min-width:150px;padding:4px;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.instcard .dropdown.open{display:block}
+.instcard .dropdown button{display:block;width:100%;text-align:left;background:none;border:none;
+  color:var(--paper);font-family:var(--body);font-size:13px;padding:8px 10px;border-radius:4px;
+  cursor:pointer}
+.instcard .dropdown button:hover{background:var(--panel)}
+.instcard .dropdown button.danger{color:var(--alert)}
+.instcard .dropdown button.danger:hover{background:rgba(240,119,109,.1)}
+
+/* 12/10/2026 : sélection multiple (suppression groupée) */
+.selbtn{background:none;border:1px solid var(--line);color:var(--muted);border-radius:4px;font-family:var(--mono);font-size:12px;padding:6px 11px;cursor:pointer}
+.selbtn:hover{border-color:var(--pixel);color:var(--pixel)}
+.selbtn.on{border-color:var(--pixel);color:var(--pixel)}
+.selbtn.danger:not(:disabled):hover{border-color:var(--alert);color:var(--alert)}
+.selbtn.danger:not(:disabled){border-color:var(--alert);color:var(--alert)}
+.selbtn:disabled{opacity:.45;cursor:not-allowed}
+.selbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 14px;padding:10px 12px;border:1px solid var(--line-soft);border-radius:6px;background:var(--panel)}
+.selbar[hidden]{display:none}
+.selbar .selcount{font-family:var(--mono);font-size:12px;color:var(--muted-2);margin-right:auto}
+.selbox{display:none;width:20px;height:20px;border:1.5px solid var(--line);border-radius:4px;align-items:center;justify-content:center;
+  font-size:13px;line-height:1;color:transparent;flex:none;background:var(--void)}
+.sel .selbox{background:var(--pixel);border-color:var(--pixel);color:var(--void)}
+.selmode .menubtn{display:none}
+.selmode .selbox{display:flex}
+.selmode .dropdown{display:none!important}
+.instcard.sel{border-color:var(--pixel)}
+.instcard .desc{font-size:12px;color:var(--muted);margin:0;line-height:1.4}
+.instcard .pctrow{display:flex;justify-content:space-between;font-family:var(--mono);
+  font-size:12px;color:var(--muted);margin-bottom:6px}
+.instcard .track{height:5px;background:var(--line-soft);border-radius:2px;overflow:hidden}
+.instcard .fill{height:100%;background:var(--pixel)}
+/* 04/10/2026 — brouillon : instrument enregistré sans tous ses champs obligatoires */
+.instcard.draft{border-style:dashed}
+.instcard.draft .fill{background:var(--photon)}
+.instcard .titleblock{display:flex;align-items:center;flex-wrap:wrap;gap:6px 8px;min-width:0}
+.instcard .draftbadge{font-family:var(--mono);font-size:12px;line-height:1.3;color:var(--photon);
+  border:1px solid var(--photon);border-radius:3px;padding:1px 6px;white-space:nowrap}
+.instcard .datesrow{display:flex;flex-direction:column;gap:2px;font-family:var(--mono);
+  font-size:12px;color:var(--muted-2)}
+.instcard .datesrow span{display:flex;align-items:center;gap:6px}
+.instcard .datesrow svg{width:12px;height:12px;flex:none;opacity:.75}
+.instcard .openrow{display:flex;justify-content:flex-end;margin-top:2px}
+.instcard .openbtn{display:inline-flex;align-items:center;gap:7px;background:transparent;
+  border:1px solid var(--line);color:var(--paper);border-radius:4px;font-family:var(--mono);
+  font-size:12px;padding:5px 12px;transition:border-color .14s,color .14s}
+.instcard:hover .openbtn{border-color:var(--pixel);color:var(--pixel)}
+
+.instcard.empty{align-items:center;justify-content:center;text-align:center;color:var(--muted);
+  border-style:dashed;cursor:pointer;padding:16px 20px;gap:6px}
+.instcard.empty:hover{border-color:var(--photon)}
+.instcard.empty .plus{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--muted);
+  margin:2px auto 2px;transition:border-color .14s,color .14s}
+.instcard.empty:hover .plus{border-color:var(--photon);color:var(--photon)}
+.instcard.empty .elab{font-family:var(--display);font-weight:600;font-size:12.5px;
+  color:var(--paper);letter-spacing:0}
+.instcard.empty .esub{font-size:12.5px;color:var(--muted);max-width:190px}
+
+.grouphead{font-family:var(--mono);font-size:12px;letter-spacing:.13em;text-transform:uppercase;
+  margin:0 0 10px;display:flex;align-items:center;gap:10px;color:var(--muted)}
+.dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--pixel)}
+
+.bottomrow{display:grid;grid-template-columns:1.1fr 1fr;gap:20px;align-items:stretch}
+.activity{height:230px;display:flex;flex-direction:column}
+/* 04/10/2026 — la liste défile dans son cadre (avant, les lignes en trop
+   étaient coupées). Chaque ligne garde sa hauteur ; les séparateurs sont
+   des bordures, pour que le fond reste uni quand la liste est courte. */
+.activity ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;flex:1;min-height:0;
+  background:var(--panel);border:1px solid var(--line-soft);border-radius:4px;
+  overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.activity li{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:10px;
+  padding:9px 14px;flex:none;border-bottom:1px solid var(--line-soft)}
+.activity li:last-child{border-bottom:none}
+.activity li .adot{width:6px;height:6px;border-radius:50%;background:var(--line);flex:none}
+.activity li .alabel{color:var(--paper)}
+.activity li .asub{color:var(--muted-2);font-size:12px}
+.activity li span:last-child{margin-left:auto;font-family:var(--mono);font-size:12px;
+  color:var(--muted-2);white-space:nowrap;flex:none}
+
+.doccol{min-height:230px;display:flex;flex-direction:column}
+.hero{position:relative;background:var(--panel);border:1px solid var(--line-soft);
+  border-radius:6px;padding:18px 22px;overflow:hidden;flex:1;box-sizing:border-box;display:flex;
+  flex-direction:column;justify-content:center;gap:14px}
+.hero .earth{position:absolute;right:-60px;bottom:-70px;width:190px;height:190px;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 32% 30%, #2c5f7a 0%, #163449 38%, #081522 68%, #050d16 100%);
+  box-shadow:0 0 46px rgba(95,220,208,.10),inset -14px -10px 30px rgba(0,0,0,.55)}
+.hero .earth::before{content:"";position:absolute;inset:-6px;border-radius:50%;
+  border:1px solid rgba(95,220,208,.35);filter:blur(1px)}
+.hero .earth::after{content:"";position:absolute;top:14%;left:8%;width:36%;height:20%;
+  background:rgba(230,238,244,.10);border-radius:50%;filter:blur(6px);transform:rotate(-18deg)}
+.hero .content{position:relative;max-width:60%}
+.hero .eyebrow{margin-bottom:10px}
+.hero h2{font-family:var(--display);font-weight:600;font-size:16px;line-height:1.12;
+  margin:0 0 6px;letter-spacing:0}
+.hero h2 .cool{color:var(--pixel)}
+.hero p{margin:0 0 8px;font-size:12.5px;color:var(--muted);line-height:1.45}
+.hero a{font-family:var(--mono);font-size:12.5px;color:var(--photon);text-decoration:none;
+  display:inline-flex;align-items:center;gap:6px}
+.hero a:hover{color:#FFBE72}
+
+@media(max-width:900px){
+  .bottomrow{grid-template-columns:1fr}
+  .hero .content{max-width:100%}
+}
+/* 06/10/2026 — le menu de gauche sur petit écran est géré par menu.js
+   (bouton en haut à gauche). L'ancienne règle le faisait sortir de l'écran
+   sans aucun moyen de le rouvrir. */
+@media(max-width:640px){
+  .wrap{padding:16px 16px 20px}
+  .pageheader{flex-wrap:wrap;align-items:flex-start;gap:14px}
+  .bottomrow > *{min-width:0}
+  .activity,.doccol{height:auto;min-height:200px}
+}
+
+/* ===================== Modal Paramètres ===================== */
+.modal-overlay{position:fixed;inset:0;background:rgba(5,8,11,.72);backdrop-filter:blur(2px);
+  display:none;align-items:center;justify-content:center;z-index:100;padding:24px}
+.modal-overlay.open{display:flex}
+.modal{width:100%;max-width:820px;height:min(640px,88vh);background:var(--panel);
+  border:1px solid var(--line-soft);border-radius:10px;display:flex;flex-direction:column;overflow:hidden}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;
+  border-bottom:1px solid var(--line-soft);flex:none}
+.modal-head .htitle{display:flex;align-items:center;gap:11px}
+.modal-head .hicon{width:30px;height:30px;border-radius:7px;background:var(--panel-2);
+  border:1px solid var(--line-soft);color:var(--pixel);display:flex;align-items:center;justify-content:center;flex:none}
+.modal-head .hicon svg{width:16px;height:16px}
+.modal-head h2{font-family:var(--display);font-weight:600;font-size:16.5px;
+  margin:0;letter-spacing:0}
+.modal-close{background:transparent;border:none;color:var(--muted);font-size:19px;cursor:pointer;
+  line-height:1;padding:4px 6px;border-radius:4px}
+.modal-close:hover{color:var(--paper);background:var(--panel-2)}
+
+.modal-shell{flex:1;min-height:0;display:flex}
+.modal-rail{flex:none;width:190px;border-right:1px solid var(--line-soft);padding:14px 10px;
+  display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+.railbtn{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:6px;
+  background:transparent;border:none;color:var(--muted);font-family:var(--body);font-size:13.5px;
+  cursor:pointer;text-align:left;transition:background .14s,color .14s}
+.railbtn svg{flex:none;width:16px;height:16px;opacity:.85}
+.railbtn:hover{background:var(--panel-2);color:var(--paper)}
+.railbtn.active{background:rgba(95,220,208,.10);color:var(--pixel);box-shadow:inset 2px 0 0 var(--pixel)}
+.railbtn.active svg{opacity:1}
+
+.modal-content{flex:1;min-width:0;overflow-y:auto;padding:20px 22px 26px;
+  display:flex;flex-direction:column;gap:18px}
+
+.msection{background:var(--panel-2);border:1px solid var(--line-soft);border-radius:8px;
+  padding:16px 18px;scroll-margin-top:8px}
+.msection-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}
+.msection-head .htxt{display:flex;gap:11px;align-items:flex-start}
+.msection-head .sicon{width:32px;height:32px;border-radius:7px;background:var(--panel);
+  border:1px solid var(--line-soft);color:var(--pixel);display:flex;align-items:center;justify-content:center;flex:none}
+.msection-head .sicon svg{width:16px;height:16px}
+.msection-head h3{font-family:var(--display);font-weight:600;font-size:13.5px;
+  margin:0 0 2px;letter-spacing:0}
+.msection-head p{margin:0;font-size:12px;color:var(--muted);line-height:1.4}
+
+.msection-body{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line-soft)}
+.minfo-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;gap:12px;
+  padding:11px 0;border-bottom:1px solid var(--line-soft)}
+.minfo-row:last-child{border-bottom:none}
+.minfo-row .label{color:var(--muted)}
+.minfo-row .value{font-family:var(--mono);color:var(--paper);text-align:right}
+
+.planbadge{font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;
+  padding:3px 9px;border-radius:5px;background:var(--pixel);color:#0A1F1C;flex:none;font-weight:600}
+.planbadge.free{background:var(--line);color:var(--muted)}
+
+.planrow{display:flex;align-items:center;gap:12px;padding:13px 0;flex-wrap:wrap}
+.planrow .ptxt{flex:1;min-width:160px}
+.planrow .ptxt .t1{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:0}
+.planrow .ptxt .t2{font-size:12px;color:var(--muted);margin-top:2px}
+.planrow .pstatus{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12px;
+  color:var(--ok);flex:none}
+.planrow .pstatus .sdot{width:6px;height:6px;border-radius:50%;background:var(--ok);flex:none}
+.planrow .pstatus.pending{color:var(--muted-2)}
+.planrow .pstatus.pending .sdot{background:var(--muted-2)}
+.planrow .pstatus.warn{color:var(--alert)}
+.planrow .pstatus.warn .sdot{background:var(--alert)}
+
+.msection-actions{display:flex;flex-direction:column;gap:8px;padding-top:14px;border-top:1px solid var(--line-soft);margin-top:2px}
+.mform-group{display:flex;flex-direction:column;gap:5px;padding:9px 0}
+.mform-group label{font-size:12.5px;color:var(--muted)}
+.mform-group input{background:var(--panel);border:1px solid var(--line-soft);border-radius:5px;
+  color:var(--paper);padding:9px 11px;font-family:var(--body);font-size:13.5px;width:100%}
+.mform-group input:focus{outline:none;border-color:var(--pixel)}
+.mbtn{border-radius:5px;padding:9px 15px;font-family:var(--mono);font-size:12px;font-weight:600;
+  letter-spacing:.03em;cursor:pointer;border:1px solid var(--line);background:transparent;
+  color:var(--paper);transition:border-color .14s,color .14s,background .14s;flex:none}
+.mbtn:hover{border-color:var(--pixel);color:var(--pixel)}
+.mbtn.primary{background:var(--photon);border-color:var(--photon);color:#0B1116}
+.mbtn.primary:hover{background:#FFBE72;border-color:#FFBE72;color:#0B1116}
+.mbtn.danger{border-color:var(--alert);color:var(--alert)}
+.mbtn.danger:hover{background:rgba(240,119,109,.12)}
+.mbtn:disabled{opacity:.5;cursor:default;border-color:var(--line);color:var(--muted)}
+.mbtn:disabled:hover{background:transparent}
+.mnote{font-size:12px;color:var(--muted-2);line-height:1.5;margin:0}
+.mnote.ok{color:var(--ok)}
+.mnote.err{color:var(--alert)}
+.mnote.warn{color:var(--photon)}
+.mdelete-list{margin:0 0 6px;padding-left:18px;font-size:12.5px;color:var(--muted);line-height:1.55}
+.mdelete-list li{margin-bottom:5px}
+@media(max-width:640px){
+  .modal{max-width:100%;height:92vh}
+  .modal-shell{flex-direction:column}
+  .modal-rail{width:100%;flex-direction:row;border-right:none;border-bottom:1px solid var(--line-soft);
+    padding:8px 10px;overflow-x:auto}
+  .railbtn{white-space:nowrap}
+}
+.langselect{background:var(--panel-2);border:1px solid var(--line);color:var(--paper);border-radius:5px;
+  padding:6px 10px;font-family:var(--body);font-size:13px;cursor:pointer}
+.langselect:focus{outline:none;border-color:var(--pixel)}
+/* « à venir » ne se coupe pas en deux lignes dans le menu */
+.sidebar .navlist a em{white-space:nowrap}
+/* encadré Confidentialité et souveraineté (même gabarit que la documentation) */
+.hero.trust .content{max-width:78%}
+.hero.trust h2{margin-bottom:8px}
+.hero.trust ul{margin:0;padding:0;list-style:none}
+.hero.trust li{position:relative;padding-left:16px;margin:0 0 5px;font-size:12.5px;line-height:1.45;color:var(--muted)}
+.hero.trust li::before{content:"";position:absolute;left:0;top:.62em;width:6px;height:6px;border-radius:50%;background:var(--pixel);opacity:.75}
+.hero.trust .shield{position:absolute;right:16px;bottom:-14px;width:118px;height:138px;color:var(--pixel);opacity:.16}
+@media(max-width:640px){.hero.trust .content{max-width:100%}.hero.trust .shield{opacity:.08}}
+.hero.trust .trustlink{display:inline-block;margin-top:6px;font-family:var(--mono);font-size:12px;color:var(--photon);text-decoration:none}
+.hero.trust .trustlink:hover{text-decoration:underline}
+
+/* 16/10/2026 : mode invité. Boutons visibles mais grisés ; info-bulle et fenêtre d'invitation. */
+.guestlock{opacity:.5;cursor:not-allowed}
+.createbtn.guestlock:hover{background:var(--pixel);border-color:var(--pixel);transform:none;box-shadow:0 2px 12px rgba(95,220,208,.30)}
+.selbtn.guestlock:hover{background:none}
+.instcard .dropdown button.guestlock:hover{background:none}
+.guesttip{position:fixed;z-index:200;max-width:260px;padding:8px 11px;border-radius:6px;background:var(--panel-2);border:1px solid var(--pixel);color:var(--paper);font-size:12.5px;line-height:1.4;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.guesttip[hidden]{display:none}
+.modal.small{max-width:440px;height:auto}
+.guestbody{padding:6px 24px 8px;font-size:14px;line-height:1.55;color:var(--paper)}
+.guestactions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;padding:14px 24px 22px}
+</style>
+</head>
+<body>
+<!-- Bandeau « version bêta » : se désactive dans beta.js (BETA_ACTIVE = false) -->
+<script src="beta.js"></script>
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <!-- 05/10/2026 — logo Nysa : la fleur à six pétales -->
+      <span class="mark"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24.00" cy="13.70" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="32.92" cy="18.85" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="32.92" cy="29.15" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="24.00" cy="34.30" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="15.08" cy="29.15" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="15.08" cy="18.85" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="24" cy="24" r="5.3" fill="#FFB86B"/></svg></span>
+      <span>
+        <div class="name">Nysa</div>
+        <div class="tag">EO Imaging Engineering</div>
+      </span>
+    </div>
+    <ul class="navlist">
+      <li><a class="active" href="espace-personnel.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(-30 12 10)"><rect x="3.5" y="7" width="13" height="6" rx="1.2"/><path d="M16.5 8h3v4h-3M7.5 7v6"/></g><path d="M11.8 13.6 8 21M11.8 13.6V21M11.8 13.6 15.8 21"/></svg>
+        <span data-i18n="nav.instruments">Instruments</span></a></li>
+      <li><a class="soon" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="8" width="6" height="9" rx="1.2"/><rect x="1.5" y="9.5" width="6" height="6" rx=".6"/><rect x="16.5" y="9.5" width="6" height="6" rx=".6"/><path d="M4.5 9.5v6M19.5 9.5v6M7.5 12.5H9M15 12.5h1.5M12 8V5"/><circle cx="12" cy="3.9" r="1"/></svg>
+        <span data-i18n="nav.platform">Plateforme</span> <em style="font-style:normal;color:var(--muted-2);font-size:12px;margin-left:auto" data-i18n="nav.soon">à venir</em></a></li>
+      <li><a href="simulations.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 4l14 8-14 8V4z"/></svg>
+        <span data-i18n="nav.simulations">Simulations</span></a></li>
+      <li><a href="resultats.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
+        <span data-i18n="nav.results">Résultats</span></a></li>
+      <!-- 07/10/2026 : visible du seul compte administrateur (révélé par menu.js) ; la page elle-même est protégée par la base -->
+      <li id="navAdminItem" hidden><a href="admin.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6z"/><path d="M9.5 12l2 2 3.5-4"/></svg>
+        <span>Administration</span></a></li>
+    </ul>
+    <div class="sidebar-bottom">
+      <div data-lang-switch style="margin:0 0 10px 12px"></div>
+      <ul class="navlist">
+        <!-- 05/10/2026 — « Retour à la démo » retiré du menu connecté : la démo reste publique à l'adresse du site -->
+        <li><a href="mailto:contact@nysa-imaging.com" data-nysa-help="general">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.2 2.4c-.9.3-1.2.9-1.2 1.8"/><circle cx="12" cy="16.6" r=".4" fill="currentColor" stroke="none"/></svg>
+          <span data-i18n="nav.help">Aide</span></a></li>
+        <li><a href="#" id="settingsLink">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19.4 13.5a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V20a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.96 18.34a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.66 8.96a1.7 1.7 0 0 0-.34-1.87l-.06-.06A2 2 0 1 1 7.09 4.2l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.04 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.56 1.04z"/></svg>
+          <span data-i18n="nav.settings">Paramètres</span></a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <span class="userchip" id="userChip"><span class="avatar" id="userAvatar">…</span><span id="userEmail">-</span></span>
+      <button class="iconbtn" aria-label="Se déconnecter" data-i18n-aria="top.signout" type="button" id="signOutBtn" title="Se déconnecter" data-i18n-title="top.signout">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+      </button>
+    </div>
+
+    <div class="wrap">
+
+      <div class="pageheader">
+        <div>
+          <p class="eyebrow" data-i18n="home.eyebrow">Instruments</p>
+          <h1 data-i18n="home.h1">Mes instruments</h1>
+          <p class="pagesub" data-i18n="home.sub">Créez, configurez et gérez vos instruments d'imagerie.</p>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <a class="simbtn createbtn" href="creer-instrument.html" data-i18n="home.create">+ Créer un instrument</a>
+        </div>
+      </div>
+
+      <!-- 09/10/2026 : filtre pour retrouver un instrument parmi les 20 (comme sur la page Résultats) -->
+      <div class="resultsfilters" id="instFilters" hidden>
+        <input type="search" id="fInstSearch" placeholder="Rechercher un instrument…" data-i18n-ph="home.search.ph" autocomplete="off">
+        <select id="fInstStatus" data-i18n-aria="home.filter.status">
+          <option value="" data-i18n="home.filter.all">Tous les instruments</option>
+          <option value="complete" data-i18n="home.filter.complete">Complets</option>
+          <option value="draft" data-i18n="home.filter.draft">Brouillons</option>
+        </select>
+        <button type="button" class="selbtn" id="btnInstSel" data-i18n="sel.btn">Sélectionner</button>
+        <span class="count" id="fInstCount"></span>
+      </div>
+      <div class="selbar" id="instSelBar" hidden>
+          <button type="button" class="selbtn" id="instSelAll" data-i18n="sel.all">Tout sélectionner</button>
+          <span class="selcount" id="instSelCount"></span>
+          <button type="button" class="selbtn danger" id="instSelDelete" disabled>Supprimer (0)</button>
+          <button type="button" class="selbtn" id="instSelCancel" data-i18n="sel.cancel">Annuler</button>
+        </div>
+
+      <div class="instcar">
+        <div class="instgrid" id="instList"></div>
+        <div class="cardnav">
+          <button class="carbtn prev" id="carPrev" type="button" data-i18n-aria="home.car.prev" aria-label="Précédent">‹</button>
+          <div class="cardots" id="carDots"></div>
+          <button class="carbtn next" id="carNext" type="button" data-i18n-aria="home.car.next" aria-label="Suivant">›</button>
+        </div>
+      </div>
+
+      <div class="bottomrow">
+        <!-- 06/10/2026 — remplace l'encadré « Activité récente ». Chaque phrase
+             doit rester vraie : la modifier si l'hébergement change.
+             Calcul : Scaleway, Paris. Base et fichiers : Supabase, région eu-west-3 (Paris). -->
+        <div class="doccol">
+          <p class="grouphead"><span class="dot"></span><span data-i18n="home.privacy">Confidentialité</span></p>
+          <div class="hero trust">
+            <svg class="shield" viewBox="0 0 120 140" aria-hidden="true"><path d="M60 6 108 24v40c0 34-20 56-48 70C32 120 12 98 12 64V24z" fill="none" stroke="currentColor" stroke-width="3"/><path d="M40 68l14 14 28-30" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="content">
+              <h2><span data-i18n="home.trust.h2a">Vos instruments et résultats restent</span> <span class="cool" data-i18n="home.trust.h2b">les vôtres</span></h2>
+              <ul>
+                <li data-i18n="home.trust.li1">Visibles de vous seul, jamais partagés ni réutilisés.</li>
+                <li data-i18n="home.trust.li4">Nysa ne les consulte pas sans votre autorisation préalable.</li>
+                <li data-i18n="home.trust.li2">Simulations calculées et données stockées en France.</li>
+                <li data-i18n="home.trust.li3">Aucun traceur, aucune publicité, aucune mesure d'audience.</li>
+              </ul>
+              <a class="trustlink" href="confidentialite.html" data-i18n="home.trust.link">Politique de confidentialité →</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="doccol">
+          <p class="grouphead"><span class="dot"></span><span data-i18n="home.doc">Documentation</span></p>
+          <div class="hero">
+            <span class="earth" aria-hidden="true"></span>
+            <div class="content">
+              <h2><span data-i18n="home.hero.h2a">Analysez la performance de vos</span> <span class="cool" data-i18n="home.hero.h2b">instruments d'imagerie</span></h2>
+              <p data-i18n="home.hero.p">Créez vos instruments, configurez vos scénarios et obtenez des métriques détaillées sur la qualité de vos images.</p>
+              <a href="hypotheses.html" data-i18n="home.hero.link">Voir les hypothèses physiques du modèle →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- 16/10/2026 : fenêtre d'invitation du mode invité -->
+<div class="modal-overlay" id="guestOverlay">
+  <div class="modal small" role="dialog" aria-modal="true" aria-labelledby="guestTitle">
+    <div class="modal-head">
+      <div class="htitle"><h2 id="guestTitle" data-i18n="guest.invite.title">Créez votre compte gratuit</h2></div>
+      <button class="modal-close" id="guestCloseBtn" type="button" aria-label="Fermer" data-i18n-aria="common.close">✕</button>
+    </div>
+    <p class="guestbody" data-i18n="guest.invite.text">Avec un compte, vous créez vos propres instruments, lancez vos simulations et retrouvez vos résultats. C'est gratuit pendant la bêta.</p>
+    <div class="guestactions">
+      <button class="mbtn" id="guestLaterBtn" type="button" data-i18n="guest.invite.later">Plus tard</button>
+      <a class="mbtn primary" id="guestGoBtn" href="login.html?signup=1" data-i18n="guest.invite.go">Créer un compte gratuit</a>
+    </div>
+  </div>
+</div>
+<div class="guesttip" id="guestTip" role="tooltip" hidden></div>
+
+<div class="modal-overlay" id="settingsOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="modal-head">
+      <div class="htitle">
+        <span class="hicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 13.5a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V20a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.96 18.34a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.66 8.96a1.7 1.7 0 0 0-.34-1.87l-.06-.06A2 2 0 1 1 7.09 4.2l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.04 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.56 1.04z"/></svg></span>
+        <h2 id="settingsTitle" data-i18n="settings.title">Paramètres</h2>
+      </div>
+      <button class="modal-close" id="settingsCloseBtn" type="button" aria-label="Fermer" data-i18n-aria="common.close">✕</button>
+    </div>
+
+    <div class="modal-shell">
+      <nav class="modal-rail">
+        <button class="railbtn active" type="button" data-target="settingsSectionCompte">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c1.3-3.6 4.2-5.5 7.5-5.5s6.2 1.9 7.5 5.5"/></svg>
+          <span data-i18n="settings.rail.account">Compte</span>
+        </button>
+        <button class="railbtn" type="button" data-target="settingsSectionPwd">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="10.5" width="14" height="9.5" rx="1.6"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>
+          <span data-i18n="settings.rail.pwd">Mot de passe</span>
+        </button>
+        <button class="railbtn" type="button" data-target="settingsSectionSub">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10.5h18"/></svg>
+          <span data-i18n="settings.rail.sub">Abonnement</span>
+        </button>
+        <button class="railbtn" type="button" data-target="settingsSectionDelete">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 12.5h9l1-12.5M10 11v5.5M14 11v5.5"/></svg>
+          <span data-i18n="settings.rail.delete">Suppression</span>
+        </button>
+      </nav>
+
+      <div class="modal-content" id="settingsContent">
+
+        <div class="msection" id="settingsSectionCompte">
+          <div class="msection-head">
+            <div class="htxt">
+              <span class="sicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c1.3-3.6 4.2-5.5 7.5-5.5s6.2 1.9 7.5 5.5"/></svg></span>
+              <div><h3 data-i18n="settings.account.h">Compte</h3><p data-i18n="settings.account.p">Vos informations personnelles et votre adresse e-mail</p></div>
+            </div>
+          </div>
+          <div class="msection-body">
+            <div class="minfo-row" id="settingsEmailRow"><span class="label" data-i18n="settings.account.email">E-mail</span><span class="value" id="settingsEmail">-</span></div>
+            <!-- 16/10/2026 : visible seulement en mode invité -->
+            <div class="minfo-row" id="settingsGuestRow" style="display:none"><span class="label" data-i18n="guest.name">Invité</span><span class="value">
+              <a class="mbtn primary" id="settingsGuestBtn" href="login.html?signup=1" data-i18n="guest.create">Créer un compte</a></span></div>
+            <!-- 06/10/2026 — langue de préférence du compte : interface et e-mails -->
+            <div class="minfo-row"><span class="label" data-i18n="settings.lang.label">Langue</span><span class="value">
+              <img id="settingsLangFlag" alt="" width="20" height="14" style="margin-right:8px;border-radius:2px;vertical-align:middle">
+              <select id="settingsLang" class="langselect" data-i18n-aria="settings.lang.label">
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+              </select></span></div>
+            <div class="minfo-row" id="settingsCreatedRow"><span class="label" data-i18n="settings.account.since">Membre depuis</span><span class="value" id="settingsCreated">-</span></div>
+            <!-- 09/10/2026 : relancer le tutoriel d'accueil -->
+            <div class="minfo-row"><span class="label" data-i18n="settings.tour.label">Tutoriel</span><span class="value">
+              <button class="mbtn" id="settingsTourBtn" type="button" data-i18n="settings.tour.btn">Revoir le tutoriel</button></span></div>
+          </div>
+          <p class="mnote" id="settingsLangNote" aria-live="polite" data-i18n="settings.lang.note" style="margin-top:10px">Langue de l'interface et des e-mails que vous recevez.</p>
+        </div>
+
+        <div class="msection" id="settingsSectionPwd">
+          <div class="msection-head">
+            <div class="htxt">
+              <span class="sicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="10.5" width="14" height="9.5" rx="1.6"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg></span>
+              <div><h3 data-i18n="settings.pwd.h">Mot de passe</h3><p data-i18n="settings.pwd.p">Modifiez votre mot de passe pour sécuriser votre compte</p></div>
+            </div>
+          </div>
+          <div class="mform-group">
+            <label for="settingsNewPwd" data-i18n="settings.pwd.new">Nouveau mot de passe</label>
+            <input type="password" id="settingsNewPwd" autocomplete="new-password" placeholder="8 caractères minimum" data-i18n-ph="settings.pwd.ph">
+          </div>
+          <div class="mform-group">
+            <label for="settingsConfirmPwd" data-i18n="settings.pwd.confirm">Confirmer le nouveau mot de passe</label>
+            <input type="password" id="settingsConfirmPwd" autocomplete="new-password">
+          </div>
+          <div class="msection-actions">
+            <p class="mnote" id="settingsPwdMsg"></p>
+            <button class="mbtn primary" id="settingsPwdBtn" type="button" style="align-self:flex-start" data-i18n="settings.pwd.btn">Mettre à jour le mot de passe</button>
+          </div>
+        </div>
+
+        <div class="msection" id="settingsSectionSub">
+          <div class="msection-head">
+            <div class="htxt">
+              <span class="sicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10.5h18"/></svg></span>
+              <div><h3 data-i18n="settings.sub.h">Abonnement</h3><p data-i18n="settings.sub.p">Votre offre et vos options d'abonnement</p></div>
+            </div>
+          </div>
+          <div class="planrow">
+            <span class="planbadge" id="settingsPlanBadge">-</span>
+            <div class="ptxt">
+              <div class="t1" id="settingsPlanName">-</div>
+              <div class="t2" id="settingsPlanDesc">-</div>
+            </div>
+            <span class="pstatus" id="settingsSubStatusDot"><span class="sdot"></span><span id="settingsSubStatusText">-</span></span>
+          </div>
+          <p class="mnote" id="settingsSubNote" style="margin:0 0 12px"></p>
+          <!-- Administrateur seulement : choix de la vue (accès complet, ou plan simulé) -->
+          <div id="settingsSimRow" style="display:none">
+            <div class="planrow">
+              <div class="ptxt">
+                <div class="t1" data-i18n="sim.label">Voir comme</div>
+                <div class="t2" data-i18n="sim.note">Testez le site avec le plan d'un compte gratuit, bêta ou individuel. Vous restez administrateur.</div>
+              </div>
+              <select id="settingsSim" class="langselect" data-i18n-aria="sim.label">
+                <option value="" data-i18n="sim.opt.admin">Administrateur</option>
+                <option value="free" data-i18n="sim.opt.free">Gratuit</option>
+                <option value="beta" data-i18n="sim.opt.beta">Bêta</option>
+                <option value="individuel" data-i18n="sim.opt.individuel">Individuel</option>
+              </select>
+            </div>
+            <p class="mnote" id="settingsSimNote" aria-live="polite" style="margin:0 0 12px"></p>
+          </div>
+          <div class="msection-actions">
+            <button class="mbtn primary" id="settingsSubBtn" type="button">-</button>
+          </div>
+        </div>
+
+        <!-- 04/10/2026 — suppression du compte : effacement immédiat et complet,
+             fait côté serveur par l'Edge Function "delete-account" (seule à
+             détenir la clé d'administration). Confirmation par saisie d'un mot. -->
+        <div class="msection" id="settingsSectionDelete">
+          <div class="msection-head">
+            <div class="htxt">
+              <span class="sicon" style="color:var(--alert)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 12.5h9l1-12.5M10 11v5.5M14 11v5.5"/></svg></span>
+              <div><h3 data-i18n="settings.del.h">Supprimer mon compte</h3><p data-i18n="settings.del.p">Effacement immédiat et définitif de toutes vos données</p></div>
+            </div>
+          </div>
+          <ul class="mdelete-list">
+            <li data-i18n="settings.del.li1">Vos instruments, vos résultats et leurs images sont effacés immédiatement, sans récupération possible.</li>
+            <li data-i18n="settings.del.li2">Votre abonnement est arrêté tout de suite : aucun nouveau prélèvement, et la période déjà payée n'est pas remboursée.</li>
+            <li data-i18n="settings.del.li3">Vos factures restent conservées par notre prestataire de paiement (Stripe), comme l'exigent nos obligations comptables.</li>
+          </ul>
+          <div class="mform-group">
+            <label for="settingsDeleteConfirm" id="settingsDeleteLabel">Pour confirmer, tapez SUPPRIMER</label>
+            <input type="text" id="settingsDeleteConfirm" autocomplete="off" spellcheck="false">
+          </div>
+          <div class="msection-actions">
+            <p class="mnote" id="settingsDeleteMsg"></p>
+            <button class="mbtn danger" id="settingsDeleteBtn" type="button" style="align-self:flex-start" disabled data-i18n="settings.del.btn">Supprimer définitivement mon compte</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bibliothèque Supabase hébergée avec le site (dossier vendor/), version figée. -->
+<script src="vendor/supabase.js"></script>
+<script src="supabase-client.js"></script>
+<!-- Instrument d'exemple ajouté aux nouveaux comptes (fichier facultatif) -->
+<script src="instrument-exemple.js"></script>
+<script>
+(async function(){
+  var session = await requireAuth();
+  if(!session) return; // requireAuth redirige déjà vers login.html si besoin
+
+  // URL des Edge Functions Supabase (Stripe Checkout / portail client).
+  // L'adresse des fonctions se déduit de celle du projet (supabase-client.js) :
+  // un seul endroit à changer si le projet déménage.
+  var FUNCTIONS_URL = SUPABASE_URL + "/functions/v1";
+
+  // ===================== Topbar : utilisateur réel =====================
+  // 16/10/2026 : mode invité (essai sans compte, voir supabase-client.js). Seul l'affichage change :
+  // aucun appel à Supabase ni au serveur de calcul n'est fait en invité.
+  var guest = !!session.guest;
+  var email = session.user.email || "";
+  if(guest){
+    document.getElementById("userEmail").textContent = t("guest.name");
+    document.getElementById("userAvatar").textContent = "?";
+    var soBtn = document.getElementById("signOutBtn");
+    soBtn.removeAttribute("data-i18n-aria"); soBtn.removeAttribute("data-i18n-title");
+    soBtn.removeAttribute("aria-label"); soBtn.removeAttribute("title");
+    soBtn.className = "mbtn primary";
+    soBtn.textContent = t("guest.create");
+    soBtn.addEventListener("click", function(){ window.location.href = "login.html?signup=1"; });
+  } else {
+    document.getElementById("userEmail").textContent = email;
+    document.getElementById("userAvatar").textContent = email.slice(0, 2).toUpperCase();
+    document.getElementById("signOutBtn").addEventListener("click", signOut);
+  }
+
+  // ===================== Mode invité : info-bulle et fenêtre d'invitation =====================
+  var guestOverlay = document.getElementById("guestOverlay");
+  var guestTip = document.getElementById("guestTip");
+  var guestLastFocus = null;
+  function openGuestInvite(){
+    guestLastFocus = document.activeElement;
+    guestTip.hidden = true;
+    guestOverlay.classList.add("open");
+    document.getElementById("guestGoBtn").focus();
+  }
+  function closeGuestInvite(){
+    guestOverlay.classList.remove("open");
+    if(guestLastFocus && guestLastFocus.focus) guestLastFocus.focus();
+  }
+  document.getElementById("guestCloseBtn").addEventListener("click", closeGuestInvite);
+  document.getElementById("guestLaterBtn").addEventListener("click", closeGuestInvite);
+  guestOverlay.addEventListener("click", function(e){ if(e.target === guestOverlay) closeGuestInvite(); });
+  document.addEventListener("keydown", function(e){
+    if(!guestOverlay.classList.contains("open")) return;
+    if(e.key === "Escape"){ e.stopPropagation(); closeGuestInvite(); return; }
+    if(e.key === "Tab"){   // le focus reste dans la fenêtre
+      var f = [document.getElementById("guestCloseBtn"), document.getElementById("guestLaterBtn"), document.getElementById("guestGoBtn")];
+      var i = f.indexOf(document.activeElement);
+      e.preventDefault();
+      f[(i + (e.shiftKey ? f.length - 1 : 1)) % f.length].focus();
+    }
+  }, true);
+  function lockForGuest(el){
+    el.classList.add("guestlock");
+    el.setAttribute("aria-disabled", "true");
+    el.setAttribute("data-guest-tip", t("guest.tip"));
+  }
+  function showGuestTip(el){
+    guestTip.textContent = el.getAttribute("data-guest-tip");
+    guestTip.hidden = false;
+    var r = el.getBoundingClientRect();
+    var w = guestTip.offsetWidth, h = guestTip.offsetHeight;
+    var x = Math.max(8, Math.min(window.innerWidth - w - 8, r.left + r.width / 2 - w / 2));
+    var y = r.bottom + 8;
+    if(y + h > window.innerHeight - 8) y = Math.max(8, r.top - h - 8);
+    guestTip.style.left = x + "px"; guestTip.style.top = y + "px";
+  }
+  if(guest){
+    document.addEventListener("mouseover", function(e){
+      var el = e.target.closest && e.target.closest("[data-guest-tip]");
+      if(el) showGuestTip(el); else guestTip.hidden = true;
+    });
+    document.addEventListener("focusin", function(e){
+      var el = e.target.closest && e.target.closest("[data-guest-tip]");
+      if(el) showGuestTip(el); else guestTip.hidden = true;
+    });
+    document.addEventListener("focusout", function(){ guestTip.hidden = true; });
+    window.addEventListener("scroll", function(){ guestTip.hidden = true; }, true);
+    // « Créer un instrument » : grisé, ouvre l'invitation
+    var createLink = document.querySelector("a.createbtn");
+    lockForGuest(createLink);
+    createLink.addEventListener("click", function(e){ e.preventDefault(); openGuestInvite(); });
+    // « Sélectionner » : idem
+    lockForGuest(document.getElementById("btnInstSel"));
+  }
+
+  var ICON_CAL = "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.6'><rect x='4' y='5' width='16' height='15' rx='1.5'/><path d='M4 9h16M8 3v4M16 3v4'/></svg>";
+  var ICON_CLOCK = "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.6'><circle cx='12' cy='12' r='8.5'/><path d='M12 7.5V12l3 2'/></svg>";
+
+  function formatDate(iso){
+    var d = new Date(iso);
+    return d.toLocaleDateString(nysaLocale(), {day:"numeric", month:"short", year:"numeric"});
+  }
+  function timeAgo(iso){
+    var diffMs = Date.now() - new Date(iso).getTime();
+    var days = Math.floor(diffMs / 86400000);
+    if(days <= 0) return t("time.today");
+    if(days === 1) return t("time.yesterday");
+    return t("time.days_ago", { n: days });
+  }
+
+  // ===================== Chargement des vraies données (Supabase) =====================
+  // Suppression douce (04/10/2026) : « supprimer » un instrument ne l'efface
+  // plus, il reçoit une date dans la colonne deleted_at et n'est plus
+  // listé. Il reste restaurable depuis Supabase (remettre deleted_at à
+  // NULL) jusqu'à la purge. Nécessite la colonne instruments.deleted_at
+  // (cf. migration SQL fournie avec ce fichier).
+  var instruments = null, instErr = null;
+  if(guest){
+    // Invité : seul l'instrument d'exemple (instrument-exemple.js), en lecture seule, construit ici.
+    if(typeof NYSA_EXAMPLE_INSTRUMENT !== "undefined"){
+      var nowIso = new Date().toISOString();
+      instruments = [{
+        id: "example",
+        name: NYSA_EXAMPLE_INSTRUMENT.name[nysaLang()] || NYSA_EXAMPLE_INSTRUMENT.name.en,
+        config: JSON.parse(JSON.stringify(NYSA_EXAMPLE_INSTRUMENT.config)),
+        created_at: nowIso, updated_at: nowIso
+      }];
+    } else { instruments = []; }
+  } else {
+    var instRes = await supabaseClient
+      .from("instruments")
+      .select("*")
+      .is("deleted_at", null)
+      .order("updated_at", { ascending: false });
+    instruments = instRes.data; instErr = instRes.error;
+    if(instErr) console.error("Erreur chargement instruments :", instErr);
+  }
+
+  // 06/10/2026 — instrument d'exemple, créé une seule fois par compte.
+  // À la première visite d'un compte sans aucun instrument, on lui ajoute
+  // l'instrument décrit dans instrument-exemple.js : il sert de point de
+  // départ pour lancer une première simulation. Le compte en garde la
+  // trace (example_created) : si l'utilisateur supprime l'exemple, il ne
+  // revient pas. Sans le fichier instrument-exemple.js, rien n'est créé.
+  try {
+    var meta = session.user.user_metadata || {};
+    if(!guest && typeof NYSA_EXAMPLE_INSTRUMENT !== "undefined" && !instErr && (instruments || []).length === 0 && !meta.example_created){
+      var lg = nysaLang();
+      var exCfg = JSON.parse(JSON.stringify(NYSA_EXAMPLE_INSTRUMENT.config));
+      var { data: exRow, error: exErr } = await supabaseClient
+        .from("instruments")
+        .insert({ name: NYSA_EXAMPLE_INSTRUMENT.name[lg] || NYSA_EXAMPLE_INSTRUMENT.name.en, config: exCfg, account_id: session.user.id })
+        .select()
+        .single();
+      if(exErr){
+        console.error("Instrument d'exemple non créé :", exErr);
+      } else {
+        instruments = [exRow];
+        // 09/10/2026 : onboarding = "welcome" fait apparaître la fenêtre de bienvenue (onboarding.js),
+        // une seule fois : les comptes existants n'ont pas cette valeur et ne la voient pas.
+        var { error: flagErr } = await supabaseClient.auth.updateUser({ data: { example_created: true, onboarding: "welcome" } });
+        if(flagErr) console.warn("Marqueur de l'instrument d'exemple non enregistré :", flagErr.message);
+        else if(window.NysaOnboarding) window.NysaOnboarding.maybeWelcome();
+      }
+    }
+  } catch(e){
+    console.error("Instrument d'exemple :", e);
+  }
+
+  // Ligne Supabase -> carte affichée (aussi utilisé après une duplication).
+  function toItem(row){
+    return {
+      id: row.id,
+      name: row.name,
+      // 04/10/2026 — brouillons : creer-instrument.html enregistre dans la
+      // config si l'instrument est incomplet (_draft), ce qui manque
+      // (_missing) et l'avancement sur les champs obligatoires (_pct). Un
+      // instrument enregistré avant ces clés est traité comme un brouillon :
+      // il n'a pas d'électronique, donc il ne peut pas servir à une simulation.
+      draft: !row.config || row.config._draft !== false,
+      missing: (row.config && row.config._missing) || [],
+      pct: (row.config && typeof row.config._pct === "number") ? row.config._pct
+           : ((row.config && row.config._draft === false) ? 100 : 0),
+      desc: (row.config && row.config.description) || "",
+      modified: formatDate(row.updated_at || row.created_at),
+      created: formatDate(row.created_at)
+    };
+  }
+  var allItems = (instruments || []).map(toItem);
+
+  // 06/10/2026 — l'encadré « Activité récente » a été remplacé par l'encadré
+  // « Confidentialité et souveraineté » : la page ne charge plus les résultats.
+
+  // ===================== Filtre (recherche par nom, complets / brouillons) =====================
+  var fSearch = document.getElementById("fInstSearch");
+  var fStatus = document.getElementById("fInstStatus");
+  fSearch.addEventListener("input", function(){ render(); });
+  fStatus.addEventListener("change", function(){ render(); });
+
+  // ===================== Rendu des cartes =====================
+  var list = document.getElementById("instList");
+  var selMode = false, selIds = {};   // sélection multiple (12/10/2026)
+
+  function render(){
+    var q = fSearch.value.trim().toLowerCase();
+    var status = fStatus.value;
+    var items = allItems.filter(function(it){
+      if(status === "draft" && !it.draft) return false;
+      if(status === "complete" && it.draft) return false;
+      if(q && (String(it.name) + " " + String(it.desc)).toLowerCase().indexOf(q) === -1) return false;
+      return true;
+    });
+
+    // Filtre visible dès qu'il y a des instruments ; compteur « n sur N » quand il filtre.
+    document.getElementById("instFilters").hidden = allItems.length === 0;
+    document.getElementById("fInstCount").textContent = items.length === allItems.length
+      ? t(allItems.length === 1 ? "home.count_one" : "home.count_many", { n: allItems.length })
+      : t("res.count_of", { shown: items.length, total: allItems.length });
+
+    if(items.length === 0){
+      var none = allItems.length > 0;   // des instruments existent, mais aucun ne correspond au filtre
+      list.innerHTML = "<div class='instcard empty'><div class='elab'>" + t(none ? "inst.nomatch" : "inst.empty.title") + "</div>"+
+        (none ? "" : "<p class='esub'>" + t("inst.empty.sub") + "</p>") + "</div>";
+      return;
+    }
+    list.innerHTML = "";
+    list.scrollLeft = 0;
+    list.classList.toggle("selmode", selMode);
+    items.forEach(function(it){
+      var a = document.createElement("a");
+      a.className = "instcard" + (it.draft ? " draft" : "");
+      a.href = "creer-instrument.html?id=" + it.id;
+      a.dataset.id = it.id;
+      if(selIds[it.id]) a.classList.add("sel");
+      // Carte d'un brouillon : tag, ce qui manque à la place de la
+      // description, avancement réel, et « Compléter » au lieu d'« Ouvrir ».
+      var desc = it.desc;
+      if(it.draft){
+        desc = it.missing.length
+          ? t("inst.missing", { list: it.missing.slice(0, 4).map(tField).join(", ") + (it.missing.length > 4 ? "…" : ".") })
+          : t("inst.draft.desc");
+      }
+      a.innerHTML =
+        "<div class='body'>"+
+          "<div class='titlerow'>"+
+            "<div class='titleblock'><div class='name'>"+escH(it.name)+"</div>"+
+            (it.draft ? "<span class='draftbadge'>" + t("inst.badge.draft") + "</span>" : "")+"</div>"+
+            "<div class='menuwrap'>"+
+              "<button class='menubtn' type='button' aria-label='" + t("inst.menu.options") + "' data-menu-toggle data-id='"+it.id+"'>⋮</button>"+
+              "<span class='selbox' aria-hidden='true'>✓</span>"+
+              "<div class='dropdown' data-menu='"+it.id+"'>"+
+                "<button type='button' data-action='rename' data-id='"+it.id+"'>" + t("inst.menu.rename") + "</button>"+
+                "<button type='button' data-action='duplicate' data-id='"+it.id+"'>" + t("inst.menu.duplicate") + "</button>"+
+                "<button type='button' class='danger' data-action='delete' data-id='"+it.id+"'>" + t("inst.menu.delete") + "</button>"+
+              "</div>"+
+            "</div>"+
+          "</div>"+
+          (desc ? "<p class='desc'>"+escH(desc)+"</p>" : "")+
+          "<div><div class='pctrow'><span>"+(it.draft ? t("inst.config.incomplete") : t("inst.config.complete"))+"</span><span>"+it.pct+" %</span></div>"+
+          "<div class='track'><div class='fill' style='width:"+it.pct+"%'></div></div></div>"+
+          "<div class='datesrow'>"+
+            "<span>"+ICON_CAL+t("inst.modified", { date: it.modified })+"</span>"+
+            "<span>"+ICON_CLOCK+t("inst.created", { date: it.created })+"</span>"+
+          "</div>"+
+          "<div class='openrow'><span class='openbtn'>"+(it.draft ? t("inst.complete_cta") : t("inst.open"))+"</span></div>"+
+        "</div>";
+      list.appendChild(a);
+    });
+    if(guest) list.querySelectorAll(".dropdown button").forEach(lockForGuest);
+    updateCarousel();
+    if(selMode) refreshSel();
+  }
+
+  // ===================== Sélection multiple et suppression groupée (12/10/2026) =====================
+  // « Sélectionner » remplace le menu ⋮ de chaque carte par une case ; un clic sur la carte la coche
+  // au lieu d'ouvrir l'instrument. « Tout sélectionner » et la suppression ne portent que sur les
+  // cartes visibles (filtres compris). Suppression douce, comme pour une carte seule.
+  function visibleItems(){
+    var q = fSearch.value.trim().toLowerCase(), status = fStatus.value;
+    return allItems.filter(function(it){
+      if(status === "draft" && !it.draft) return false;
+      if(status === "complete" && it.draft) return false;
+      if(q && (String(it.name) + " " + String(it.desc)).toLowerCase().indexOf(q) === -1) return false;
+      return true;
+    });
+  }
+  function refreshSel(){
+    var vis = visibleItems(), sel = vis.filter(function(it){ return selIds[it.id]; });
+    list.querySelectorAll(".instcard[data-id]").forEach(function(c){ c.classList.toggle("sel", !!selIds[c.dataset.id]); });
+    document.getElementById("instSelCount").textContent = t(sel.length === 1 ? "sel.count_one" : "sel.count_many", { n: sel.length });
+    var del = document.getElementById("instSelDelete");
+    del.textContent = t("sel.delete", { n: sel.length }); del.disabled = sel.length === 0;
+    var all = document.getElementById("instSelAll");
+    all.textContent = (vis.length > 0 && sel.length === vis.length) ? t("sel.none") : t("sel.all");
+    all.disabled = vis.length === 0;
+  }
+  function setSelMode(on){
+    selMode = on; selIds = {};
+    document.getElementById("instSelBar").hidden = !on;
+    document.getElementById("btnInstSel").classList.toggle("on", on);
+    closeAllMenus();
+    render();
+  }
+  document.getElementById("btnInstSel").addEventListener("click", function(){
+    if(guest){ openGuestInvite(); return; }
+    setSelMode(!selMode);
+  });
+  document.getElementById("instSelCancel").addEventListener("click", function(){ setSelMode(false); });
+  document.getElementById("instSelAll").addEventListener("click", function(){
+    var vis = visibleItems();
+    var allOn = vis.length > 0 && vis.every(function(it){ return selIds[it.id]; });
+    vis.forEach(function(it){ if(allOn) delete selIds[it.id]; else selIds[it.id] = true; });
+    refreshSel();
+  });
+  document.addEventListener("keydown", function(e){ if(e.key === "Escape" && selMode) setSelMode(false); });
+  document.getElementById("instSelDelete").addEventListener("click", async function(){
+    var ids = visibleItems().filter(function(it){ return selIds[it.id]; }).map(function(it){ return it.id; });
+    var n = ids.length;
+    if(!n) return;
+    if(!confirm(t(n === 1 ? "sel.confirm.inst_one" : "sel.confirm.inst_many", { n: n }))) return;
+    var btn = this;
+    btn.disabled = true; btn.textContent = t("sel.progress", { i: n, n: n });
+    var { data: done, error } = await supabaseClient.from("instruments")
+      .update({ deleted_at: new Date().toISOString() })
+      .in("id", ids)
+      .select("id");
+    if(error){
+      console.error("Erreur suppression groupée d'instruments :", error);
+      alert(t("home.err.delete", { msg: error.message }));
+      refreshSel();
+      return;
+    }
+    var okIds = {};
+    (done || []).forEach(function(r){ okIds[r.id] = true; });
+    allItems = allItems.filter(function(i){ return !okIds[i.id]; });
+    var fail = n - (done || []).length;
+    setSelMode(false);
+    if(fail) alert(t("sel.partial", { ok: n - fail, fail: fail }));
+  });
+
+  // ===================== Carrousel =====================
+  var carPrev = document.getElementById("carPrev"), carNext = document.getElementById("carNext"), carDots = document.getElementById("carDots");
+  function carPages(){
+    var cards = list.querySelectorAll(".instcard:not(.empty)");
+    if(!cards.length) return 1;
+    var step = list.clientWidth + 14;
+    return Math.max(1, Math.ceil((list.scrollWidth - 4) / step));
+  }
+  function updateCarousel(){
+    var pages = carPages();
+    var atEnd = list.scrollLeft + list.clientWidth >= list.scrollWidth - 4;
+    // La dernière page est souvent plus courte (4 cartes pour 3 visibles) : en fin de course, on allume le dernier point.
+    var page = atEnd ? pages - 1 : Math.min(pages - 1, Math.round(list.scrollLeft / (list.clientWidth + 14)));
+    var multi = pages > 1;
+    carPrev.disabled = list.scrollLeft < 4;
+    carNext.disabled = list.scrollLeft + list.clientWidth >= list.scrollWidth - 4;
+    carDots.innerHTML = "";
+    if(multi){
+      for(var i = 0; i < pages; i++){
+        var d = document.createElement("button");
+        d.type = "button"; d.className = i === page ? "on" : "";
+        d.setAttribute("aria-label", (i + 1) + " / " + pages);
+        d.dataset.page = i;
+        carDots.appendChild(d);
+      }
+    }
+  }
+  function carGo(dir){ list.scrollBy({ left: dir * (list.clientWidth + 14), behavior: "smooth" }); }
+  carPrev.addEventListener("click", function(){ carGo(-1); });
+  carNext.addEventListener("click", function(){ carGo(1); });
+  carDots.addEventListener("click", function(e){
+    var b = e.target.closest("button[data-page]");
+    if(b) list.scrollTo({ left: b.dataset.page * (list.clientWidth + 14), behavior: "smooth" });
+  });
+  var carTimer = null;
+  list.addEventListener("scroll", function(){ clearTimeout(carTimer); carTimer = setTimeout(updateCarousel, 60); });
+  window.addEventListener("resize", updateCarousel);
+  render();
+
+  // ===================== Menu "⋮" des cartes instrument (Renommer / Dupliquer / Supprimer) =====================
+  function closeAllMenus(){
+    list.querySelectorAll(".dropdown.open").forEach(function(d){ d.classList.remove("open"); });
+  }
+
+  list.addEventListener("click", async function(e){
+    // Mode sélection : un clic sur une carte la coche (les cartes sont des liens : on bloque l'ouverture)
+    if(selMode){
+      var card = e.target.closest(".instcard[data-id]");
+      if(card){
+        e.preventDefault(); e.stopPropagation();
+        if(selIds[card.dataset.id]) delete selIds[card.dataset.id]; else selIds[card.dataset.id] = true;
+        refreshSel();
+      }
+      return;
+    }
+    // Ouvrir/fermer le menu
+    var toggle = e.target.closest("[data-menu-toggle]");
+    if(toggle){
+      e.preventDefault();
+      e.stopPropagation();
+      var dd = list.querySelector(".dropdown[data-menu='"+toggle.dataset.id+"']");
+      var wasOpen = dd.classList.contains("open");
+      closeAllMenus();
+      if(!wasOpen) dd.classList.add("open");
+      return;
+    }
+
+    // Action choisie dans le menu
+    var actionBtn = e.target.closest("[data-action]");
+    if(!actionBtn){
+      closeAllMenus(); // clic ailleurs dans la liste (ex. sur la carte) → on ferme
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    closeAllMenus();
+    if(guest){ openGuestInvite(); return; }
+
+    var id = actionBtn.dataset.id;
+    var action = actionBtn.dataset.action;
+
+    if(action === "delete"){
+      var toDelete = allItems.find(function(i){ return String(i.id) === String(id); });
+      var ok = confirm(t("home.confirm.delete_one", { name: (toDelete ? toDelete.name : "") }));
+      if(!ok) return;
+      var { error } = await supabaseClient.from("instruments")
+        .update({ deleted_at: new Date().toISOString() })
+        .eq("id", id);
+      if(error){
+        console.error("Erreur suppression instrument :", error);
+        alert(t("home.err.delete", { msg: error.message }));
+        return;
+      }
+      allItems = allItems.filter(function(i){ return String(i.id) !== String(id); });
+      render();
+      return;
+    }
+
+    if(action === "rename"){
+      var toRename = allItems.find(function(i){ return String(i.id) === String(id); });
+      var newName = prompt(t("home.prompt.rename"), toRename ? toRename.name : "");
+      if(newName === null || newName.trim() === "") return;
+      newName = newName.trim();
+      var { error } = await supabaseClient
+        .from("instruments")
+        .update({ name: newName, updated_at: new Date().toISOString() })
+        .eq("id", id);
+      if(error){
+        console.error("Erreur renommage instrument :", error);
+        alert(t("home.err.rename", { msg: error.message }));
+        return;
+      }
+      toRename.name = newName;
+      toRename.modified = formatDate(new Date().toISOString());
+      render();
+      return;
+    }
+
+    if(action === "duplicate"){
+      // On relit la ligne complète en base pour dupliquer fidèlement sa config
+      // (allItems ne garde qu'un sous-ensemble mappé des colonnes).
+      var { data: original, error: fetchErr } = await supabaseClient
+        .from("instruments").select("*").eq("id", id).single();
+      if(fetchErr || !original){
+        console.error("Erreur lecture instrument à dupliquer :", fetchErr);
+        alert(t("home.err.duplicate"));
+        return;
+      }
+      var { data: inserted, error: insErr } = await supabaseClient
+        .from("instruments")
+        .insert({ name: original.name + t("home.copy_suffix"), config: original.config, account_id: session.user.id })
+        .select()
+        .single();
+      if(insErr){
+        console.error("Erreur duplication instrument :", insErr);
+        alert(t("home.err.duplicate_msg", { msg: insErr.message }));
+        return;
+      }
+      allItems.unshift(toItem(inserted)); // la copie garde le tag brouillon de l'original
+      render();
+      return;
+    }
+  });
+
+  // Fermer les menus ouverts au clic en dehors de la liste
+  document.addEventListener("click", function(e){
+    if(!list.contains(e.target)) closeAllMenus();
+  });
+
+  // ===================== Paramètres (modal) =====================
+  // L'abonnement est lu dans "account_entitlements" : table server-owned,
+  // en lecture seule pour le client (aucune policy INSERT/UPDATE pour le
+  // rôle authenticated). Seul le webhook Stripe, qui tourne avec la clé
+  // service_role, peut y écrire. Un utilisateur ne peut donc pas se
+  // passer en plan payant depuis le navigateur.
+  //
+  // ATTENTION : cet affichage n'est qu'un garde-fou d'interface. Le vrai
+  // contrôle d'accès doit être fait par l'API de simulation (FastAPI),
+  // qui doit vérifier le plan avant de lancer un calcul.
+  var entitlement = { plan: "free", subscription_status: "inactive", current_period_end: null };
+
+  // 05/10/2026 — bêta gratuite : tout compte reçoit l'accès au simulateur
+  // jusqu'à la fin de la bêta. C'est la base qui l'accorde (fonction
+  // claim_beta_access, cf. beta-gratuite.sql) : elle écrit une vraie ligne
+  // d'abonnement, celle que le serveur de simulation vérifie. Elle ne fait
+  // rien pour un abonné payant, ni après la date de fin. Si la fonction
+  // n'existe pas encore, l'appel échoue sans conséquence.
+  try {
+    if(!guest && typeof supabaseClient.rpc === "function"){
+      var betaRes = await supabaseClient.rpc("claim_beta_access");
+      if(betaRes && betaRes.error) console.warn("Accès bêta non accordé :", betaRes.error.message);
+    }
+  } catch(e){ console.warn("Accès bêta non accordé :", e); }
+
+  if(!guest){
+    var { data: entRow, error: entErr } = await supabaseClient
+      .from("account_entitlements")
+      .select("*") // toute la ligne : si la colonne cancel_at_period_end n'existe pas encore, la lecture ne casse pas
+      .maybeSingle();
+    if(entErr) console.error("Erreur chargement abonnement :", entErr);
+    if(entRow) entitlement = applySimulatedPlan(entRow);
+  }
+
+  var overlay = document.getElementById("settingsOverlay");
+  var planBadge = document.getElementById("settingsPlanBadge");
+  var planName = document.getElementById("settingsPlanName");
+  var planDesc = document.getElementById("settingsPlanDesc");
+  var subStatusDot = document.getElementById("settingsSubStatusDot");
+  var subStatusText = document.getElementById("settingsSubStatusText");
+  var subNote = document.getElementById("settingsSubNote");
+  var subBtn = document.getElementById("settingsSubBtn");
+
+  document.getElementById("settingsEmail").textContent = email;
+  // Langue de préférence : la liste montre la langue en cours ; un changement
+  // l'enregistre avec le compte et recharge la page (setNysaLang, i18n.js).
+  var langSel = document.getElementById("settingsLang");
+  langSel.value = nysaLang();
+  var langFlag = document.getElementById("settingsLangFlag");
+  function showLangFlag(){ if(window.nysaFlagSrc) langFlag.src = window.nysaFlagSrc(langSel.value); }
+  showLangFlag();
+  langSel.addEventListener("change", showLangFlag);
+  // Compte créé avant l'ajout de cette préférence : on y enregistre la langue
+  // affichée, pour que ses e-mails aient une langue définie.
+  var accountLang = session.user.user_metadata ? session.user.user_metadata.lang : null;
+  if(!guest && accountLang !== "en" && accountLang !== "fr" && supabaseClient.auth.updateUser){
+    supabaseClient.auth.updateUser({ data: { lang: nysaLang() } }).catch(function(e){ console.warn("Préférence de langue non enregistrée :", e); });
+  }
+  var langNote = document.getElementById("settingsLangNote");
+  langSel.addEventListener("change", function(){
+    langSel.disabled = true;
+    setNysaLang(langSel.value, function(state){
+      if(state === "saving") langNote.textContent = t("settings.lang.saving");
+      else if(state === "saved") langNote.textContent = t("settings.lang.saved");
+      else {                                  // échec : on reste dans la langue actuelle
+        langNote.textContent = t("settings.lang.error");
+        langSel.value = nysaLang();
+        langSel.disabled = false;
+      }
+    });
+  });
+  document.getElementById("settingsCreated").textContent = session.user.created_at
+    ? formatDate(session.user.created_at) : "-";
+  if(guest){
+    // Paramètres réduits : langue, tutoriel, et un bloc « Créer un compte ».
+    ["settingsSectionPwd", "settingsSectionSub", "settingsSectionDelete"].forEach(function(id){
+      document.getElementById(id).style.display = "none";
+      var rb = document.querySelector(".railbtn[data-target='" + id + "']");
+      if(rb) rb.style.display = "none";
+    });
+    document.getElementById("settingsEmailRow").style.display = "none";
+    document.getElementById("settingsCreatedRow").style.display = "none";
+    document.getElementById("settingsGuestRow").style.display = "";
+    langNote.removeAttribute("data-i18n");
+    langNote.textContent = t("guest.settings.note");
+  }
+
+  // Même règle que le serveur (main.py, _require_active_plan) : plan payant,
+  // statut « active », et échéance absente ou future. Avant le 04/10/2026,
+  // l'échéance n'était pas regardée ici : un accès attribué à la main et
+  // expiré s'affichait encore comme « Actif ».
+  // Marge de 2 jours après l'échéance, identique à celle du serveur
+  // (main.py, _PERIOD_GRACE_DAYS) : un retard du webhook Stripe au moment
+  // d'un renouvellement ne doit pas faire passer un abonné pour non abonné.
+  var PERIOD_GRACE_MS = 2 * 24 * 3600 * 1000;
+  function isSubscribed(){
+    if(entitlement.plan === "free" || entitlement.subscription_status !== "active") return false;
+    if(entitlement.current_period_end
+       && new Date(entitlement.current_period_end).getTime() + PERIOD_GRACE_MS <= Date.now()) return false;
+    return true;
+  }
+
+  // Accès bêta : accordé par la base (beta_access), sans abonnement Stripe.
+  // Dès qu'un vrai abonnement existe, le compte est traité comme un abonné.
+  function isBeta(){
+    return entitlement.beta_access === true && !entitlement.stripe_subscription_id;
+  }
+
+  function renderSubscription(){
+    subBtn.hidden = false;
+    if(entitlement.isAdmin && !entitlement.simulated){
+      // Administrateur sans simulation : accès complet, quel que soit le plan réel en base.
+      planBadge.textContent = t("sub.badge.admin");
+      planBadge.classList.remove("free");
+      planName.textContent = t("sub.admin.name");
+      planDesc.textContent = t("sub.admin.desc");
+      subStatusDot.className = "pstatus";
+      subStatusText.textContent = t("sub.status.active");
+      subNote.className = "mnote";
+      subNote.textContent = "";
+      subBtn.hidden = true;
+
+    } else if(isSubscribed() && isBeta()){
+      // 05/10/2026 — bêta gratuite : aucun prix, aucun abonnement à gérer.
+      planBadge.textContent = t("sub.badge.beta");
+      planBadge.classList.remove("free");
+      planName.textContent = t("sub.beta.name");
+      planDesc.textContent = t("sub.beta.desc");
+      subStatusDot.className = "pstatus";
+      subStatusText.textContent = t("sub.status.active");
+      subNote.className = "mnote";
+      subNote.textContent = entitlement.current_period_end
+        ? t("sub.beta.until", { date: formatDate(entitlement.current_period_end) })
+        : t("sub.beta.active");
+      subBtn.hidden = true;
+
+    } else if(isSubscribed()){
+      planBadge.textContent = t("sub.badge.individual");
+      planBadge.classList.remove("free");
+      planName.textContent = t("sub.plan.individual");
+      planDesc.textContent = t("sub.full");   // 05/10/2026 — plus de prix affiché pendant la bêta
+      subStatusDot.className = "pstatus";
+      subStatusText.textContent = t("sub.status.active");
+      // 04/10/2026 — date affichée sous l'offre : renouvellement, ou fin
+      // d'accès si l'abonnement a été résilié (il reste actif jusqu'à la
+      // fin de la période payée). Les deux informations viennent du
+      // webhook Stripe (current_period_end, cancel_at_period_end).
+      if(entitlement.current_period_end && entitlement.cancel_at_period_end){
+        subNote.className = "mnote warn";
+        subNote.textContent = t("sub.cancelled_until", { date: formatDate(entitlement.current_period_end) });
+      } else {
+        subNote.className = "mnote";
+        subNote.textContent = entitlement.current_period_end
+          ? t("sub.renews", { date: formatDate(entitlement.current_period_end) })
+          : "";
+      }
+      subBtn.textContent = t("sub.manage");
+      subBtn.className = "mbtn";
+
+    } else if(entitlement.subscription_status === "past_due"){
+      planBadge.textContent = t("sub.badge.individual");
+      planBadge.classList.remove("free");
+      planName.textContent = t("sub.plan.individual");
+      planDesc.textContent = t("sub.pending");
+      subStatusDot.className = "pstatus warn";
+      subStatusText.textContent = t("sub.failed");
+      subNote.className = "mnote err";
+      subNote.textContent = t("sub.update_note");
+      subBtn.textContent = t("sub.update_btn");
+      subBtn.className = "mbtn primary";
+
+    } else {
+      planBadge.textContent = t("sub.badge.free");
+      planBadge.classList.add("free");
+      planName.textContent = t("sub.none");
+      planDesc.textContent = t("sub.none.desc");
+      subStatusDot.className = "pstatus pending";
+      subStatusText.textContent = t("sub.status.inactive");
+      subNote.className = "mnote";
+      subNote.textContent = "";
+      // 04/10/2026 — abonnement terminé : le compte reste utilisable sans
+      // simulation pendant 12 mois, puis il est supprimé avec ses données
+      // (fonction purge-lapsed-accounts, qui prévient par e-mail 30 jours
+      // avant). On affiche les deux dates. Même durée que KEEP_DAYS côté serveur.
+      if(entitlement.subscription_ended_at){
+        var endedAt = new Date(entitlement.subscription_ended_at);
+        var keptUntil = new Date(endedAt.getTime() + 365 * 24 * 3600 * 1000);
+        subNote.className = "mnote warn";
+        subNote.textContent = t("sub.ended", { end: formatDate(endedAt.toISOString()), del: formatDate(keptUntil.toISOString()) });
+      }
+      // Bêta terminée pour ce compte : on le dit, plutôt que « Aucun abonnement ».
+      if(isBeta()){
+        planName.textContent = t("sub.beta.ended.name");
+        planDesc.textContent = t("sub.beta.ended.desc");
+        if(entitlement.current_period_end){
+          subNote.className = "mnote";
+          subNote.textContent = t("sub.beta.ended.note", { date: formatDate(entitlement.current_period_end) });
+        }
+      }
+      subBtn.textContent = t("sub.subscribe");   // 05/10/2026 — plus de prix affiché (tarif décidé après la bêta)
+      subBtn.className = "mbtn primary";
+    }
+    // Vue simulée : pas de vrai paiement ni de portail Stripe sur le compte admin.
+    if(entitlement.simulated) subBtn.hidden = true;
+    subBtn.disabled = false;
+  }
+  renderSubscription();
+
+  // Administrateur : choix de la vue (accès complet, ou plan simulé gratuit / bêta / individuel).
+  // Le serveur applique le même plan (main.py, _require_active_plan).
+  if(entitlement.isAdmin){
+    var simRow = document.getElementById("settingsSimRow");
+    var simSel = document.getElementById("settingsSim");
+    var simNote = document.getElementById("settingsSimNote");
+    simRow.style.display = "";
+    simSel.value = entitlement.simulated || "";
+    simSel.addEventListener("change", async function(){
+      simSel.disabled = true;
+      simNote.textContent = t("sim.saving");
+      var err = await setSimulatedPlan(simSel.value || null);
+      if(err){
+        simNote.textContent = t("sim.error");
+        simSel.value = entitlement.simulated || "";
+        simSel.disabled = false;
+        return;
+      }
+      simNote.textContent = t("sim.saved");
+      setTimeout(function(){ window.location.reload(); }, 500);
+    });
+  }
+
+  // ---- Suppression du compte (04/10/2026) ----
+  // Le bouton n'est actif que si le mot exact est saisi. La suppression
+  // elle-même est faite par l'Edge Function "delete-account" : arrêt de
+  // l'abonnement Stripe, effacement des images, puis suppression de
+  // l'utilisateur (qui efface en cascade compte, instruments, résultats et
+  // abonnement en base). Le mot de confirmation est revérifié côté serveur.
+  var DELETE_WORD_SERVER = "SUPPRIMER";            // mot attendu par la fonction delete-account, quelle que soit la langue
+  var DELETE_WORD = t("settings.del.word");        // mot que l'utilisateur tape, dans la langue de l'interface
+  document.getElementById("settingsDeleteLabel").textContent = t("settings.del.label", { word: DELETE_WORD });
+  var delInput = document.getElementById("settingsDeleteConfirm");
+  var delBtn = document.getElementById("settingsDeleteBtn");
+  var delMsg = document.getElementById("settingsDeleteMsg");
+  delInput.addEventListener("input", function(){
+    delBtn.disabled = delInput.value.trim() !== DELETE_WORD;
+  });
+  delBtn.addEventListener("click", async function(){
+    if(delInput.value.trim() !== DELETE_WORD) return;
+    delBtn.disabled = true; delInput.disabled = true;
+    delMsg.className = "mnote"; delMsg.textContent = t("settings.del.busy");
+    var ok = false, detail = "";
+    try {
+      var { data: { session: s } } = await supabaseClient.auth.getSession();
+      if(!s){ window.location.href = "login.html"; return; }
+      var res = await fetch(FUNCTIONS_URL + "/delete-account", {
+        method: "POST",
+        headers: { "Authorization": "Bearer " + s.access_token, "Content-Type": "application/json" },
+        body: JSON.stringify({ confirm: DELETE_WORD_SERVER })
+      });
+      ok = res.ok;
+      if(!ok) detail = await res.text();
+    } catch(e){ detail = String(e); }
+
+    if(!ok){
+      console.error("delete-account :", detail);
+      delMsg.className = "mnote err";
+      delMsg.textContent = t("settings.del.fail");
+      delInput.disabled = false; delBtn.disabled = false;
+      return;
+    }
+    // Compte supprimé : on efface la session locale et on quitte l'espace personnel.
+    try { await supabaseClient.auth.signOut(); } catch(e){ /* l'utilisateur n'existe plus : sans importance */ }
+    // Ceinture et bretelles : si la déconnexion côté serveur a échoué (le
+    // compte n'existe plus), on retire quand même la session gardée par le
+    // navigateur, sinon login.html renverrait vers l'espace personnel.
+    Object.keys(localStorage).forEach(function(k){
+      if(k.indexOf("sb-") === 0 && k.indexOf("-auth-token") > 0) localStorage.removeItem(k);
+    });
+    localStorage.removeItem(SESSION_MARKER_KEY);
+    window.location.href = "login.html?reason=account_deleted";
+  });
+
+  // ---- Rail de navigation : défilement vers la section + surbrillance ----
+  var railBtns = document.querySelectorAll(".railbtn");
+  var contentEl = document.getElementById("settingsContent");
+  railBtns.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var target = document.getElementById(btn.dataset.target);
+      if(target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+  var sectionObserver = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(!entry.isIntersecting) return;
+      railBtns.forEach(function(btn){
+        btn.classList.toggle("active", btn.dataset.target === entry.target.id);
+      });
+    });
+  }, { root: contentEl, threshold: 0.5 });
+  document.querySelectorAll(".msection").forEach(function(sec){ sectionObserver.observe(sec); });
+
+  function openSettings(){ overlay.classList.add("open"); }
+  function closeSettings(){ overlay.classList.remove("open"); }
+
+  document.getElementById("settingsLink").addEventListener("click", function(e){
+    e.preventDefault();
+    openSettings();
+  });
+  // 04/10/2026 — les autres pages (Simulations, Résultats) n'ont plus leur
+  // propre fenêtre de paramètres : leur lien « Paramètres » mène ici avec
+  // ?settings=1, et la fenêtre s'ouvre directement.
+  if(new URLSearchParams(window.location.search).get("settings") === "1"){
+    openSettings();
+    history.replaceState({}, "", window.location.pathname);
+  }
+  document.getElementById("settingsCloseBtn").addEventListener("click", closeSettings);
+  // 09/10/2026 : « Revoir le tutoriel » ferme les paramètres et relance le tutoriel d'accueil (onboarding.js).
+  document.getElementById("settingsTourBtn").addEventListener("click", function(){
+    closeSettings();
+    if(window.NysaOnboarding) window.NysaOnboarding.start();
+  });
+  overlay.addEventListener("click", function(e){
+    if(e.target === overlay) closeSettings();
+  });
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape" && overlay.classList.contains("open")) closeSettings();
+  });
+
+  // ---- Appel générique aux Edge Functions Stripe ----
+  async function callStripeFunction(name){
+    var { data: { session: s } } = await supabaseClient.auth.getSession();
+    if(!s){ window.location.href = "login.html"; return null; }
+    var res = await fetch(FUNCTIONS_URL + "/" + name, {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + s.access_token,
+        "Content-Type": "application/json"
+      }
+    });
+    if(!res.ok){
+      console.error(name + " :", await res.text());
+      return null;
+    }
+    return await res.json();
+  }
+
+  // Un seul bouton : Checkout si pas encore client Stripe, portail sinon.
+  subBtn.addEventListener("click", async function(){
+    var previous = subBtn.textContent;
+    subBtn.disabled = true;
+    subBtn.textContent = t("sub.redirect");
+
+    // 04/10/2026 — aiguillage corrigé. Le portail client ne sert qu'à gérer
+    // un abonnement qui existe : actif, ou en retard de paiement. Dans tous
+    // les autres cas (jamais abonné, abonnement résilié, accès expiré), on
+    // va vers la page de paiement. Avant, seul le plan « free » y menait :
+    // un compte au plan payant mais sans abonnement en cours partait vers
+    // le portail, où il ne pouvait pas s'abonner. La page de paiement
+    // réutilise le client Stripe existant (cf. create-checkout-session).
+    var manageExisting = isSubscribed() || entitlement.subscription_status === "past_due";
+    var fn = manageExisting ? "create-portal-session" : "create-checkout-session";
+
+    var out = await callStripeFunction(fn);
+    // 04/10/2026 — la fonction a constaté dans Stripe que ce compte a déjà
+    // un abonnement en cours : aucune page de paiement n'est créée (pas
+    // d'abonnement en double). La base vient d'être réalignée ; on recharge
+    // en passant par l'affichage « activation » du retour de paiement.
+    if(out && out.already_subscribed){
+      window.location.href = "espace-personnel.html?checkout=success";
+      return;
+    }
+    if(!out || !out.url){
+      alert(t("sub.pay_fail"));
+      subBtn.disabled = false;
+      subBtn.textContent = previous;
+      return;
+    }
+    window.location.href = out.url;
+  });
+
+  // ---- Retour depuis Stripe Checkout ----
+  // Le webhook met à jour account_entitlements de façon asynchrone : il
+  // peut avoir quelques secondes de retard sur la redirection. On repolle
+  // brièvement plutôt que d'afficher un état périmé.
+  (async function handleCheckoutReturn(){
+    var params = new URLSearchParams(window.location.search);
+    if(params.get("checkout") !== "success") return;
+
+    openSettings();
+    subBtn.disabled = true;
+    subBtn.textContent = t("sub.activating");
+
+    for(var i = 0; i < 10; i++){
+      var { data: fresh } = await supabaseClient
+        .from("account_entitlements")
+        .select("*")
+        .maybeSingle();
+      if(fresh && fresh.plan !== "free" && fresh.subscription_status === "active"){
+        entitlement = fresh;
+        renderSubscription();
+        history.replaceState({}, "", window.location.pathname);
+        return;
+      }
+      await new Promise(function(r){ setTimeout(r, 1000); });
+    }
+    console.warn("Abonnement pas encore visible : webhook en retard ?");
+    subNote.className = "mnote";
+    subNote.textContent = t("sub.paid_wait");
+    renderSubscription();
+  })();
+
+  // ---- Changement de mot de passe (Supabase Auth, direct côté client) ----
+  var pwdBtn = document.getElementById("settingsPwdBtn");
+  var pwdMsg = document.getElementById("settingsPwdMsg");
+  var newPwdInput = document.getElementById("settingsNewPwd");
+  var confirmPwdInput = document.getElementById("settingsConfirmPwd");
+
+  pwdBtn.addEventListener("click", async function(){
+    var pwd = newPwdInput.value;
+    var confirmPwd = confirmPwdInput.value;
+    pwdMsg.className = "mnote";
+
+    if(pwd.length < 8){
+      pwdMsg.textContent = t("pwd.min");
+      pwdMsg.className = "mnote err";
+      return;
+    }
+    if(pwd !== confirmPwd){
+      pwdMsg.textContent = t("pwd.mismatch");
+      pwdMsg.className = "mnote err";
+      return;
+    }
+
+    pwdBtn.disabled = true;
+    pwdBtn.textContent = t("pwd.updating");
+    var { error } = await supabaseClient.auth.updateUser({ password: pwd });
+    pwdBtn.disabled = false;
+    pwdBtn.textContent = t("settings.pwd.btn");
+
+    if(error){
+      pwdMsg.textContent = t("common.error_msg", { msg: error.message });
+      pwdMsg.className = "mnote err";
+      return;
+    }
+    pwdMsg.textContent = t("pwd.done");
+    pwdMsg.className = "mnote ok";
+    newPwdInput.value = "";
+    confirmPwdInput.value = "";
+  });
+})();
+</script>
+<script src="aide.js"></script>
+<!-- Menu de gauche repliable sur petit écran -->
+<script src="menu.js"></script>
+<script src="onboarding.js"></script>
+</body>
+</html>
