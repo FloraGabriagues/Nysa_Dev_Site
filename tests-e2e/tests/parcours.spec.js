@@ -159,12 +159,12 @@ test.describe("Pages publiques @public", () => {
     await expect(page.locator("h1")).toContainText("Earth observation satellite");
     await expect(page).toHaveTitle("Satellite Image Simulation and Optical Quality | Nysa");
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://nysa-imaging.com/");
-    await expect(page.locator("#fullSimLink")).toHaveText("Access the full beta");
+    await expect(page.locator("#fullSimLink")).toHaveText("Access the full simulator");
     await expect(page.locator("[data-lang-switch] button")).toHaveCount(2);
     await page.locator("[data-lang-switch] button", { hasText: "FR" }).click();
     await expect(page.locator("h1")).toContainText("satellite d'observation de la Terre");
     await expect(page).toHaveTitle("Simulation d'images satellite et qualité optique | Nysa");
-    await expect(page.locator("#fullSimLink")).toHaveText("Accéder à la bêta complète");
+    await expect(page.locator("#fullSimLink")).toHaveText("Accéder au simulateur complet");
     expect(errors, "erreurs JavaScript sur la démo").toEqual([]);
   });
 
