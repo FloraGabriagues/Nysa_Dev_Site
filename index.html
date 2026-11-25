@@ -1,26 +1,29 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="author" content="Flora Gabriagues">
 <!-- Description pour les moteurs de recherche, et aperçu affiché quand
      l'adresse du site est partagée (e-mail, LinkedIn, messagerie). -->
-<meta name="description" content="Nysa simulates the image an Earth observation optical instrument would produce, from its optics, detector and acquisition parameters.">
+<meta name="description" id="metaDesc" data-fr="Simulez des images satellite réalistes à partir de votre instrument : optique, détecteur, atmosphère, acquisition. Analysez MTF, PSF et SNR avec Nysa." content="Simulate realistic satellite images from your instrument's optics, detector, atmosphere and acquisition. Analyze MTF, PSF and SNR with Nysa.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Nysa">
-<meta property="og:title" content="Nysa | Multispectral imaging simulator">
-<meta property="og:description" content="Optics, detector, acquisition: see their impact on the image before you build your system.">
+<meta property="og:title" content="Satellite Image Simulation and Optical Quality | Nysa">
+<meta property="og:description" content="Simulate realistic satellite images from your instrument's optics, detector, atmosphere and acquisition. Analyze MTF, PSF and SNR with Nysa.">
 <meta property="og:url" content="https://nysa-imaging.com/">
+<link rel="canonical" href="https://nysa-imaging.com/">
 <meta property="og:image" content="https://nysa-imaging.com/apercu-nysa.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<title data-tx>Simulateur de qualité image | Nysa</title>
+<title data-tx>Simulation d'images satellite et qualité optique | Nysa</title>
 <!-- Traduction FR / EN : textes et moteur dans i18n.js -->
 <script src="i18n.js"></script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2048%2048%22%3E%3Ccircle%20cx%3D%2224.00%22%20cy%3D%2213.70%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2232.92%22%20cy%3D%2218.85%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2232.92%22%20cy%3D%2229.15%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2224.00%22%20cy%3D%2234.30%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2215.08%22%20cy%3D%2229.15%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2215.08%22%20cy%3D%2218.85%22%20r%3D%229.7%22%20fill%3D%22none%22%20stroke%3D%22%234FD1C5%22%20stroke-width%3D%223.6%22/%3E%3Ccircle%20cx%3D%2224%22%20cy%3D%2224%22%20r%3D%225.3%22%20fill%3D%22%23FFB86B%22/%3E%3C/svg%3E">
 <!-- Polices hébergées avec le site (dossier fonts/) : aucun appel à Google. -->
 <link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="compare-mode.css">
 <style>
 :root{
   --void:#090E13; --panel:#131E27; --panel-2:#1A2833;
@@ -335,6 +338,10 @@ canvas.chart{width:100%;height:272px;display:block}
 .note{font-size:12.5px;color:var(--muted);margin-top:12px;line-height:1.65}
 .note .flag{color:var(--alert)}
 
+.about{margin-top:56px;max-width:78ch}
+.about h2{font-family:var(--display);font-weight:500;font-size:19px;line-height:1.3;margin:0 0 10px;color:var(--paper)}
+.about h2:not(:first-child){margin-top:28px}
+.about p{margin:0;font-size:14.5px;line-height:1.7;color:var(--muted)}
 footer{margin-top:56px;padding-top:26px;border-top:1px solid var(--line-soft);
   display:flex;justify-content:space-between;gap:28px;flex-wrap:wrap}
 footer p{margin:0;font-size:12.5px;color:var(--muted-2);max-width:62ch;line-height:1.75}
@@ -379,7 +386,7 @@ footer p{margin:0;font-size:12.5px;color:var(--muted-2);max-width:62ch;line-heig
       <span class="mark"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24.00" cy="13.70" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="32.92" cy="18.85" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="32.92" cy="29.15" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="24.00" cy="34.30" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="15.08" cy="29.15" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="15.08" cy="18.85" r="9.7" fill="none" stroke="#4FD1C5" stroke-width="3.0"/><circle cx="24" cy="24" r="5.3" fill="#FFB86B"/></svg></span>
       <span><span class="name">Nysa</span><span class="tag">EO Imaging Engineering</span></span>
     </a>
-    <h1 data-i18n-html="demo.h1">Simulateur d'imagerie <span class="cool">multispectrale</span></h1>
+    <h1 data-i18n-html="demo.h1">Simulez les images de votre <span class="cool">satellite d'observation de la Terre</span></h1>
     <p class="valueprop" data-tx>Optique, détecteur, acquisition : visualisez leur impact sur l'image avant de construire votre système.</p>
     <!-- retirée temporairement pour voir le rendu sans, cf. échange du 27/08
     <p class="chain">
@@ -392,7 +399,7 @@ footer p{margin:0;font-size:12.5px;color:var(--muted-2);max-width:62ch;line-heig
   <span data-lang-switch></span>
   <!-- 07/10/2026 : ce bouton ouvrait la saisie d'une clé d'administration ; il mène maintenant au simulateur
        complet (la page de connexion s'ouvre d'abord si la personne n'est pas connectée). -->
-  <a id="fullSimLink" href="espace-personnel.html?invite=1" data-tx>Accéder à la bêta complète</a>
+  <a id="fullSimLink" href="espace-personnel.html?invite=1" data-tx>Accéder au simulateur complet</a>
   </div>
 </header>
 
@@ -495,6 +502,13 @@ footer p{margin:0;font-size:12.5px;color:var(--muted-2);max-width:62ch;line-heig
 
 </div>
 
+
+<section class="about">
+  <h2 data-tx>Simulez les performances de votre instrument d'observation de la Terre</h2>
+  <p data-tx>Nysa est un simulateur d'images satellite conçu pour les ingénieurs et les équipes qui développent des systèmes d'observation de la Terre. À partir des caractéristiques de l'instrument, Nysa simule la formation de l'image en tenant compte de l'optique, du détecteur, des conditions d'acquisition et de l'atmosphère.</p>
+  <h2 data-tx>Analysez la qualité image : MTF, PSF et SNR</h2>
+  <p data-tx>Explorez l'influence des paramètres instrumentaux sur la qualité de l'image, à travers la fonction de transfert de modulation (MTF), la fonction d'étalement du point (PSF) et le rapport signal sur bruit (SNR). Évaluez les compromis instrumentaux avant la réalisation du système.</p>
+</section>
 
 <footer>
   <p><span data-tx>Scènes : IGN, BD ORTHO® 2023, Licence Ouverte Etalab 2.0.</span> <a href="hypotheses.html" style="color:var(--muted);text-decoration:underline" data-tx>Hypothèses et sources</a></p>
@@ -1160,7 +1174,8 @@ function refresh(){
   if(pending) cancelAnimationFrame(pending);
   pending = requestAnimationFrame(function(){
     renderSim();
-    paintLeft();
+    (window._nysaPaintLeft || paintLeft)();
+    if(window._nysaAfterRefresh) window._nysaAfterRefresh();
     pending = null;
   });
 }
@@ -1361,8 +1376,25 @@ window.RENDER_HELP_G = {
   percentile: "Étirement dépendant du contenu : écrête 4 % des pixels. À réserver au jugement de netteté, jamais du niveau."
 };
 
+// ===================== EXPOSE POUR COMPARE-MODE.JS =====================
+window._nysa = {
+  get st(){ return st; },
+  PARAMS: PARAMS,
+  PMAP: PMAP,
+  truthCv: truthCv,
+  simCv: simCv,
+  sceneCv: sceneCv,
+  tctx: tctx,
+  compareBox: compareBox,
+  setWipe: setWipe,
+  refresh: refresh,
+  get curW(){ return curW; },
+  get curH(){ return curH; }
+};
 
 })();
 </script>
+<script src="compare-mode.js"></script>
+<script src="capture.js"></script>
 </body>
 </html>
