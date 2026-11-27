@@ -1780,7 +1780,7 @@ function setStatus(kind, text){
 // Libellés lisibles des champs du payload — utilisés pour traduire les
 // erreurs de validation de l'API (qui ne connaît que les codes courts).
 var FIELD_LABELS = {};   // libellés dans i18n.js (clés field.*), dans la langue de l'interface
-["scene","D","I","E","T","W","PX","NSUP","ESUP","R","P","K","FW","QE","ADC","T_filter","H","S","TI","TDI","perfoCsv","perfoCsvAlign","perfoCsvConvention","qeSpectral"].forEach(function(k){
+["scene","D","I","E","T","W","PX","NSUP","ESUP","R","P","K","FW","QE","ADC","T_filter","H","S","TI","TDI","perfoCsv","perfoCsvAlign","perfoCsvConvention","qeSpectral","pupilFree"].forEach(function(k){
   FIELD_LABELS[k] = t("field." + k);
 });
 
@@ -1878,6 +1878,18 @@ async function launchSimulation(){
   function orDefault(v, d){ return (v === undefined || v === null || v === "") ? d : Number(v); }
   // Longueurs d'onde des deux points d'une courbe plate (mode « Valeur constante »).
   var FLAT_CURVE_NM = [300, 1100];
+  // Pupille libre (27/11/2026) : en mode libre, le bloc pupilFree remplace D, E, NSUP et ESUP ;
+  // le serveur en déduit lui-même le diamètre (D_small). Ces quatre clés ne sont donc pas envoyées.
+  var freePupil = (inst.config.pupil_mode === "free");
+  if(freePupil && !(inst.config.pupilFree && Array.isArray(inst.config.pupilFree.shapes) && inst.config.pupilFree.shapes.length)){
+    clearInterval(pingInterval);
+    simRunning = false;
+    ppct.textContent = t("sim.pct.failed");
+    etaText.textContent = "-";
+    addLog(t("common.error_msg", { msg: escH(t("sim.err.pupil_free")) }));
+    setStatus("error", t("sim.status.failed"));
+    return;
+  }
   var payload = Object.assign({
     scene: scene.id,
     D: inst.config.D, I: inst.config.I,
@@ -1893,6 +1905,10 @@ async function launchSimulation(){
   // grise ces champs quand l'obscuration est nulle, et des valeurs saisies
   // avant restent enregistrées ; elles ne sont pas envoyées.
   if(!(payload.E > 0)){ payload.NSUP = 0; payload.ESUP = 0; }
+  if(freePupil){
+    delete payload.D; delete payload.E; delete payload.NSUP; delete payload.ESUP;
+    payload.pupilFree = inst.config.pupilFree;
+  }
 
   // Atmosphère (03/10/2026) — seules les valeurs modifiées sont envoyées :
   // sans bloc "atmosphere", le backend applique ses réglages par défaut

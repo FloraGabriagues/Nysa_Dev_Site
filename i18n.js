@@ -426,6 +426,7 @@ var I18N = {
   "field.perfoCsvAlign": { fr: "Cadrage du cas WFE", en: "WFE case alignment" },
   "field.perfoCsvConvention": { fr: "Convention Zernike du cas WFE", en: "Zernike convention of the WFE case" },
   "field.qeSpectral":    { fr: "Courbe QE(λ)", en: "QE(λ) curve" },
+  "field.pupilFree":     { fr: "Pupille libre", en: "Free pupil" },
 
   // ---------------- messages renvoyés par le serveur de simulation ----------------
   "api.server_error":    { fr: "Erreur serveur ({status})", en: "Server error ({status})" },
@@ -528,6 +529,8 @@ var I18N = {
   "sim.log.stopped":     { fr: "Simulation interrompue par l'utilisateur.",
                            en: "Simulation stopped by the user." },
   "sim.err.session":     { fr: "Session expirée : reconnectez-vous puis relancez la simulation.", en: "Session expired: sign in again, then rerun the simulation." },
+  "sim.err.pupil_free":  { fr: "La pupille libre de cet instrument est absente ou illisible : ouvrez l'instrument pour la redéfinir.",
+                             en: "The free pupil of this instrument is missing or unreadable: open the instrument to define it again." },
   "sim.save.saving":     { fr: "Sauvegarde du résultat…", en: "Saving the result…" },
   "sim.save.done":       { fr: "Résultat sauvegardé.", en: "Result saved." },
   "sim.save.view":       { fr: "📊 Voir les résultats", en: "📊 View results" },

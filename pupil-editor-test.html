@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Éditeur de pupille libre (page de test) | Nysa</title>
-<!-- Page de test de l'éditeur de pupille libre, étape 2 : tout se règle au clavier et aux champs, sans souris sur le
-     dessin. Elle n'est liée à aucune autre page ni à Supabase. À placer à la racine du site dev, à côté de
+<!-- Page de test de l'éditeur de pupille libre, étapes 2 et 3 : tout se règle aux champs, et à la souris sur le dessin
+     (déplacer, tourner par crans, tracer un polygone libre). Elle n'est liée à aucune autre page ni à Supabase. À placer à la racine du site dev, à côté de
      pupil-geometry.js, avec vendor/polygon-clipping.min.js. -->
 <link rel="stylesheet" href="fonts/fonts.css">
 <style>
@@ -90,6 +90,7 @@ input[type=range]{width:100%;margin:8px 0 0;accent-color:var(--pixel)}
 .ctrlrow label{font-family:var(--mono);font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
 .ctrlrow select{background:var(--panel-2);color:var(--paper);border:1px solid var(--line);border-radius:3px;padding:7px 9px;font-family:var(--body);font-size:13.5px}
 .previewbox{border:1px solid var(--line-soft);border-radius:6px;overflow:hidden;background:var(--void)}
+#preview{touch-action:none;user-select:none;-webkit-user-select:none}
 #preview svg{display:block;width:100%;height:auto;max-height:78vh;aspect-ratio:1/1}
 .legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px;font-family:var(--mono);font-size:12px;color:var(--muted)}
 .legend i{display:inline-block;width:18px;height:0;border-top:2px solid;vertical-align:middle;margin-right:6px}
@@ -97,6 +98,10 @@ input[type=range]{width:100%;margin:8px 0 0;accent-color:var(--pixel)}
 .legend .ladd{border-color:var(--add)}
 .legend .lsub{border-color:var(--alert);border-top-style:dashed}
 .gridnote{font-size:12px;color:var(--photon);margin:8px 0 0}
+.drawbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 12px;padding:10px 12px;border:1px solid var(--photon);border-radius:5px;background:rgba(245,172,87,.08);font-size:13px;color:var(--paper)}
+.drawbar[hidden]{display:none}
+.drawbar span{flex:1;min-width:200px}
+.mousehint{font-size:12px;color:var(--muted-2);margin:8px 0 0;line-height:1.5}
 
 /* ---------- valeurs calculées ---------- */
 .vals{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}
@@ -117,7 +122,7 @@ textarea:focus{outline:none;border-color:var(--pixel)}
 <div class="wrap">
   <header>
     <h1>Éditeur de pupille libre</h1>
-    <span class="tag">page de test, étape 2 : sans souris sur le dessin</span>
+    <span class="tag">page de test, étape 3 : souris sur le dessin</span>
   </header>
 
   <div class="layout">
@@ -164,6 +169,11 @@ textarea:focus{outline:none;border-color:var(--pixel)}
               <option value="0.1">10 cm</option><option value="0.2">20 cm</option><option value="0.5">50 cm</option>
               <option value="1">1 m</option><option value="2">2 m</option><option value="5">5 m</option>
             </select></div>
+          <div class="c"><label for="selSnap">Aimantation</label>
+            <select id="selSnap">
+              <option value="grid" selected>Sur la grille</option>
+              <option value="none">Aucune</option>
+            </select></div>
           <div class="c"><label for="selView">Demi-largeur de la vue</label>
             <select id="selView">
               <option value="auto" selected>Automatique</option>
@@ -172,6 +182,11 @@ textarea:focus{outline:none;border-color:var(--pixel)}
               <option value="5">5 m</option><option value="10">10 m</option><option value="25">25 m</option>
             </select></div>
         </div>
+        <div class="drawbar" id="drawBar" hidden>
+          <span id="drawMsg"></span>
+          <button class="btn primary" type="button" id="btnDrawEnd">Terminer</button>
+          <button class="btn" type="button" id="btnDrawCancel">Annuler</button>
+        </div>
         <div class="previewbox" id="preview"></div>
         <div class="legend">
           <span><i class="lres"></i>pupille obtenue</span>
@@ -179,6 +194,7 @@ textarea:focus{outline:none;border-color:var(--pixel)}
           <span><i class="lsub"></i>forme retirée</span>
         </div>
         <p class="gridnote" id="gridNote" hidden></p>
+        <p class="mousehint">Souris : glisser une forme pour la déplacer, glisser la poignée ronde pour la tourner (par crans). Alt maintenu : sans aimantation. Échap : annuler le geste en cours.</p>
       </div>
 
       <div class="card">
@@ -211,7 +227,10 @@ textarea:focus{outline:none;border-color:var(--pixel)}
 // ===================== État =====================
 // Les valeurs saisies restent en TEXTE dans state.shapes (champ vide ou en cours de frappe toléré) ; elles sont
 // converties en nombres seulement pour calculer (buildBlock).
-var state = { shapes: [], sel: -1, cran: 15, grid: "auto", view: "auto", serverGrid: null };
+var state = { shapes: [], sel: -1, cran: 15, grid: "auto", view: "auto", snap: "grid", serverGrid: null, draw: null };
+var drag = null;                      // geste en cours : { kind: "move" | "rot", i, ... }
+var view = null;                      // repère de l'aperçu (échelle, pas de grille), posé par renderPreview
+var lastRes = null, lastOutlines = [];
 var MAXS = NysaPupil.MAX_SHAPES, MAXP = NysaPupil.MAX_POINTS, MAXA = NysaPupil.MAX_ARMS;
 var TYPE_LABEL = { circle: "Cercle", rectangle: "Rectangle", polygon_regular: "Polygone régulier", polygon_free: "Polygone libre", support: "Supports" };
 
@@ -373,8 +392,10 @@ function bodyHtml(s, i){
         "<input type='text' inputmode='decimal' autocomplete='off' data-num data-neg data-i='" + i + "' data-f='pt' data-j='" + j + "' data-c='y' value='" + esc(s.points[j].y) + "' aria-label='Point " + (j + 1) + ", Y'>" +
         "<button type='button' class='ibtn danger' data-act='ptdel' data-i='" + i + "' data-j='" + j + "' aria-label='Supprimer ce point'>×</button></div>";
     }
-    h += "</div><button type='button' class='btn' data-act='ptadd' data-i='" + i + "'" + (s.points.length >= MAXP ? " disabled" : "") + ">+ Ajouter un point</button>" +
-      "<p class='hint' style='margin:8px 0 0'>La rotation se fait autour de l'origine des points. Le contour ne doit pas se croiser.</p></div>";
+    h += "</div><div class='btnrow'><button type='button' class='btn' data-act='ptadd' data-i='" + i + "'" + (s.points.length >= MAXP ? " disabled" : "") + ">+ Ajouter un point</button>" +
+      "<button type='button' class='btn' data-act='draw' data-i='" + i + "'>Tracer à la souris</button>" +
+      "<button type='button' class='btn' data-act='recenter' data-i='" + i + "'>Centrer le pivot</button></div>" +
+      "<p class='hint' style='margin:8px 0 0'>La rotation se fait autour de l'origine des points. Tracée à la souris, la forme a son pivot en son centre ; « Centrer le pivot » le replace au centre d'une forme saisie à la main, sans la déplacer. Le contour ne doit pas se croiser.</p></div>";
   }
   if(s.type === "support"){
     h += "<div class='field'><span class='lab'>Direction des bras (degrés, 0° vers +X, sens trigonométrique)</span><div class='rowlist'>";
@@ -470,6 +491,9 @@ listEl.addEventListener("click", function(e){
   var act = el.getAttribute("data-act"), i = Number(el.getAttribute("data-i")), j = Number(el.getAttribute("data-j")), s = state.shapes[i];
   if(!s) return;
   var tmp, focusSel = null;
+  if(act === "draw"){ startDraw(i); return; }
+  if(act === "recenter"){ recenterShape(i); renderList(); refresh(); return; }
+  if(state.draw){ state.draw = null; updateDrawBar(); }          // tout autre clic de la liste interrompt le tracé
   if(act === "sel"){ select(state.sel === i ? -1 : i); return; }
   if(act === "up" && i > 0){ tmp = state.shapes[i - 1]; state.shapes[i - 1] = s; state.shapes[i] = tmp; state.sel = (state.sel === i) ? i - 1 : (state.sel === i - 1 ? i : state.sel); }
   else if(act === "down" && i < state.shapes.length - 1){ tmp = state.shapes[i + 1]; state.shapes[i + 1] = s; state.shapes[i] = tmp; state.sel = (state.sel === i) ? i + 1 : (state.sel === i + 1 ? i : state.sel); }
@@ -540,6 +564,7 @@ function loadShapes(shapes, noConfirm){
 $("selCran").addEventListener("change", function(e){ state.cran = Number(e.target.value); renderList(); refresh(); });
 $("selGrid").addEventListener("change", function(e){ state.grid = e.target.value; refresh(); });
 $("selView").addEventListener("change", function(e){ state.view = e.target.value; refresh(); });
+$("selSnap").addEventListener("change", function(e){ state.snap = e.target.value; });
 
 // ===================== Calcul et affichage =====================
 function stripIdx(msg){ return msg.replace(/^Forme 2 : /, "").replace(/^./, function(c){ return c.toUpperCase(); }); }
@@ -581,6 +606,8 @@ function refresh(){
 
   var anyErr = errs.some(function(x){ return !!x; });
   try{ res = NysaPupil.geometry(block); }catch(e3){ gerr = e3.message; }
+  lastRes = res; lastOutlines = outlines;
+  if(state.draw && !state.shapes[state.draw.i]){ state.draw = null; }
 
   // erreurs et titres sur les cartes
   for(i = 0; i < n; i++){
@@ -591,6 +618,7 @@ function refresh(){
   renderValues(res, anyErr ? "Corrigez les formes signalées dans la liste." : gerr, n);
   renderPreview(res, outlines);
   updateJson(block);
+  updateDrawBar();
 }
 
 function renderValues(res, gerr, n){
@@ -694,10 +722,35 @@ function renderPreview(res, outlines){
     "<text x='" + (30 + barPx / 2).toFixed(1) + "' y='" + (S - 34) + "' text-anchor='middle' font-family='var(--mono)' font-size='11.5' fill='var(--paper)'>" + fmt(barLen) + " m</text>";
   var extent = "<text x='" + (S - 6) + "' y='14' text-anchor='end' font-family='var(--mono)' font-size='11' fill='var(--muted-2)'>vue ± " + fmt(half) + " m</text>";
 
+  // repère de l'aperçu, pour convertir la souris en mètres ; poignée de rotation de la forme choisie ; tracé en cours
+  view = { S: S, C: C, k: k0, half: half, step: step, handle: null };
+  var over = "", ss = state.shapes[state.sel];
+  if(!state.draw && ss && outlines[state.sel]){
+    var hx = toNum(ss.x) || 0, hy = toNum(ss.y) || 0, th = (toNum(ss.rot) || 0) * Math.PI / 180, dm = 0;
+    outlines[state.sel].forEach(function(poly){ poly[0].forEach(function(p){ var qd = Math.hypot(p[0] - hx, p[1] - hy); if(qd > dm) dm = qd; }); });
+    var Rpx = Math.max(46, Math.min(dm * k0 + 18, 210)), cxp = Number(X(hx)), cyp = Number(Y(hy));
+    var hxp = cxp + Rpx * Math.cos(th), hyp = cyp - Rpx * Math.sin(th);
+    var hcol = ss.mode === "subtract" ? "var(--alert)" : "var(--add)";
+    view.handle = { px: hxp, py: hyp };
+    over += "<line x1='" + cxp + "' y1='" + cyp + "' x2='" + hxp.toFixed(1) + "' y2='" + hyp.toFixed(1) + "' stroke='" + hcol + "' stroke-width='1.4' stroke-dasharray='3 3'/>" +
+      "<circle cx='" + hxp.toFixed(1) + "' cy='" + hyp.toFixed(1) + "' r='8' fill='var(--void)' stroke='" + hcol + "' stroke-width='2.4'/>" +
+      "<circle cx='" + hxp.toFixed(1) + "' cy='" + hyp.toFixed(1) + "' r='2.6' fill='" + hcol + "'/>" +
+      "<text x='" + (hxp + 12).toFixed(1) + "' y='" + (hyp + 4).toFixed(1) + "' font-family='var(--mono)' font-size='12' fill='" + hcol + "'>" + fmt(toNum(ss.rot) || 0) + "°</text>";
+  }
+  if(state.draw){
+    var dp = state.draw.pts, poly = dp.map(function(p){ return X(p.x) + "," + Y(p.y); });
+    if(dp.length){
+      over += "<polyline points='" + poly.join(" ") + (state.draw.cursor ? " " + X(state.draw.cursor.x) + "," + Y(state.draw.cursor.y) : "") + "' fill='none' stroke='var(--photon)' stroke-width='2' stroke-dasharray='5 3'/>";
+      if(state.draw.cursor && dp.length >= 2){ over += "<line x1='" + X(state.draw.cursor.x) + "' y1='" + Y(state.draw.cursor.y) + "' x2='" + X(dp[0].x) + "' y2='" + Y(dp[0].y) + "' stroke='var(--photon)' stroke-width='1' stroke-dasharray='2 4' opacity='.6'/>"; }
+    }
+    dp.forEach(function(p, k){ over += "<circle cx='" + X(p.x) + "' cy='" + Y(p.y) + "' r='" + (k === 0 ? 8 : 4.5) + "' fill='" + (k === 0 ? "none" : "var(--photon)") + "' stroke='var(--photon)' stroke-width='2'/>"; });
+    if(state.draw.cursor){ over += "<circle cx='" + X(state.draw.cursor.x) + "' cy='" + Y(state.draw.cursor.y) + "' r='3' fill='var(--paper)'/>"; }
+  }
+
   $("preview").innerHTML =
     "<svg viewBox='0 0 " + S + " " + S + "' xmlns='http://www.w3.org/2000/svg' role='img' aria-label='Aperçu de la pupille'>" +
       "<rect width='" + S + "' height='" + S + "' fill='var(--void)'/>" +
-      grid + fill + lines + selLine + marks + labels + bar + extent +
+      grid + fill + lines + selLine + marks + labels + bar + extent + over +
     "</svg>";
 }
 
@@ -734,6 +787,218 @@ $("btnCopy").addEventListener("click", function(){
   if(navigator.clipboard && navigator.clipboard.writeText){
     navigator.clipboard.writeText(ta.value).then(ok, function(){ ta.select(); document.execCommand("copy"); ok(); });
   } else { ta.select(); document.execCommand("copy"); ok(); }
+});
+
+
+// ===================== Souris sur l'aperçu (étape 3) =====================
+// Les événements sont posés sur le conteneur #preview, qui ne change jamais : le dessin SVG, lui, est refait à
+// chaque mouvement, et un élément remplacé perdrait la capture du pointeur.
+var prev = $("preview"), raf = 0;
+function scheduleRefresh(){ if(raf) return; raf = requestAnimationFrame(function(){ raf = 0; refresh(); }); }
+
+function worldFromEvent(e){
+  var svg = prev.querySelector("svg");
+  if(!svg || !view) return null;
+  var m = svg.getScreenCTM();
+  if(!m) return null;
+  var pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+  var q = pt.matrixTransform(m.inverse());
+  return { px: q.x, py: q.y, x: (q.x - view.C) / view.k, y: (view.C - q.y) / view.k };
+}
+function snapOn(e){ return state.snap === "grid" && !e.altKey; }
+function snapV(v, e){ return snapOn(e) ? Math.round(v / view.step) * view.step : v; }
+function coordStr(v){ return numStr(Number(v.toFixed(6))); }     // au micromètre près
+
+function inRing(ring, x, y){
+  var inside = false, n = ring.length, i, j = n - 1;
+  for(i = 0; i < n; j = i++){
+    var a = ring[i], b = ring[j];
+    if(((a[1] > y) !== (b[1] > y)) && (x < (b[0] - a[0]) * (y - a[1]) / (b[1] - a[1]) + a[0])) inside = !inside;
+  }
+  return inside;
+}
+function inMulti(multi, x, y){
+  return multi.some(function(poly){
+    if(!inRing(poly[0], x, y)) return false;
+    for(var h = 1; h < poly.length; h++) if(inRing(poly[h], x, y)) return false;
+    return true;
+  });
+}
+// Forme sous le pointeur : la forme déjà choisie en priorité, sinon la plus haute de la liste.
+function hitShape(x, y){
+  var s = state.sel;
+  if(s >= 0 && lastOutlines[s] && inMulti(lastOutlines[s], x, y)) return s;
+  for(var i = state.shapes.length - 1; i >= 0; i--) if(lastOutlines[i] && inMulti(lastOutlines[i], x, y)) return i;
+  return -1;
+}
+function onHandle(w){ return view && view.handle && Math.hypot(w.px - view.handle.px, w.py - view.handle.py) <= 13; }
+
+function setField(i, f, val){
+  var el = $("f-" + i + "-" + f);
+  if(el) el.value = val;
+  if(f === "rot"){
+    var sl = listEl.querySelector("input[type=range][data-i='" + i + "']"), v = toNum(val);
+    if(sl && v !== undefined && v >= -180 && v <= 180) sl.value = v;
+  }
+}
+
+prev.addEventListener("pointerdown", function(e){
+  if(e.button !== 0) return;
+  var w = worldFromEvent(e);
+  if(!w) return;
+  if(state.draw){ addDrawPoint(w, e); return; }
+  var i, s;
+  if(onHandle(w)){
+    i = state.sel; s = state.shapes[i];
+    drag = { kind: "rot", i: i, rot0: s.rot, pid: e.pointerId };
+  } else {
+    i = hitShape(w.x, w.y);
+    if(i < 0){ if(state.sel >= 0) select(-1); return; }
+    if(i !== state.sel) select(i);
+    s = state.shapes[i];
+    drag = { kind: "move", i: i, x0: toNum(s.x) || 0, y0: toNum(s.y) || 0, sx0: s.x, sy0: s.y, w0: w, moved: false, pid: e.pointerId };
+  }
+  try{ prev.setPointerCapture(e.pointerId); }catch(_){}
+  e.preventDefault();
+});
+
+prev.addEventListener("pointermove", function(e){
+  var w = worldFromEvent(e);
+  if(!w) return;
+  if(state.draw){
+    var sx = snapV(w.x, e), sy = snapV(w.y, e);
+    state.draw.cursor = { x: sx, y: sy };
+    prev.style.cursor = "crosshair";
+    scheduleRefresh();
+    return;
+  }
+  if(!drag){
+    prev.style.cursor = onHandle(w) ? "grab" : (hitShape(w.x, w.y) >= 0 ? "move" : "default");
+    return;
+  }
+  var s = state.shapes[drag.i];
+  if(!s){ drag = null; return; }
+  if(drag.kind === "move"){
+    if(!drag.moved && Math.hypot(w.px - drag.w0.px, w.py - drag.w0.py) < 3) return;      // un simple clic ne déplace rien
+    drag.moved = true;
+    var nx = snapV(drag.x0 + (w.x - drag.w0.x), e), ny = snapV(drag.y0 + (w.y - drag.w0.y), e);
+    s.x = coordStr(nx); s.y = coordStr(ny);
+    setField(drag.i, "x", s.x); setField(drag.i, "y", s.y);
+  } else {
+    var cx = toNum(s.x) || 0, cy = toNum(s.y) || 0;
+    var ang = Math.atan2(w.y - cy, w.x - cx) * 180 / Math.PI;
+    if(!e.altKey) ang = Math.round(ang / state.cran) * state.cran;          // la rotation va par crans, sauf Alt maintenu
+    while(ang > 180) ang -= 360;
+    while(ang <= -180) ang += 360;
+    s.rot = coordStr(ang);
+    setField(drag.i, "rot", s.rot);
+  }
+  scheduleRefresh();
+});
+
+function endDrag(e){
+  if(!drag) return;
+  try{ prev.releasePointerCapture(drag.pid); }catch(_){}
+  drag = null;
+  prev.style.cursor = "default";
+}
+prev.addEventListener("pointerup", endDrag);
+prev.addEventListener("pointercancel", endDrag);
+
+function cancelDrag(){
+  if(!drag) return;
+  var s = state.shapes[drag.i];
+  if(s){
+    if(drag.kind === "move"){ s.x = drag.sx0; s.y = drag.sy0; setField(drag.i, "x", s.x); setField(drag.i, "y", s.y); }
+    else { s.rot = drag.rot0; setField(drag.i, "rot", s.rot); }
+  }
+  try{ prev.releasePointerCapture(drag.pid); }catch(_){}
+  drag = null;
+  refresh();
+}
+
+// Centre d'une forme polygonale (centre de gravité de sa surface ; à défaut, moyenne des sommets).
+function centroid(pts){
+  var a = 0, cx = 0, cy = 0, n = pts.length, i, p, q, f;
+  for(i = 0; i < n; i++){
+    p = pts[i]; q = pts[(i + 1) % n];
+    f = p.x * q.y - q.x * p.y;
+    a += f; cx += (p.x + q.x) * f; cy += (p.y + q.y) * f;
+  }
+  if(Math.abs(a) < 1e-18){
+    cx = 0; cy = 0;
+    pts.forEach(function(r){ cx += r.x; cy += r.y; });
+    return { x: cx / n, y: cy / n };
+  }
+  return { x: cx / (3 * a), y: cy / (3 * a) };
+}
+function recenterShape(i){
+  var s = state.shapes[i];
+  if(!s || s.type !== "polygon_free") return;
+  var pts = s.points.map(function(p){ return { x: toNum(p.x), y: toNum(p.y) }; });
+  if(pts.length < 3 || pts.some(function(p){ return p.x === undefined || p.y === undefined; })) return;
+  var c = centroid(pts), r = (toNum(s.rot) || 0) * Math.PI / 180, co = Math.cos(r), si = Math.sin(r);
+  // le pivot se déplace au centre, et la forme est décalée en sens inverse : elle ne bouge pas à l'écran
+  s.points = pts.map(function(p){ return { x: numStr(Number((p.x - c.x).toFixed(9))), y: numStr(Number((p.y - c.y).toFixed(9))) }; });
+  s.x = numStr(Number(((toNum(s.x) || 0) + c.x * co - c.y * si).toFixed(9)));
+  s.y = numStr(Number(((toNum(s.y) || 0) + c.x * si + c.y * co).toFixed(9)));
+}
+
+// ---------- tracé d'un polygone libre ----------
+function startDraw(i){
+  if(state.sel !== i) select(i);
+  state.draw = { i: i, pts: [], cursor: null };
+  refresh();
+}
+function addDrawPoint(w, e){
+  var d = state.draw, sx = snapV(w.x, e), sy = snapV(w.y, e);
+  if(d.pts.length >= 3 && Math.hypot(w.px - (view.C + d.pts[0].x * view.k), w.py - (view.C - d.pts[0].y * view.k)) <= 12){ commitDraw(); return; }
+  if(d.pts.length >= MAXP) return;
+  var last = d.pts[d.pts.length - 1];
+  if(last && Math.abs(last.x - sx) < 1e-12 && Math.abs(last.y - sy) < 1e-12) return;      // même point deux fois de suite
+  d.pts.push({ x: sx, y: sy });
+  d.cursor = { x: sx, y: sy };
+  refresh();
+}
+function commitDraw(){
+  var d = state.draw;
+  if(!d || d.pts.length < 3) return;
+  var s = state.shapes[d.i];
+  if(!s){ state.draw = null; refresh(); return; }
+  // Le pivot de la forme (sa position X, Y, autour de laquelle elle tourne) est placé au centre de la forme tracée.
+  // Les points de la souris (repère de la pupille) deviennent des points relatifs à ce centre, avant rotation.
+  var c = centroid(d.pts), r = (toNum(s.rot) || 0) * Math.PI / 180, co = Math.cos(r), si = Math.sin(r);
+  s.x = numStr(Number(c.x.toFixed(9))); s.y = numStr(Number(c.y.toFixed(9)));
+  s.points = d.pts.map(function(p){
+    var dx = p.x - c.x, dy = p.y - c.y;
+    return { x: numStr(Number((dx * co + dy * si).toFixed(9))), y: numStr(Number((-dx * si + dy * co).toFixed(9))) };
+  });
+  state.draw = null;
+  renderList(); refresh();
+}
+function cancelDraw(){ state.draw = null; renderList(); refresh(); }
+function updateDrawBar(){
+  var bar = $("drawBar");
+  if(!state.draw){ bar.hidden = true; return; }
+  var n = state.draw.pts.length;
+  $("drawMsg").textContent = "Tracé du polygone libre " + (state.draw.i + 1) + " : " + n + " point" + (n > 1 ? "s" : "") + ". " +
+    (n < 3 ? "Cliquez pour poser les points." : "Cliquez sur le premier point (cercle) ou sur Terminer pour fermer.") + " Retour arrière : retire le dernier point.";
+  $("btnDrawEnd").disabled = n < 3;
+  bar.hidden = false;
+}
+$("btnDrawEnd").addEventListener("click", commitDraw);
+$("btnDrawCancel").addEventListener("click", cancelDraw);
+
+document.addEventListener("keydown", function(e){
+  var typing = e.target && e.target.matches && e.target.matches("input,textarea,select");
+  if(e.key === "Escape"){
+    if(drag) cancelDrag();
+    else if(state.draw) cancelDraw();
+  } else if(state.draw && e.key === "Enter" && !typing){
+    e.preventDefault(); commitDraw();
+  } else if(state.draw && e.key === "Backspace" && !typing){
+    e.preventDefault(); state.draw.pts.pop(); refresh();
+  }
 });
 
 // ===================== Démarrage =====================
