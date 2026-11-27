@@ -285,6 +285,19 @@ header{display:flex;align-items:center;justify-content:space-between;gap:16px;fl
   border:1px solid var(--line);border-radius:5px;padding:7px 12px;transition:border-color .14s,color .14s}
 .helplink svg{width:15px;height:15px;flex:none;color:var(--pixel)}
 .helplink:hover{border-color:var(--pixel);color:var(--pixel)}
+/* 27/11/2026 : choix de la forme de pupille (circulaire / libre) et carte des valeurs de la pupille libre */
+.field .pupseg{display:inline-flex;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.field .pupseg button{appearance:none;cursor:pointer;background:transparent;border:none;color:var(--muted);
+  font-family:var(--body);font-size:12.5px;padding:5px 14px}
+.field .pupseg button + button{border-left:1px solid var(--line)}
+.field .pupseg button.on{background:var(--panel-2);color:var(--pixel)}
+.pupcard{border:1px solid var(--line-soft);border-radius:6px;padding:12px 14px;margin-bottom:14px;background:var(--panel-2)}
+.pupvals{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px 14px;margin:0 0 12px}
+.pupvals .k{font-family:var(--mono);font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+.pupvals .v{font-family:var(--mono);font-size:15px;color:var(--pixel)}
+.pupvals .v small{font-size:12px;color:var(--muted-2)}
+.pupcard .note{font-size:12px;color:var(--muted-2);margin:10px 0 0;line-height:1.45}
+.pupcard .empty{font-size:13px;color:var(--muted-2);margin:0 0 12px}
 </style>
 </head>
 <body>
@@ -356,6 +369,10 @@ header{display:flex;align-items:center;justify-content:space-between;gap:16px;fl
 <script src="supabase-client.js"></script>
 <!-- Instrument d'exemple, affiché en lecture seule en mode invité -->
 <script src="instrument-exemple.js"></script>
+<!-- Pupille libre (27/11/2026) : géométrie, puis éditeur en fenêtre -->
+<script src="vendor/polygon-clipping.min.js"></script>
+<script src="pupil-geometry.js"></script>
+<script src="pupil-editor.js"></script>
 <script>
 var SCHEMA = [
   {id:"paysage", kind:"ctx", label:"Paysage L", sub:"scène source"},
@@ -375,6 +392,9 @@ var SCHEMA = [
        help:"Nombre de bras qui tiennent le miroir secondaire."},
       {k:"ESUP", label:"Épaisseur des supports", unit:"m", placeholder:"0 (défaut)",
        help:"Largeur d'un bras vue de face. Obligatoire dès qu'un nombre de supports est saisi."},
+      // 27/11/2026 : champ virtuel (aucune saisie) qui représente la pupille libre dans les règles « obligatoire »,
+      // l'avancement et la liste « il manque… » ; actif seulement en mode libre (cf. fieldVisible).
+      {k:"pupilFree", label:"Pupille libre", virtual:true, placeholder:"obligatoire"},
       {k:"T", label:"Transmission optique", unit:"0 à 1", placeholder:"1 (défaut)", min:0, max:1,
        help:"Produit des réflectivités et transmissions de tous les éléments optiques. Exemple : quatre miroirs à 0,95 donnent 0,81. Ne pas y inclure le filtre de bande ni le rendement du détecteur."}
     ]},
@@ -502,7 +522,32 @@ async function loadInstrument(){
 // (f.modes), facultatif (f.optional), ou obligatoire seulement si un autre
 // champ est non nul (f.requiredIf). Seuls les champs visibles et non
 // facultatifs comptent dans l'avancement.
+// ===================== Pupille libre (27/11/2026) =====================
+// state.values.pupil_mode : "circular" (défaut) ou "free". state.values.pupilFree : bloc pupil_free validé
+// (formes en nombres, tel qu'envoyé au serveur). Les valeurs circulaires (D, E, NSUP, ESUP) sont conservées
+// quand on passe en mode libre : elles sont seulement masquées et ne comptent plus.
+var PUP_CIRC = { D:1, E:1, NSUP:1, ESUP:1 };
+function pupMode(){ return state.values.pupil_mode === "free" ? "free" : "circular"; }
+var pupCache = { key: null, res: null };
+// Géométrie de la pupille libre ({geom, info}), ou null si le bloc est absent ou invalide. Recalculée seulement si le bloc change.
+function pupilRes(){
+  var blk = state.values.pupilFree;
+  if(!blk || !blk.shapes || !blk.shapes.length) return null;
+  var key = JSON.stringify(blk);
+  if(pupCache.key !== key){
+    pupCache.key = key;
+    try{ pupCache.res = NysaPupil.geometry(blk); }catch(e){ pupCache.res = null; }
+  }
+  return pupCache.res;
+}
+function pupilInfo(){ var r = pupilRes(); return r ? r.info : null; }
+// Diamètre de référence de la pupille : D en mode circulaire, D_small en mode libre (comme côté serveur).
+function effD(){
+  if(pupMode() === "free"){ var i = pupilInfo(); return i ? i.D_small : NaN; }
+  return Number(state.values.D);
+}
 function isFilled(k){
+  if(k === "pupilFree") return pupMode() === "free" && !!pupilInfo();
   var v = state.values[k];
   return v !== undefined && v !== null && v !== "";
 }
@@ -567,7 +612,7 @@ function fieldDisabled(f){
 }
 // Erreur BLOQUANTE (rouge) : message, ou "" si la valeur est acceptable.
 function hardMessage(f){
-  if(f.type === "select" || fieldDisabled(f)) return "";
+  if(f.type === "select" || f.virtual || fieldDisabled(f)) return "";
   // Épaisseur des supports : obligatoire et non nulle dès qu'un nombre de
   // supports est saisi (sinon les supports n'auraient aucun effet).
   if(f.k === "ESUP" && Number(state.values.NSUP) > 0 && !(Number(state.values.ESUP) > 0)){
@@ -587,7 +632,7 @@ function hardMessage(f){
 }
 // Alerte NON bloquante (orange) : valeur possible mais inhabituelle.
 function softMessage(f){
-  if(f.type === "select" || !isFilled(f.k) || fieldDisabled(f) || hardMessage(f)) return "";
+  if(f.type === "select" || f.virtual || !isFilled(f.k) || fieldDisabled(f) || hardMessage(f)) return "";
   var r = fieldRule(f), v = Number(state.values[f.k]), u = f.unit && f.unit !== "0 à 1" ? " " + f.unit : "";
   if(f.k === "E" && isFilled("D") && v > 0.5 * Number(state.values.D)) return tx("Valeur inhabituelle : obscuration supérieure à la moitié du diamètre.");
   if(!r.plausible) return "";
@@ -612,7 +657,7 @@ function fmt3(x){ return String(Number(Number(x).toPrecision(3))); }
 //    l'ouverture (focale / diamètre), pour repérer une erreur d'unité.
 //    Le pas pixel vient du bloc Détecteur.
 function syncOpticsDerived(){
-  var I = Number(state.values.I), D = Number(state.values.D), PX = Number(state.values.PX);
+  var I = Number(state.values.I), D = effD(), PX = Number(state.values.PX);
   var gsdEl = document.getElementById("gsd-I");
   if(gsdEl){
     var okI = isFilled("I") && I > 0;
@@ -626,7 +671,7 @@ function syncOpticsDerived(){
     } else {
       var f = PX / I; // µm / µrad = m
       dEl.innerHTML = tx("Focale équivalente") + " <b>" + fmt3(f) + " m</b>" +
-        (isFilled("D") && D > 0 ? " · " + tx("ouverture") + " <b>f/" + fmt3(f / D) + "</b>" : "");
+        (D > 0 ? " · " + tx("ouverture") + " <b>f/" + fmt3(f / D) + "</b>" : "");
     }
   }
 }
@@ -757,6 +802,8 @@ function wireSpectralEnter(selector, idxAttr, wlClass, valClass, addBtnId){
 }
 
 function fieldVisible(f){
+  if(f.k === "pupilFree") return pupMode() === "free";
+  if(pupMode() === "free" && PUP_CIRC[f.k]) return false;
   return !f.modes || f.modes.indexOf(state.values.electronics_mode) >= 0;
 }
 // 04/10/2026 — UNE définition de « champ obligatoire », partagée par
@@ -1037,6 +1084,34 @@ document.addEventListener("keydown", function(e){ if(e.key === "Escape") closeBu
 window.addEventListener("resize", placeBubble);
 window.addEventListener("scroll", placeBubble, true);
 
+// Sélecteur Circulaire / Libre en haut du bloc Optique, et, en mode libre, la carte des valeurs calculées.
+function pupilModeHtml(){
+  var free = pupMode() === "free";
+  var h = "<div class='field'><div class='labrow'><label>"+tx("Forme de la pupille")+"</label></div>"+
+    "<div class='pupseg' role='group' aria-label='"+txa("Forme de la pupille")+"'>"+
+      "<button type='button' data-pup-mode='circular'"+(free ? "" : " class='on'")+">"+tx("Circulaire")+"</button>"+
+      "<button type='button' data-pup-mode='free'"+(free ? " class='on'" : "")+">"+tx("Libre")+"</button></div></div>";
+  if(!free) return h;
+  var res = pupilRes(), info = res ? res.info : null, n = (state.values.pupilFree && state.values.pupilFree.shapes) ? state.values.pupilFree.shapes.length : 0;
+  function f4(x){ return String(Number(Number(x).toPrecision(4))); }
+  h += "<div class='pupcard'>";
+  if(info){
+    h += "<div class='pupvals'>"+
+      "<div><div class='k'>"+tx("Surface")+"</div><div class='v'>"+f4(info.area_m2)+" <small>m²</small></div></div>"+
+      "<div><div class='k'>D_small</div><div class='v'>"+f4(info.D_small)+" <small>m</small></div></div>"+
+      "<div><div class='k'>D_large</div><div class='v'>"+f4(info.D_large)+" <small>m</small></div></div>"+
+      "<div><div class='k'>"+tx("Formes")+"</div><div class='v'>"+n+"</div></div></div>";
+  } else if(state.values.pupilFree && n){
+    h += "<p class='empty' style='color:var(--alert)'>"+tx("Pupille libre non valide : ouvrez l'éditeur pour la corriger.")+"</p>";
+  } else {
+    h += "<p class='empty'>"+tx("Aucune pupille définie.")+"</p>";
+  }
+  h += "<button type='button' class='btn next' id='btnPupilEdit'>"+(info ? tx("Modifier la pupille") : tx("Définir la pupille"))+"</button>"+
+    "<p class='note'>"+tx("Le diamètre, l'obscuration et les supports se déduisent de la forme dessinée. Le flux collecté est proportionnel à la surface de la pupille.")+" "+
+    tx("Les valeurs circulaires sont conservées : vous pouvez revenir au mode circulaire.")+"</p></div>";
+  return h;
+}
+
 function renderPanel(){
   var block = currentBlock();
   if(!block){ panelEl.innerHTML = ""; return; }
@@ -1047,7 +1122,7 @@ function renderPanel(){
   var advancedHtml = "";
   var advancedFilled = false;
   block.fields.forEach(function(f){
-    if(!fieldVisible(f) || f.mention) return;
+    if(!fieldVisible(f) || f.mention || f.virtual) return;
     var v = state.values[f.k] !== undefined ? state.values[f.k] : (f.k === "DET_TYPE" ? "CMOS" : "");
     var valueAttr = v !== "" ? " value='"+escH(v)+"'" : "";
     // ESUP : obligatoire seulement si des supports sont renseignés
@@ -1107,6 +1182,7 @@ function renderPanel(){
     // courbe n'est saisie). Juste un aperçu visuel côté site — voir
     // renderQeChart pour ce qui est actuellement tracé.
   });
+  if(block.id === "optique") fieldsHtml = pupilModeHtml() + fieldsHtml;
   // Sections repliées (04/10/2026) : ouvertes d'office si elles contiennent
   // déjà une valeur, pour ne jamais cacher une saisie existante.
   var advancedDetails = advancedHtml
@@ -1170,6 +1246,25 @@ function renderPanel(){
       if(state.values[lock.mode] === "curve" && firstWl) firstWl.focus();
     });
   });
+  panelEl.querySelectorAll("[data-pup-mode]").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var m = btn.getAttribute("data-pup-mode");
+      if(m === pupMode()) return;
+      state.values.pupil_mode = m;
+      persist(); updateProgress(); renderChain(); renderPanel();
+    });
+  });
+  var pupEdit = document.getElementById("btnPupilEdit");
+  if(pupEdit) pupEdit.addEventListener("click", function(){
+    NysaPupilEditor.open({
+      block: state.values.pupilFree || null,
+      onApply: function(clean){
+        state.values.pupilFree = clean;
+        persist(); updateProgress(); renderChain();
+        if(state.active === "optique") renderPanel();
+      }
+    });
+  });
   block.fields.forEach(function(f){
     if(!document.getElementById("f-"+f.k)) return; // champ masqué par le mode d'électronique
     document.getElementById("f-"+f.k).addEventListener("input", function(e){
@@ -1229,6 +1324,7 @@ function renderPanel(){
     "<button class='btn primary' type='button' id='btnSave'>"+tx("Enregistrer l'instrument")+"</button></div>";
   panelEl.appendChild(actions);
   document.getElementById("btnReset").addEventListener("click", function(){
+    if(block.id === "optique") delete state.values.pupil_mode;
     block.fields.forEach(function(f){
       delete state.values[f.k];
       // 04/10/2026 — la courbe spectrale liée au champ est effacée aussi,
@@ -1678,9 +1774,36 @@ function wireWfeCasesUI(){
 // renderPanel). Grille décorative en fond (appréciée telle quelle) +
 // cotes de plan CAD (D, d, supports) pour les valeurs — pas d'axes X/Y
 // gradués, retirés le 18/09/2026 ("les axes ne sont pas bien").
+// Plan de la pupille libre : le contour calculé, mis à l'échelle pour tenir dans le cadre, avec D_small et D_large.
+function renderFreePupilGeometry(host){
+  var res = pupilRes(), cx = 210, cy = 140;
+  var grid = "<g stroke='var(--line-soft)' stroke-width='1'>";
+  for(var gx = 20; gx <= 420; gx += 40) grid += "<line x1='"+gx+"' y1='0' x2='"+gx+"' y2='310'/>";
+  for(var gy = 15; gy <= 295; gy += 40) grid += "<line x1='0' y1='"+gy+"' x2='440' y2='"+gy+"'/>";
+  grid += "</g>";
+  var body = "";
+  if(res){
+    var mx = 0;
+    res.geom.forEach(function(poly){ poly[0].forEach(function(p){ mx = Math.max(mx, Math.abs(p[0]), Math.abs(p[1])); }); });
+    var k = mx > 0 ? 105 / mx : 1;
+    var d = res.geom.map(function(poly){
+      return poly.map(function(r){ return "M"+r.map(function(p){ return (cx + p[0]*k).toFixed(1)+","+(cy - p[1]*k).toFixed(1); }).join("L")+"Z"; }).join("");
+    }).join("");
+    body = "<path d='"+d+"' fill='var(--pixel)' fill-opacity='.24' fill-rule='evenodd' stroke='var(--pixel)' stroke-width='1.6' stroke-linejoin='round'/>"+
+      "<text x='"+cx+"' y='276' text-anchor='middle' class='geo-dim'>D_small = "+Number(res.info.D_small.toPrecision(4))+" m</text>"+
+      "<text x='"+cx+"' y='300' text-anchor='middle' class='geo-dim'>D_large = "+Number(res.info.D_large.toPrecision(4))+" m</text>";
+  } else {
+    body = "<text x='"+cx+"' y='"+cy+"' text-anchor='middle' class='geo-dim'>"+tx("Aucune pupille définie.")+"</text>";
+  }
+  host.innerHTML =
+    "<svg viewBox='0 0 440 310' preserveAspectRatio='xMidYMid meet' style='width:100%;height:100%;display:block'>"+
+      "<rect x='0' y='0' width='440' height='310' fill='var(--void)'/>"+grid+body+
+    "</svg>";
+}
 function renderOpticsGeometry(){
   var host = document.getElementById("opticsGeoSvg");
   if(!host) return;
+  if(pupMode() === "free"){ renderFreePupilGeometry(host); return; }
   var D = Number(state.values.D) || 0;
   var E = Number(state.values.E) || 0;
   var n = Math.max(0, Math.round(Number(state.values.NSUP) || 0));
@@ -2250,7 +2373,11 @@ async function saveToSupabase(){
   var missing = missingRequired();
   state.values._draft = missing.length > 0;
   state.values._missing = missing;
-  state.values._pct = overallPct(); // avancement affiché sur la carte de « Mes objets"
+  state.values._pct = overallPct();
+  // 27/11/2026 : en mode libre, grandeurs déduites de la pupille, lisibles par les autres pages sans recalcul.
+  var pinfo = pupMode() === "free" ? pupilInfo() : null;
+  if(pinfo) state.values._pupilInfo = { area_m2: pinfo.area_m2, D_small: pinfo.D_small, D_large: pinfo.D_large };
+  else delete state.values._pupilInfo; // avancement affiché sur la carte de « Mes objets"
 
   btn.disabled = true;
   var hint = document.createElement("p");
@@ -2374,6 +2501,8 @@ window.addEventListener("beforeunload", function(e){
 function hasAnyEntry(){
   return Object.keys(state.values).some(function(k){
     if(k.charAt(0) === "_") return false; // clés internes (_draft, _missing)
+    if(k === "pupil_mode") return false;
+    if(k === "pupilFree") return pupMode() === "free" && !!pupilInfo();
     var v = state.values[k];
     if(Array.isArray(v)) return v.length > 0;
     return v !== undefined && v !== null && v !== "";
@@ -2391,11 +2520,17 @@ function buildExport(){
   function clean(x){ return Number(Number(x).toPrecision(12)); } // évite 2.0000000000000003e-6
   var tel = {}, det = {}, form = {};
 
-  if(has("D")) tel.D = num("D");
+  if(pupMode() === "free"){
+    // Pupille libre : D vaut D_small et le bloc pupil_free est écrit tel quel (comme le fait paramfile_builder.py).
+    var pinfo = pupilInfo();
+    if(pinfo){ tel.D = clean(pinfo.D_small); tel.pupil_free = state.values.pupilFree; }
+  } else {
+    if(has("D")) tel.D = num("D");
+    if(has("E")) tel.central_obscuration = num("E");
+    if(num("E") > 0 && has("NSUP")) tel.n_supports = num("NSUP");
+    if(num("E") > 0 && has("ESUP")) tel.support_width = num("ESUP");
+  }
   if(has("I")) tel.iFoV = clean(num("I") * 1e-6);                       // µrad -> rad
-  if(has("E")) tel.central_obscuration = num("E");
-  if(num("E") > 0 && has("NSUP")) tel.n_supports = num("NSUP");
-  if(num("E") > 0 && has("ESUP")) tel.support_width = num("ESUP");
   var tCurve = exportCurve("T");
   if(tCurve) tel.T_opt_spectral = tCurve;
 
@@ -2499,11 +2634,20 @@ document.getElementById("fileInput").addEventListener("change", function(e){
         var tel = data.Telescope || {};
         var det = data.Detector || {};
 
-        if(tel.D != null) state.values.D = tel.D;
+        // Pupille libre (27/11/2026) : un bloc pupil_free valide met l'instrument en mode libre et remplace D, E et les supports.
+        var freeOk = false;
+        if(tel.pupil_free){
+          try{
+            var cleanP = NysaPupil.validate(tel.pupil_free);
+            NysaPupil.geometry(cleanP);
+            state.values.pupilFree = cleanP; state.values.pupil_mode = "free"; freeOk = true;
+          }catch(errP){ alert(tx("Pupille libre du fichier non valide : elle est ignorée.")); }
+        }
+        if(tel.D != null && !freeOk) state.values.D = tel.D;
         if(tel.iFoV != null) state.values.I = tel.iFoV * 1e6;               // rad -> µrad
-        if(tel.central_obscuration != null) state.values.E = tel.central_obscuration;
-        if(tel.n_supports != null) state.values.NSUP = tel.n_supports;
-        if(tel.support_width != null) state.values.ESUP = tel.support_width;
+        if(tel.central_obscuration != null && !freeOk) state.values.E = tel.central_obscuration;
+        if(tel.n_supports != null && !freeOk) state.values.NSUP = tel.n_supports;
+        if(tel.support_width != null && !freeOk) state.values.ESUP = tel.support_width;
         // Courbe plate -> valeur constante ; sinon -> mode courbe (04/10/2026).
         importCurve("T", tel.T_opt_spectral);
         // W (WFE RMS) : pas de champ scalaire direct dans un paramFile — le
