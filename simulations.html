@@ -2313,7 +2313,10 @@ async function autoSaveResultInner(){
         rho_ref: d.rho_ref, reflectance_min: d.reflectance_min, reflectance_max: d.reflectance_max,
         reflectance_mean: d.reflectance_mean, full_well_e: d.full_well_e, signal_mean_e: d.signal_mean_e,
         signal_median_e: d.signal_median_e, fill_pct: d.fill_pct, snr_mean: d.snr_mean,
-        mtf_at_nyquist: d.mtf_at_nyquist, S_ref_e: d.S_ref_e, rgb_gain_applied: d.rgb_gain_applied,
+        mtf_at_nyquist: d.mtf_at_nyquist,
+        // 27/11/2026 : pupille libre, MTF à Nyquist min et max selon la direction (min = max pour une pupille circulaire)
+        mtf_at_nyquist_min: d.mtf_at_nyquist_min, mtf_at_nyquist_max: d.mtf_at_nyquist_max,
+        S_ref_e: d.S_ref_e, rgb_gain_applied: d.rgb_gain_applied,
         saturation: d.saturation || null, dn_bits: d.dn_bits || null,
       };
       for(var gi = 0; gi < GRAPH_KEYS.length; gi++){

@@ -166,14 +166,18 @@ footer a{color:var(--muted)}
     <h2><span lang="fr">Optique</span><span lang="en">Optics</span></h2>
     <div lang="fr"><ul>
   <li>La réponse impulsionnelle (PSF) est calculée par optique de Fourier à partir de la pupille, avec la bibliothèque POPPY.</li>
-  <li>La pupille est circulaire. Elle peut porter une obscuration centrale et des supports de miroir secondaire, définis par leur nombre et leur épaisseur.</li>
+  <li>La pupille est soit circulaire, soit de forme libre. Une pupille circulaire peut porter une obscuration centrale et des supports de miroir secondaire, définis par leur nombre et leur épaisseur.</li>
+  <li>Une pupille libre se construit en assemblant des formes (cercles, rectangles, polygones, supports) que l'on ajoute ou que l'on retire, par exemple pour un miroir segmenté. Son diamètre de référence est D_small, sa plus petite largeur. La lumière collectée suit la surface exacte de la pupille.</li>
+  <li>En pupille libre, le défaut de front d'onde n'est pas modélisé : la pupille est supposée parfaite et un fichier de coefficients de Zernike est ignoré. La PSF vient de la seule diffraction par la forme de la pupille.</li>
   <li>Le défaut de front d'onde se décrit de deux façons : une valeur RMS unique, ou un fichier de coefficients de Zernike qui peut varier le long du champ.</li>
   <li>La PSF de chaque bande est calculée à sa longueur d'onde centrale.</li>
   <li>La scène, plus fine que l'instrument simulé, est ramenée au pas d'échantillonnage au sol de l'instrument, déduit de l'iFoV et de l'altitude.</li>
 </ul></div>
     <div lang="en"><ul>
   <li>The point spread function (PSF) is computed by Fourier optics from the pupil, using the POPPY library.</li>
-  <li>The pupil is circular. It can include a central obscuration and secondary mirror spider vanes, defined by their number and thickness.</li>
+  <li>The pupil is either circular or free-shape. A circular pupil can include a central obscuration and secondary mirror spider vanes, defined by their number and thickness.</li>
+  <li>A free pupil is built by assembling shapes (circles, rectangles, polygons, spider vanes) that are added or subtracted, for example for a segmented mirror. Its reference diameter is D_small, its smallest width. The light collected follows the exact area of the pupil.</li>
+  <li>With a free pupil, wavefront error is not modeled: the pupil is assumed perfect and a Zernike coefficient file is ignored. The PSF comes from diffraction by the pupil shape alone.</li>
   <li>Wavefront error is described in two ways: a single RMS value, or a file of Zernike coefficients that can vary across the field.</li>
   <li>The PSF of each band is computed at its central wavelength.</li>
   <li>The scene, finer than the simulated instrument, is brought to the instrument's ground sampling distance, derived from the iFoV and the altitude.</li>
@@ -221,7 +225,7 @@ footer a{color:var(--muted)}
   <section id="resultats">
     <h2><span lang="fr">Lecture des résultats</span><span lang="en">Reading the results</span></h2>
     <div lang="fr"><ul>
-  <li><b>MTF à Nyquist</b> : contraste transmis par l'instrument à la fréquence de Nyquist du détecteur, optique et pixel compris.</li>
+  <li><b>MTF à Nyquist</b> : contraste transmis par l'instrument à la fréquence de Nyquist du détecteur, optique et pixel compris. Avec une pupille libre, la MTF dépend de la direction de la fréquence spatiale. Nysa affiche le minimum et le maximum sur toutes les directions, avec un graphe polaire. La liste des résultats trie sur le minimum.</li>
   <li><b>SNR</b> : rapport entre le signal moyen et le bruit, calculé par bande. Il est calculé avant saturation : il ne tient pas compte de l'écrêtage des pixels saturés (puits plein, convertisseur ou accumulateur TDI). Consultez toujours la carte des pixels saturés avant de l'interpréter.</li>
   <li><b>Remplissage</b> : part du full well occupée par le signal moyen, avant écrêtage.</li>
   <li><b>Image affichée</b> : le rendu (brut, brut avec balance des blancs ou étirement p2/p98) et le point blanc choisi ne modifient que l'affichage dans le navigateur.</li>
@@ -229,7 +233,7 @@ footer a{color:var(--muted)}
   <li><b>Équilibre des couleurs</b> : pour l'affichage, les bandes sont ramenées à une référence commune, avec un point blanc propre à chaque scène (un objet blanc repéré dans l'image) que vous pouvez remplacer par le vôtre. Ce n'est pas un étalonnage radiométrique absolu.</li>
 </ul></div>
     <div lang="en"><ul>
-  <li><b>MTF at Nyquist</b>: contrast transmitted by the instrument at the detector Nyquist frequency, optics and pixel included.</li>
+  <li><b>MTF at Nyquist</b>: contrast transmitted by the instrument at the detector Nyquist frequency, optics and pixel included. With a free pupil, the MTF depends on the direction of the spatial frequency. Nysa shows the minimum and maximum over all directions, with a polar plot. The results list sorts on the minimum.</li>
   <li><b>SNR</b>: ratio between mean signal and noise, computed per band. It is computed before saturation: it does not account for the clipping of saturated pixels (full well, converter or TDI accumulator). Always check the saturated-pixel map before interpreting it.</li>
   <li><b>Well fill</b>: share of the full well occupied by the mean signal, before clipping.</li>
   <li><b>Displayed image</b>: the rendering (raw, raw with white balance or p2/p98 stretch) and the chosen white point only change the display in the browser.</li>
@@ -246,6 +250,7 @@ footer a{color:var(--muted)}
   <li>La baisse de signal en bord de champ, en cos⁴ de l'angle de champ.</li>
   <li>Les effets d'adjacence détaillés et les réflexions spéculaires.</li>
   <li>La variation de la PSF à l'intérieur d'une bande spectrale.</li>
+  <li>En pupille libre : les aberrations, y compris les erreurs de phasage entre segments.</li>
   <li>La diffusion et la diaphonie entre pixels du détecteur.</li>
   <li>La dépendance de la PRNU à la longueur d'onde.</li>
   <li>La non-uniformité de l'offset électronique. Si la DSNU d'un détecteur en dépend surtout, le modèle la représente mal.</li>
@@ -261,6 +266,7 @@ footer a{color:var(--muted)}
   <li>Signal falloff at the edge of the field, as cos⁴ of the field angle.</li>
   <li>Detailed adjacency effects and specular reflections.</li>
   <li>PSF variation within a spectral band.</li>
+  <li>With a free pupil: aberrations, including phasing errors between segments.</li>
   <li>Diffusion and crosstalk between detector pixels.</li>
   <li>The wavelength dependence of PRNU.</li>
   <li>Non-uniformity of the electronic offset. If a detector's DSNU mostly comes from it, the model represents it poorly.</li>
