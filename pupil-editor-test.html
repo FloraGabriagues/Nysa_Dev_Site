@@ -1,0 +1,747 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Éditeur de pupille libre (page de test) | Nysa</title>
+<!-- Page de test de l'éditeur de pupille libre, étape 2 : tout se règle au clavier et aux champs, sans souris sur le
+     dessin. Elle n'est liée à aucune autre page ni à Supabase. À placer à la racine du site dev, à côté de
+     pupil-geometry.js, avec vendor/polygon-clipping.min.js. -->
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+:root{
+  --void:#090E13; --panel:#131E27; --panel-2:#1A2833;
+  --line:#2E4152; --line-soft:#22323F;
+  --paper:#C4D6D4; --muted:#9BADBD; --muted-2:#8497AA;
+  --photon:#F5AC57; --pixel:#5FDCD0; --alert:#F0776D; --ok:#7FD88F; --add:#6AA9FF;
+  --display:"Montserrat","IBM Plex Sans",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--void);color:var(--paper);font-family:var(--body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1280px;margin:0 auto;padding:0 26px 90px}
+header{padding:20px 0;border-bottom:1px solid var(--line-soft);margin-bottom:22px;display:flex;align-items:baseline;gap:16px;flex-wrap:wrap}
+header h1{font-family:var(--display);font-weight:600;font-size:18px;margin:0}
+header .tag{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.04em}
+
+.layout{display:grid;grid-template-columns:minmax(340px,430px) 1fr;gap:22px;align-items:start}
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line-soft);border-radius:8px;padding:18px 20px;margin-bottom:18px}
+.subhead{font-family:var(--mono);font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin:0 0 12px;display:flex;align-items:center;gap:10px}
+.subhead .dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--photon)}
+.subhead .count{margin-left:auto;letter-spacing:0;text-transform:none;color:var(--muted-2)}
+.hint{font-size:12.5px;color:var(--muted);margin:0 0 12px;line-height:1.5}
+
+/* ---------- boutons ---------- */
+.btn{appearance:none;cursor:pointer;border-radius:4px;padding:8px 12px;font-family:var(--body);font-size:13px;font-weight:500;border:1px solid var(--line);background:transparent;color:var(--paper)}
+.btn:hover{border-color:var(--pixel);color:var(--pixel)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn:disabled:hover{border-color:var(--line);color:var(--paper)}
+.btn.primary{background:var(--pixel);color:#052824;border-color:var(--pixel)}
+.btn.primary:hover{background:#7DE6DC;color:#052824}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px}
+.ibtn{appearance:none;cursor:pointer;background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:3px;min-width:28px;height:28px;padding:0 6px;font-family:var(--mono);font-size:13px;line-height:1}
+.ibtn:hover{border-color:var(--pixel);color:var(--pixel)}
+.ibtn.danger:hover{border-color:var(--alert);color:var(--alert)}
+.ibtn:disabled{opacity:.3;cursor:not-allowed}
+.ibtn:disabled:hover{border-color:var(--line);color:var(--muted)}
+
+/* ---------- liste des formes ---------- */
+.scard{border:1px solid var(--line-soft);border-left:3px solid var(--add);border-radius:6px;margin-bottom:10px;background:var(--panel-2)}
+.scard.sub{border-left-color:var(--alert)}
+.scard.sel{border-color:var(--line);border-left-width:3px}
+.scard.sel:not(.sub){border-left-color:var(--add)}
+.shead{display:flex;align-items:center;gap:10px;padding:10px 10px 10px 12px;cursor:pointer}
+.shead:focus-visible{outline:2px solid var(--pixel);outline-offset:-2px}
+.sidx{font-family:var(--mono);font-size:12px;color:var(--muted);width:22px;flex:none}
+.stitle{flex:1;min-width:0;font-size:13.5px;line-height:1.35;display:flex;flex-direction:column}
+.stitle b{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.smode{font-family:var(--mono);font-size:11.5px;color:var(--add)}
+.scard.sub .smode{color:var(--alert)}
+.sbtns{display:flex;gap:5px;flex:none}
+.serr{font-size:12.5px;color:var(--alert);margin:0;padding:0 12px 10px 44px}
+.sbody{padding:4px 14px 14px;border-top:1px solid var(--line-soft)}
+.field{margin:12px 0 0}
+.field label,.field .lab{display:block;font-size:12.5px;color:var(--muted);margin-bottom:5px}
+.field .row{display:flex;gap:8px;align-items:center;min-width:0}
+.field input[type=text]{flex:1;min-width:0;background:var(--void);border:1px solid var(--line);border-radius:3px;color:var(--paper);padding:7px 9px;font-family:var(--mono);font-size:13.5px}
+.field input[type=text]:focus{outline:none;border-color:var(--pixel)}
+.field .unit{font-family:var(--mono);font-size:12px;color:var(--muted-2);min-width:18px}
+.field .lockhint{font-size:12px;color:var(--muted-2);margin:0}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 14px}
+.modeseg{display:inline-flex;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.modeseg button{appearance:none;cursor:pointer;background:transparent;border:none;color:var(--muted);font-family:var(--body);font-size:12.5px;padding:5px 14px}
+.modeseg button + button{border-left:1px solid var(--line)}
+.modeseg button.on.add{background:rgba(106,169,255,.16);color:var(--add)}
+.modeseg button.on.sub{background:rgba(240,119,109,.16);color:var(--alert)}
+input[type=range]{width:100%;margin:8px 0 0;accent-color:var(--pixel)}
+.rowlist{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.rowlist .prow{display:flex;gap:8px;align-items:center}
+.rowlist .pidx{font-family:var(--mono);font-size:12px;color:var(--muted-2);width:22px;flex:none}
+.spread{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--line-soft);font-size:12.5px;color:var(--muted)}
+.spread input{width:64px;flex:none;background:var(--void);border:1px solid var(--line);border-radius:3px;color:var(--paper);padding:6px 8px;font-family:var(--mono);font-size:13px}
+.empty{font-size:13px;color:var(--muted-2);margin:0 0 10px}
+
+/* ---------- aperçu ---------- */
+.ctrlrow{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:12px}
+.ctrlrow .c{display:flex;flex-direction:column;gap:4px}
+.ctrlrow label{font-family:var(--mono);font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.ctrlrow select{background:var(--panel-2);color:var(--paper);border:1px solid var(--line);border-radius:3px;padding:7px 9px;font-family:var(--body);font-size:13.5px}
+.previewbox{border:1px solid var(--line-soft);border-radius:6px;overflow:hidden;background:var(--void)}
+#preview svg{display:block;width:100%;height:auto;max-height:78vh;aspect-ratio:1/1}
+.legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:18px;height:0;border-top:2px solid;vertical-align:middle;margin-right:6px}
+.legend .lres{border-color:var(--pixel)}
+.legend .ladd{border-color:var(--add)}
+.legend .lsub{border-color:var(--alert);border-top-style:dashed}
+.gridnote{font-size:12px;color:var(--photon);margin:8px 0 0}
+
+/* ---------- valeurs calculées ---------- */
+.vals{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}
+.val{background:var(--panel-2);border:1px solid var(--line-soft);border-radius:5px;padding:8px 11px}
+.val .k{font-family:var(--mono);font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+.val .v{font-family:var(--mono);font-size:16px;color:var(--pixel)}
+.val .v small{font-size:12px;color:var(--muted-2)}
+.gerr{font-size:13.5px;color:var(--alert);margin:10px 0 0}
+.gok{font-size:12.5px;color:var(--muted);margin:10px 0 0;line-height:1.5}
+
+/* ---------- JSON ---------- */
+textarea{width:100%;min-height:150px;resize:vertical;background:var(--void);color:var(--paper);border:1px solid var(--line);border-radius:4px;padding:10px;font-family:var(--mono);font-size:12px;line-height:1.45}
+textarea:focus{outline:none;border-color:var(--pixel)}
+.jmsg{font-size:12.5px;margin:8px 0 0;min-height:18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Éditeur de pupille libre</h1>
+    <span class="tag">page de test, étape 2 : sans souris sur le dessin</span>
+  </header>
+
+  <div class="layout">
+    <!-- ================= colonne de gauche : liste des formes ================= -->
+    <div class="leftcol">
+      <div class="card">
+        <p class="subhead"><span class="dot"></span><span>Ajouter une forme</span></p>
+        <div class="btnrow" id="addBtns">
+          <button class="btn" type="button" data-add="circle">+ Cercle</button>
+          <button class="btn" type="button" data-add="rectangle">+ Rectangle</button>
+          <button class="btn" type="button" data-add="polygon_regular">+ Polygone régulier</button>
+          <button class="btn" type="button" data-add="polygon_free">+ Polygone libre</button>
+          <button class="btn" type="button" data-add="support">+ Supports</button>
+        </div>
+        <p class="hint" style="margin-top:12px">Les formes s'appliquent dans l'ordre de la liste : « Ajouter » réunit, « Retirer » découpe. Un support retire toujours de la matière.</p>
+        <div class="btnrow">
+          <button class="btn" type="button" data-example="circ">Exemple : cercle, obscuration, 3 supports</button>
+          <button class="btn" type="button" data-example="webb">Exemple : 18 hexagones</button>
+          <button class="btn" type="button" data-example="clear">Tout effacer</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <p class="subhead"><span class="dot"></span><span>Formes</span><span class="count" id="shapeCount"></span></p>
+        <div id="shapeList"></div>
+      </div>
+    </div>
+
+    <!-- ================= colonne de droite : aperçu et valeurs ================= -->
+    <div class="rightcol">
+      <div class="card">
+        <p class="subhead"><span class="dot"></span><span>Aperçu de la pupille</span></p>
+        <div class="ctrlrow">
+          <div class="c"><label for="selCran">Cran de rotation</label>
+            <select id="selCran">
+              <option value="1">1°</option><option value="5">5°</option><option value="15" selected>15°</option>
+              <option value="30">30°</option><option value="60">60°</option>
+            </select></div>
+          <div class="c"><label for="selGrid">Pas de grille</label>
+            <select id="selGrid">
+              <option value="auto" selected>Automatique</option>
+              <option value="0.001">1 mm</option><option value="0.002">2 mm</option><option value="0.005">5 mm</option>
+              <option value="0.01">1 cm</option><option value="0.02">2 cm</option><option value="0.05">5 cm</option>
+              <option value="0.1">10 cm</option><option value="0.2">20 cm</option><option value="0.5">50 cm</option>
+              <option value="1">1 m</option><option value="2">2 m</option><option value="5">5 m</option>
+            </select></div>
+          <div class="c"><label for="selView">Demi-largeur de la vue</label>
+            <select id="selView">
+              <option value="auto" selected>Automatique</option>
+              <option value="0.05">0,05 m</option><option value="0.1">0,1 m</option><option value="0.2">0,2 m</option>
+              <option value="0.5">0,5 m</option><option value="1">1 m</option><option value="2">2 m</option>
+              <option value="5">5 m</option><option value="10">10 m</option><option value="25">25 m</option>
+            </select></div>
+        </div>
+        <div class="previewbox" id="preview"></div>
+        <div class="legend">
+          <span><i class="lres"></i>pupille obtenue</span>
+          <span><i class="ladd"></i>forme ajoutée</span>
+          <span><i class="lsub"></i>forme retirée</span>
+        </div>
+        <p class="gridnote" id="gridNote" hidden></p>
+      </div>
+
+      <div class="card">
+        <p class="subhead"><span class="dot"></span><span>Valeurs calculées</span></p>
+        <div class="vals" id="vals"></div>
+        <p class="gerr" id="gerr" hidden></p>
+        <p class="gok" id="gnote">D_small est la plus petite largeur de la pupille (enveloppe convexe). D_large est le diamètre du plus petit cercle qui l'englobe. La surface est exacte.</p>
+      </div>
+
+      <div class="card">
+        <p class="subhead"><span class="dot"></span><span>JSON de la pupille</span></p>
+        <p class="hint">Le bloc qui sera envoyé au serveur. Vous pouvez aussi y coller une pupille (par exemple celle d'un fichier de test) puis cliquer sur « Appliquer ».</p>
+        <textarea id="json" spellcheck="false"></textarea>
+        <div class="btnrow" style="margin-top:10px">
+          <button class="btn primary" type="button" id="btnApply">Appliquer</button>
+          <button class="btn" type="button" id="btnCopy">Copier</button>
+        </div>
+        <p class="jmsg" id="jmsg"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="vendor/polygon-clipping.min.js"></script>
+<script src="pupil-geometry.js"></script>
+<script>
+(function(){
+"use strict";
+
+// ===================== État =====================
+// Les valeurs saisies restent en TEXTE dans state.shapes (champ vide ou en cours de frappe toléré) ; elles sont
+// converties en nombres seulement pour calculer (buildBlock).
+var state = { shapes: [], sel: -1, cran: 15, grid: "auto", view: "auto", serverGrid: null };
+var MAXS = NysaPupil.MAX_SHAPES, MAXP = NysaPupil.MAX_POINTS, MAXA = NysaPupil.MAX_ARMS;
+var TYPE_LABEL = { circle: "Cercle", rectangle: "Rectangle", polygon_regular: "Polygone régulier", polygon_free: "Polygone libre", support: "Supports" };
+
+function $(id){ return document.getElementById(id); }
+function esc(v){ return String(v).replace(/&/g, "&amp;").replace(/'/g, "&#39;").replace(/"/g, "&quot;").replace(/</g, "&lt;"); }
+function toNum(s){
+  if(s === "" || s === undefined || s === null) return undefined;
+  var v = Number(s);
+  return isFinite(v) ? v : undefined;
+}
+function fmt(x){
+  if(!isFinite(x)) return "-";
+  if(x === 0) return "0";
+  return String(Number(Number(x).toPrecision(4)));
+}
+function numStr(x){ return String(Number(Number(x).toPrecision(10))); }
+
+function newShape(type){
+  var s = { type: type, mode: "add", x: "0", y: "0", rot: "0" };
+  if(type === "circle"){ s.diameter = "1"; }
+  else if(type === "rectangle"){ s.width = "0.5"; s.height = "0.2"; }
+  else if(type === "polygon_regular"){ s.n_sides = "6"; s.flat_to_flat = "0.5"; }
+  else if(type === "polygon_free"){ s.points = [{x:"-0.2", y:"-0.15"}, {x:"0.2", y:"-0.15"}, {x:"0", y:"0.2"}]; }
+  else if(type === "support"){ s.mode = "subtract"; s.angles = ["-90", "30", "150"]; s.width = "0.03"; }
+  return s;
+}
+
+// Forme de l'état -> forme du bloc pupil_free (nombres). Un champ vide est omis (le serveur applique ses
+// valeurs par défaut pour x, y, rotation, ou signale le champ manquant pour les tailles).
+function buildShape(s){
+  var o = { type: s.type, mode: s.mode }, v;
+  function put(key, val){ if(val !== undefined) o[key] = val; }
+  put("x", toNum(s.x)); put("y", toNum(s.y)); put("rotation_deg", toNum(s.rot));
+  if(s.type === "circle"){ put("diameter", toNum(s.diameter)); }
+  else if(s.type === "rectangle"){ put("width", toNum(s.width)); put("height", toNum(s.height)); }
+  else if(s.type === "polygon_regular"){ put("n_sides", toNum(s.n_sides)); put("flat_to_flat", toNum(s.flat_to_flat)); }
+  else if(s.type === "polygon_free"){
+    o.points = s.points.map(function(p){
+      var a = toNum(p.x), b = toNum(p.y);
+      return [a === undefined ? NaN : a, b === undefined ? NaN : b];
+    });
+  } else if(s.type === "support"){
+    o.angles_deg = s.angles.map(function(a){ v = toNum(a); return v === undefined ? NaN : v; });
+    put("width", toNum(s.width));
+  }
+  return o;
+}
+function buildBlock(){
+  var b = { shapes: state.shapes.map(buildShape) };
+  if(state.serverGrid) b.grid_step_m = state.serverGrid;
+  return b;
+}
+
+// Forme du bloc (nombres) -> forme de l'état (textes).
+function fromBlockShape(c){
+  var s = { type: c.type, mode: c.mode, x: numStr(c.x), y: numStr(c.y), rot: numStr(c.rotation_deg) };
+  if(c.type === "circle"){ s.diameter = numStr(c.diameter); }
+  else if(c.type === "rectangle"){ s.width = numStr(c.width); s.height = numStr(c.height); }
+  else if(c.type === "polygon_regular"){ s.n_sides = numStr(c.n_sides); s.flat_to_flat = numStr(c.flat_to_flat); }
+  else if(c.type === "polygon_free"){ s.points = c.points.map(function(p){ return { x: numStr(p[0]), y: numStr(p[1]) }; }); }
+  else if(c.type === "support"){ s.angles = c.angles_deg.map(numStr); s.width = numStr(c.width); }
+  return s;
+}
+
+// ===================== Exemples =====================
+function exampleCirc(){
+  // Cercle de 0,30 m, obscuration centrale de 0,085 m (diamètre), 3 supports de 0,03 m
+  var a = newShape("circle"); a.diameter = "0.3";
+  var b = newShape("circle"); b.mode = "subtract"; b.diameter = "0.085";
+  var c = newShape("support"); c.angles = ["-90", "30", "150"]; c.width = "0.03";
+  return [a, b, c];
+}
+function exampleWebb(){
+  // 18 hexagones de 0,10 m entre côtés opposés, séparés de 4 mm : couronne de 6, puis 12 hexagones plus loin
+  var ff = 0.10, gap = 0.004, pitch = ff + gap, out = [], k, ang, r;
+  function hex(rd, deg){
+    var s = newShape("polygon_regular");
+    s.n_sides = "6"; s.flat_to_flat = numStr(ff);
+    s.x = numStr(rd * Math.cos(deg * Math.PI / 180)); s.y = numStr(rd * Math.sin(deg * Math.PI / 180));
+    out.push(s);
+  }
+  for(k = 0; k < 6; k++){ ang = 30 + 60 * k; hex(pitch, ang); }
+  for(k = 0; k < 6; k++){ ang = 30 + 60 * k; hex(2 * pitch, ang); }
+  for(k = 0; k < 6; k++){ ang = 60 * k; hex(Math.sqrt(3) * pitch, ang); }
+  return out;
+}
+
+// ===================== Filtre de frappe des champs numériques =====================
+// Même principe que sur creer-instrument.html : virgule changée en point, rien d'autre que des chiffres, un seul
+// point, un signe moins en tête seulement si le champ l'autorise (data-neg), pas de point pour un entier (data-int).
+function filterNumeric(e){
+  var el = e.target;
+  if(!el.matches || !el.matches("input[data-num]")) return;
+  var raw = el.value, pos = el.selectionStart;
+  var v = raw.replace(/,/g, ".").replace(/[^0-9.]/g, "");
+  var neg = el.hasAttribute("data-neg") && /^\s*-/.test(raw);
+  if(el.hasAttribute("data-int")){ v = v.replace(/\./g, ""); }
+  else { var dot = v.indexOf("."); if(dot >= 0) v = v.slice(0, dot + 1) + v.slice(dot + 1).replace(/\./g, ""); }
+  if(neg) v = "-" + v;
+  if(v !== raw){
+    el.value = v;
+    try{ var p = Math.max(0, pos - (raw.length - v.length)); el.setSelectionRange(p, p); }catch(_){}
+  }
+}
+
+// ===================== Liste des formes =====================
+function summary(s){
+  var t = TYPE_LABEL[s.type], q = "?";
+  function g(k){ var v = toNum(s[k]); return v === undefined ? q : fmt(v); }
+  if(s.type === "circle") return t + ", Ø " + g("diameter") + " m";
+  if(s.type === "rectangle") return t + ", " + g("width") + " × " + g("height") + " m";
+  if(s.type === "polygon_regular") return g("n_sides") + " côtés, " + g("flat_to_flat") + " m entre côtés";
+  if(s.type === "polygon_free") return t + ", " + s.points.length + " points";
+  return t + ", " + s.angles.length + " bras de " + g("width") + " m";
+}
+
+function numField(i, f, label, unit, val, opts){
+  opts = opts || {};
+  return "<div class='field'><label for='f-" + i + "-" + f + "'>" + label + "</label><div class='row'>" +
+    "<input type='text' inputmode='decimal' autocomplete='off' data-num" + (opts.neg ? " data-neg" : "") + (opts.int ? " data-int" : "") +
+    " id='f-" + i + "-" + f + "' data-i='" + i + "' data-f='" + f + "' value='" + esc(val) + "'>" +
+    "<span class='unit'>" + unit + "</span></div></div>";
+}
+
+function bodyHtml(s, i){
+  var h = "", j;
+  if(s.type === "support"){
+    h += "<div class='field'><span class='lab'>Mode</span><p class='lockhint'>Un support retire toujours de la matière.</p></div>";
+  } else {
+    h += "<div class='field'><span class='lab'>Mode</span><div class='modeseg'>" +
+      "<button type='button' data-act='mode' data-m='add' data-i='" + i + "' class='add" + (s.mode === "add" ? " on" : "") + "'>Ajouter</button>" +
+      "<button type='button' data-act='mode' data-m='subtract' data-i='" + i + "' class='sub" + (s.mode === "subtract" ? " on" : "") + "'>Retirer</button></div></div>";
+  }
+  if(s.type === "circle"){
+    h += numField(i, "diameter", "Diamètre", "m", s.diameter);
+  } else if(s.type === "rectangle"){
+    h += "<div class='grid2'>" + numField(i, "width", "Largeur", "m", s.width) + numField(i, "height", "Hauteur", "m", s.height) + "</div>";
+  } else if(s.type === "polygon_regular"){
+    h += "<div class='grid2'>" + numField(i, "n_sides", "Nombre de côtés (3 à 12)", "", s.n_sides, {int: true}) +
+      numField(i, "flat_to_flat", "Distance entre côtés opposés", "m", s.flat_to_flat) + "</div>";
+  } else if(s.type === "support"){
+    h += numField(i, "width", "Largeur d'un bras", "m", s.width);
+  }
+  h += "<div class='grid2'>" + numField(i, "x", "Position X", "m", s.x, {neg: true}) + numField(i, "y", "Position Y", "m", s.y, {neg: true}) + "</div>";
+
+  var rot = toNum(s.rot), rv = (rot !== undefined && rot >= -180 && rot <= 180) ? rot : 0;
+  h += "<div class='field'><label for='f-" + i + "-rot'>Rotation (cran de " + state.cran + "°)</label><div class='row'>" +
+    "<input type='text' inputmode='decimal' autocomplete='off' data-num data-neg id='f-" + i + "-rot' data-i='" + i + "' data-f='rot' value='" + esc(s.rot) + "'>" +
+    "<span class='unit'>°</span>" +
+    "<button type='button' class='ibtn' data-act='rotstep' data-d='-1' data-i='" + i + "' aria-label='Un cran vers la droite' title='Un cran vers la droite'>−</button>" +
+    "<button type='button' class='ibtn' data-act='rotstep' data-d='1' data-i='" + i + "' aria-label='Un cran vers la gauche' title='Un cran vers la gauche'>+</button></div>" +
+    "<input type='range' min='-180' max='180' step='" + state.cran + "' value='" + rv + "' data-i='" + i + "' data-f='rotslider' aria-label='Rotation de la forme'></div>";
+
+  if(s.type === "polygon_free"){
+    h += "<div class='field'><span class='lab'>Points du contour, avant rotation et translation (m)</span><div class='rowlist'>";
+    for(j = 0; j < s.points.length; j++){
+      h += "<div class='prow'><span class='pidx'>" + (j + 1) + "</span>" +
+        "<input type='text' inputmode='decimal' autocomplete='off' data-num data-neg data-i='" + i + "' data-f='pt' data-j='" + j + "' data-c='x' value='" + esc(s.points[j].x) + "' aria-label='Point " + (j + 1) + ", X'>" +
+        "<input type='text' inputmode='decimal' autocomplete='off' data-num data-neg data-i='" + i + "' data-f='pt' data-j='" + j + "' data-c='y' value='" + esc(s.points[j].y) + "' aria-label='Point " + (j + 1) + ", Y'>" +
+        "<button type='button' class='ibtn danger' data-act='ptdel' data-i='" + i + "' data-j='" + j + "' aria-label='Supprimer ce point'>×</button></div>";
+    }
+    h += "</div><button type='button' class='btn' data-act='ptadd' data-i='" + i + "'" + (s.points.length >= MAXP ? " disabled" : "") + ">+ Ajouter un point</button>" +
+      "<p class='hint' style='margin:8px 0 0'>La rotation se fait autour de l'origine des points. Le contour ne doit pas se croiser.</p></div>";
+  }
+  if(s.type === "support"){
+    h += "<div class='field'><span class='lab'>Direction des bras (degrés, 0° vers +X, sens trigonométrique)</span><div class='rowlist'>";
+    for(j = 0; j < s.angles.length; j++){
+      h += "<div class='prow'><span class='pidx'>" + (j + 1) + "</span>" +
+        "<input type='text' inputmode='decimal' autocomplete='off' data-num data-neg data-i='" + i + "' data-f='arm' data-j='" + j + "' value='" + esc(s.angles[j]) + "' aria-label='Direction du bras " + (j + 1) + "'>" +
+        "<span class='unit'>°</span>" +
+        "<button type='button' class='ibtn danger' data-act='armdel' data-i='" + i + "' data-j='" + j + "' aria-label='Supprimer ce bras'>×</button></div>";
+    }
+    h += "</div><button type='button' class='btn' data-act='armadd' data-i='" + i + "'" + (s.angles.length >= MAXA ? " disabled" : "") + ">+ Ajouter un bras</button>" +
+      "<div class='spread'>Répartir <input type='text' inputmode='numeric' data-num data-int id='sp-n-" + i + "' value='3' aria-label='Nombre de bras'> bras à partir de " +
+      "<input type='text' inputmode='decimal' data-num data-neg id='sp-a-" + i + "' value='-90' aria-label='Premier angle'> ° " +
+      "<button type='button' class='btn' data-act='spread' data-i='" + i + "'>Appliquer</button></div></div>";
+  }
+  return h;
+}
+
+function cardHtml(s, i){
+  var sel = (i === state.sel), n = state.shapes.length;
+  return "<div class='scard" + (sel ? " sel" : "") + (s.mode === "subtract" ? " sub" : "") + "'>" +
+    "<div class='shead' data-act='sel' data-i='" + i + "' role='button' tabindex='0' aria-expanded='" + sel + "'>" +
+      "<span class='sidx'>" + (i + 1) + "</span>" +
+      "<span class='stitle'><b id='ttl-" + i + "'>" + esc(summary(s)) + "</b><span class='smode'>" + (s.mode === "add" ? "ajoute" : "retire") + "</span></span>" +
+      "<span class='sbtns'>" +
+        "<button type='button' class='ibtn' data-act='up' data-i='" + i + "' title='Monter' aria-label='Monter dans la liste'" + (i === 0 ? " disabled" : "") + ">▲</button>" +
+        "<button type='button' class='ibtn' data-act='down' data-i='" + i + "' title='Descendre' aria-label='Descendre dans la liste'" + (i === n - 1 ? " disabled" : "") + ">▼</button>" +
+        "<button type='button' class='ibtn' data-act='dup' data-i='" + i + "' title='Dupliquer' aria-label='Dupliquer la forme'" + (n >= MAXS ? " disabled" : "") + ">⧉</button>" +
+        "<button type='button' class='ibtn danger' data-act='del' data-i='" + i + "' title='Supprimer' aria-label='Supprimer la forme'>×</button>" +
+      "</span></div>" +
+    "<p class='serr' id='err-" + i + "' hidden></p>" +
+    (sel ? "<div class='sbody'>" + bodyHtml(s, i) + "</div>" : "") +
+  "</div>";
+}
+
+function renderList(){
+  var host = $("shapeList");
+  if(!state.shapes.length){ host.innerHTML = "<p class='empty'>Aucune forme. Ajoutez-en une avec les boutons ci-dessus.</p>"; }
+  else host.innerHTML = state.shapes.map(cardHtml).join("");
+  $("shapeCount").textContent = state.shapes.length + " / " + MAXS;
+  var add = document.querySelectorAll("#addBtns .btn");
+  for(var k = 0; k < add.length; k++) add[k].disabled = state.shapes.length >= MAXS;
+}
+
+function select(i){
+  state.sel = i;
+  renderList();
+  refresh();
+  if(i >= 0){
+    var head = document.querySelector(".shead[data-i='" + i + "']");
+    if(head && head.scrollIntoView) head.scrollIntoView({ block: "nearest" });
+  }
+}
+
+function snapRot(cur, dir){
+  var c = state.cran, q = cur / c, n;
+  if(dir > 0) n = Math.floor(q + 1e-9) + 1; else n = Math.ceil(q - 1e-9) - 1;
+  var v = n * c;
+  while(v > 180) v -= 360;
+  while(v <= -180) v += 360;
+  return v;
+}
+
+// ===================== Interactions =====================
+var listEl = $("shapeList");
+listEl.addEventListener("input", filterNumeric, true);
+$("shapeList").addEventListener("input", function(e){
+  var el = e.target, f = el.getAttribute && el.getAttribute("data-f");
+  if(!f) return;
+  var i = Number(el.getAttribute("data-i")), s = state.shapes[i];
+  if(!s) return;
+  if(f === "pt") s.points[Number(el.getAttribute("data-j"))][el.getAttribute("data-c")] = el.value;
+  else if(f === "arm") s.angles[Number(el.getAttribute("data-j"))] = el.value;
+  else if(f === "rotslider"){ s.rot = String(Number(el.value)); var t = $("f-" + i + "-rot"); if(t) t.value = s.rot; }
+  else {
+    s[f] = el.value;
+    if(f === "rot"){
+      var sl = listEl.querySelector("input[type=range][data-i='" + i + "']"), v = toNum(el.value);
+      if(sl && v !== undefined && v >= -180 && v <= 180) sl.value = v;
+    }
+  }
+  refresh();
+});
+
+function addShape(type){
+  if(state.shapes.length >= MAXS) return;
+  state.shapes.push(newShape(type));
+  select(state.shapes.length - 1);
+}
+
+listEl.addEventListener("click", function(e){
+  var el = e.target.closest ? e.target.closest("[data-act]") : null;
+  if(!el) return;
+  var act = el.getAttribute("data-act"), i = Number(el.getAttribute("data-i")), j = Number(el.getAttribute("data-j")), s = state.shapes[i];
+  if(!s) return;
+  var tmp, focusSel = null;
+  if(act === "sel"){ select(state.sel === i ? -1 : i); return; }
+  if(act === "up" && i > 0){ tmp = state.shapes[i - 1]; state.shapes[i - 1] = s; state.shapes[i] = tmp; state.sel = (state.sel === i) ? i - 1 : (state.sel === i - 1 ? i : state.sel); }
+  else if(act === "down" && i < state.shapes.length - 1){ tmp = state.shapes[i + 1]; state.shapes[i + 1] = s; state.shapes[i] = tmp; state.sel = (state.sel === i) ? i + 1 : (state.sel === i + 1 ? i : state.sel); }
+  else if(act === "dup"){
+    if(state.shapes.length >= MAXS) return;
+    state.shapes.splice(i + 1, 0, JSON.parse(JSON.stringify(s)));
+    state.sel = i + 1;
+  }
+  else if(act === "del"){
+    state.shapes.splice(i, 1);
+    if(state.sel === i) state.sel = -1; else if(state.sel > i) state.sel -= 1;
+  }
+  else if(act === "mode"){ s.mode = el.getAttribute("data-m"); }
+  else if(act === "rotstep"){
+    var cur = toNum(s.rot); if(cur === undefined) cur = 0;
+    s.rot = numStr(snapRot(cur, Number(el.getAttribute("data-d"))));
+  }
+  else if(act === "ptadd"){
+    if(s.points.length >= MAXP) return;
+    var last = s.points[s.points.length - 1];
+    s.points.push({ x: last ? last.x : "0", y: last ? last.y : "0" });
+    focusSel = "input[data-f='pt'][data-i='" + i + "'][data-j='" + (s.points.length - 1) + "'][data-c='x']";
+  }
+  else if(act === "ptdel"){ s.points.splice(j, 1); }
+  else if(act === "armadd"){
+    if(s.angles.length >= MAXA) return;
+    s.angles.push("0");
+    focusSel = "input[data-f='arm'][data-i='" + i + "'][data-j='" + (s.angles.length - 1) + "']";
+  }
+  else if(act === "armdel"){ s.angles.splice(j, 1); }
+  else if(act === "spread"){
+    var n = toNum($("sp-n-" + i).value), a0 = toNum($("sp-a-" + i).value);
+    if(n === undefined || n < 1) n = 1;
+    n = Math.min(MAXA, Math.floor(n));
+    if(a0 === undefined) a0 = 0;
+    s.angles = [];
+    for(var k = 0; k < n; k++) s.angles.push(numStr(a0 + 360 * k / n));
+  }
+  else return;
+  renderList();
+  refresh();
+  if(focusSel){ var f = listEl.querySelector(focusSel); if(f){ f.focus(); f.select(); } }
+});
+listEl.addEventListener("keydown", function(e){
+  if((e.key === "Enter" || e.key === " ") && e.target.getAttribute && e.target.getAttribute("data-act") === "sel"){
+    e.preventDefault();
+    var i = Number(e.target.getAttribute("data-i"));
+    select(state.sel === i ? -1 : i);
+  }
+});
+
+$("addBtns").addEventListener("click", function(e){
+  var t = e.target.getAttribute && e.target.getAttribute("data-add");
+  if(t) addShape(t);
+});
+document.querySelector("[data-example='circ']").addEventListener("click", function(){ loadShapes(exampleCirc()); });
+document.querySelector("[data-example='webb']").addEventListener("click", function(){ loadShapes(exampleWebb()); });
+document.querySelector("[data-example='clear']").addEventListener("click", function(){
+  if(state.shapes.length && !confirm("Effacer toutes les formes ?")) return;
+  loadShapes([], true);
+});
+function loadShapes(shapes, noConfirm){
+  if(!noConfirm && state.shapes.length && !confirm("Remplacer les formes actuelles par cet exemple ?")) return;
+  state.shapes = shapes; state.sel = -1; state.serverGrid = null;
+  renderList(); refresh();
+}
+
+$("selCran").addEventListener("change", function(e){ state.cran = Number(e.target.value); renderList(); refresh(); });
+$("selGrid").addEventListener("change", function(e){ state.grid = e.target.value; refresh(); });
+$("selView").addEventListener("change", function(e){ state.view = e.target.value; refresh(); });
+
+// ===================== Calcul et affichage =====================
+function stripIdx(msg){ return msg.replace(/^Forme 2 : /, "").replace(/^./, function(c){ return c.toUpperCase(); }); }
+var DUMMY = { type: "circle", mode: "add", diameter: 1 };
+
+function maxDistFrom(verts, x, y){
+  var d = 0;
+  verts.forEach(function(p){ var q = Math.hypot(p[0] - x, p[1] - y); if(q > d) d = q; });
+  return d;
+}
+
+function refresh(){
+  var block = buildBlock(), n = state.shapes.length, i, outlines = [], errs = [], addVerts = [], res = null, gerr = "";
+
+  // Chaque forme est validée seule (avec une forme « ajouter » fictive devant elle, pour que la règle « au moins
+  // une forme ajoutée » ne se déclenche pas), puis dessinée seule. Les supports passent en second : leur longueur
+  // dépend des formes ajoutées.
+  function oneShape(k, supportLen){
+    var obj = block.shapes[k];
+    var c = NysaPupil.validate({ shapes: [DUMMY, obj] }).shapes[1];
+    return { c: c, g: NysaPupil.shapeGeometry(c, supportLen) };
+  }
+  for(i = 0; i < n; i++){
+    if(state.shapes[i].type === "support") continue;
+    try{
+      var o = oneShape(i);
+      outlines[i] = o.g;
+      if(o.c.mode === "add") o.g.forEach(function(poly){ poly[0].forEach(function(p){ addVerts.push(p); }); });
+    }catch(e){ errs[i] = stripIdx(e.message); }
+  }
+  for(i = 0; i < n; i++){
+    if(state.shapes[i].type !== "support") continue;
+    try{
+      var c0 = NysaPupil.validate({ shapes: [DUMMY, block.shapes[i]] }).shapes[1];
+      var L = addVerts.length ? 1.05 * maxDistFrom(addVerts, c0.x, c0.y) + 0.01 : 1;
+      outlines[i] = NysaPupil.shapeGeometry(c0, L);
+    }catch(e2){ errs[i] = stripIdx(e2.message); }
+  }
+
+  var anyErr = errs.some(function(x){ return !!x; });
+  try{ res = NysaPupil.geometry(block); }catch(e3){ gerr = e3.message; }
+
+  // erreurs et titres sur les cartes
+  for(i = 0; i < n; i++){
+    var er = $("err-" + i), tt = $("ttl-" + i);
+    if(tt) tt.textContent = summary(state.shapes[i]);
+    if(er){ er.textContent = errs[i] || ""; er.hidden = !errs[i]; }
+  }
+  renderValues(res, anyErr ? "Corrigez les formes signalées dans la liste." : gerr, n);
+  renderPreview(res, outlines);
+  updateJson(block);
+}
+
+function renderValues(res, gerr, n){
+  var vals = $("vals"), g = $("gerr");
+  if(res){
+    var inf = res.info, adds = 0, subs = 0;
+    inf.clean.shapes.forEach(function(c){ if(c.mode === "add") adds++; else subs++; });
+    vals.innerHTML =
+      "<div class='val'><div class='k'>Surface</div><div class='v'>" + fmt(inf.area_m2) + " <small>m²</small></div></div>" +
+      "<div class='val'><div class='k'>D_small</div><div class='v'>" + fmt(inf.D_small) + " <small>m</small></div></div>" +
+      "<div class='val'><div class='k'>D_large</div><div class='v'>" + fmt(inf.D_large) + " <small>m</small></div></div>" +
+      "<div class='val'><div class='k'>Ø équivalent (surface)</div><div class='v'>" + fmt(Math.sqrt(4 * inf.area_m2 / Math.PI)) + " <small>m</small></div></div>" +
+      "<div class='val'><div class='k'>Étendue</div><div class='v'>" + fmt(2 * inf.half_side_m) + " <small>m</small></div></div>" +
+      "<div class='val'><div class='k'>Formes</div><div class='v'>" + n + " <small>(" + adds + " ajoutées, " + subs + " retirées)</small></div></div>";
+    g.hidden = true;
+  } else {
+    vals.innerHTML = "";
+    g.textContent = gerr || "Pupille invalide.";
+    g.hidden = false;
+  }
+}
+
+// ---------- aperçu SVG ----------
+function niceStep(raw){
+  var steps = [0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10];
+  for(var k = 0; k < steps.length; k++) if(steps[k] >= raw) return steps[k];
+  return 10;
+}
+function scanExtent(g, acc){
+  g.forEach(function(poly){ poly[0].forEach(function(p){
+    var m = Math.max(Math.abs(p[0]), Math.abs(p[1])); if(m > acc.v) acc.v = m;
+  }); });
+}
+
+function renderPreview(res, outlines){
+  var S = 600, C = 300, i, n = state.shapes.length;
+
+  // demi-largeur de la vue (le repère reste centré sur l'origine)
+  var half;
+  if(state.view !== "auto") half = Number(state.view);
+  else {
+    var acc = { v: 0 };
+    outlines.forEach(function(g, k){ if(g && state.shapes[k].type !== "support") scanExtent(g, acc); });
+    if(res) scanExtent(res.geom, acc);
+    if(acc.v === 0) outlines.forEach(function(g){ if(g) scanExtent(g, acc); });
+    half = Math.max(acc.v * 1.18, 0.02);
+  }
+  var k0 = C / half;
+  function X(x){ return (C + x * k0).toFixed(1); }
+  function Y(y){ return (C - y * k0).toFixed(1); }
+  function ringPath(r){ return "M" + r.map(function(p){ return X(p[0]) + "," + Y(p[1]); }).join("L") + "Z"; }
+  function multiPath(m){ return m.map(function(poly){ return poly.map(ringPath).join(""); }).join(""); }
+
+  // grille : pas choisi, ou pas automatique (environ 10 divisions sur la largeur) ; élargi s'il y aurait trop de traits
+  var step = state.grid === "auto" ? niceStep(2 * half / 10) : Number(state.grid), note = "";
+  if(2 * half / step > 80){ var bigger = niceStep(2 * half / 10); note = "Grille agrandie à " + fmt(bigger) + " m pour rester lisible."; step = bigger; }
+  $("gridNote").textContent = note; $("gridNote").hidden = !note;
+
+  var grid = "<g stroke='var(--line-soft)' stroke-width='1'>", nMin = Math.ceil(-half / step - 1e-9), nMax = Math.floor(half / step + 1e-9), q, v;
+  var labEvery = Math.max(1, Math.ceil(46 / (step * k0))), labels = "";
+  for(q = nMin; q <= nMax; q++){
+    v = q * step;
+    if(q !== 0) grid += "<line x1='" + X(v) + "' y1='0' x2='" + X(v) + "' y2='" + S + "'/><line x1='0' y1='" + Y(v) + "' x2='" + S + "' y2='" + Y(v) + "'/>";
+    if(q !== 0 && q % labEvery === 0 && Number(X(v)) > 26 && Number(X(v)) < S - 26){
+      var lab = String(Number(v.toPrecision(6)));
+      labels += "<text x='" + X(v) + "' y='" + (S - 6) + "' text-anchor='middle'>" + lab + "</text>" +
+                "<text x='5' y='" + (Number(Y(v)) + 3.5).toFixed(1) + "'>" + lab + "</text>";
+    }
+  }
+  grid += "</g><g stroke='var(--line)' stroke-width='1.2'><line x1='" + C + "' y1='0' x2='" + C + "' y2='" + S + "'/><line x1='0' y1='" + C + "' x2='" + S + "' y2='" + C + "'/></g>";
+  labels = "<g font-family='var(--mono)' font-size='10.5' fill='var(--muted-2)'>" + labels +
+    "<text x='" + (S - 6) + "' y='" + (C - 7) + "' text-anchor='end' fill='var(--muted)'>X (m)</text>" +
+    "<text x='" + (C + 7) + "' y='14' fill='var(--muted)'>Y (m)</text></g>";
+
+  // pupille obtenue
+  var fill = res ? "<path d='" + multiPath(res.geom) + "' fill='var(--pixel)' fill-opacity='.24' fill-rule='evenodd' stroke='var(--pixel)' stroke-width='1.5' stroke-linejoin='round'/>" : "";
+
+  // contours de chaque forme : retirées en rouge pointillé, ajoutées en bleu, la forme choisie par-dessus, plus épaisse
+  var lines = "", selLine = "", marks = "";
+  for(i = 0; i < n; i++){
+    var g = outlines[i], s = state.shapes[i];
+    if(!g) continue;
+    var sub = s.mode === "subtract", isSel = (i === state.sel);
+    var colr = sub ? "var(--alert)" : "var(--add)";
+    var path = "<path d='" + multiPath(g) + "' fill='" + (isSel ? (sub ? "rgba(240,119,109,.08)" : "rgba(106,169,255,.08)") : "none") + "' stroke='" + colr + "' stroke-width='" + (isSel ? 2.4 : 1.1) + "'" + (sub ? " stroke-dasharray='6 4'" : "") + " stroke-linejoin='round' fill-rule='evenodd'/>";
+    if(isSel) selLine += path; else lines += path;
+    var cx = toNum(s.x), cy = toNum(s.y);
+    if(cx === undefined) cx = 0;
+    if(cy === undefined) cy = 0;
+    if(isSel){
+      marks += "<g stroke='var(--paper)' stroke-width='1.4'><line x1='" + (Number(X(cx)) - 6) + "' y1='" + Y(cy) + "' x2='" + (Number(X(cx)) + 6) + "' y2='" + Y(cy) + "'/><line x1='" + X(cx) + "' y1='" + (Number(Y(cy)) - 6) + "' x2='" + X(cx) + "' y2='" + (Number(Y(cy)) + 6) + "'/></g>";
+    }
+    if(n <= 40 || isSel){
+      marks += "<text x='" + (Number(X(cx)) + 7) + "' y='" + (Number(Y(cy)) - 6) + "' font-family='var(--mono)' font-size='" + (isSel ? 13 : 11) + "' fill='" + (isSel ? "var(--paper)" : "var(--muted-2)") + "'>" + (i + 1) + "</text>";
+    }
+  }
+
+  // échelle : un trait de longueur ronde, en bas à gauche
+  var barLen = niceStep(half * 0.45), barPx = barLen * k0;
+  var bar = "<g stroke='var(--paper)' stroke-width='2'><line x1='30' y1='" + (S - 26) + "' x2='" + (30 + barPx).toFixed(1) + "' y2='" + (S - 26) + "'/><line x1='30' y1='" + (S - 31) + "' x2='30' y2='" + (S - 21) + "'/><line x1='" + (30 + barPx).toFixed(1) + "' y1='" + (S - 31) + "' x2='" + (30 + barPx).toFixed(1) + "' y2='" + (S - 21) + "'/></g>" +
+    "<text x='" + (30 + barPx / 2).toFixed(1) + "' y='" + (S - 34) + "' text-anchor='middle' font-family='var(--mono)' font-size='11.5' fill='var(--paper)'>" + fmt(barLen) + " m</text>";
+  var extent = "<text x='" + (S - 6) + "' y='14' text-anchor='end' font-family='var(--mono)' font-size='11' fill='var(--muted-2)'>vue ± " + fmt(half) + " m</text>";
+
+  $("preview").innerHTML =
+    "<svg viewBox='0 0 " + S + " " + S + "' xmlns='http://www.w3.org/2000/svg' role='img' aria-label='Aperçu de la pupille'>" +
+      "<rect width='" + S + "' height='" + S + "' fill='var(--void)'/>" +
+      grid + fill + lines + selLine + marks + labels + bar + extent +
+    "</svg>";
+}
+
+// ---------- JSON ----------
+function jsonText(block){
+  return JSON.stringify(block, function(k, v){ return (typeof v === "number" && !isFinite(v)) ? null : v; }, 2);
+}
+function updateJson(block){
+  var ta = $("json");
+  if(document.activeElement !== ta) ta.value = jsonText(block);
+}
+$("btnApply").addEventListener("click", function(){
+  var msg = $("jmsg");
+  try{
+    var data = JSON.parse($("json").value);
+    if(data && !data.shapes && (data.pupil_free || data.pupilFree)) data = data.pupil_free || data.pupilFree;
+    var clean = NysaPupil.validate(data);
+    NysaPupil.geometry(clean);
+    state.shapes = clean.shapes.map(fromBlockShape);
+    state.serverGrid = clean.grid_step_m || null;
+    state.sel = -1;
+    renderList(); refresh();
+    $("json").blur();
+    $("json").value = jsonText(buildBlock());
+    msg.style.color = "var(--ok)"; msg.textContent = "Pupille chargée : " + state.shapes.length + " forme" + (state.shapes.length > 1 ? "s" : "") + ".";
+  }catch(err){
+    msg.style.color = "var(--alert)";
+    msg.textContent = (err instanceof SyntaxError) ? "JSON illisible : " + err.message : err.message;
+  }
+});
+$("btnCopy").addEventListener("click", function(){
+  var ta = $("json"), msg = $("jmsg");
+  function ok(){ msg.style.color = "var(--ok)"; msg.textContent = "Copié."; }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(ta.value).then(ok, function(){ ta.select(); document.execCommand("copy"); ok(); });
+  } else { ta.select(); document.execCommand("copy"); ok(); }
+});
+
+// ===================== Démarrage =====================
+state.shapes = exampleCirc();
+state.sel = 0;
+renderList();
+refresh();
+})();
+</script>
+</body>
+</html>
