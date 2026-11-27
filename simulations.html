@@ -605,6 +605,7 @@ h1{font-family:var(--display);font-weight:500;font-size:clamp(21px,2.4vw,27.5px)
                     <select id="fWfeCase">
                       <option value="" data-i18n="sim.wfe.simplified">Simplifié (RMS)</option>
                     </select>
+                    <p class="fielderr" id="errWfeCase" hidden></p>
                   </div>
                   <!-- Angle de visée : non modélisé en V1 (visée au nadir), affiché grisé. -->
                   <div class="field">
@@ -1037,8 +1038,52 @@ function selectedWfeCase(){
   return cases.find(function(c){ return c.id === wfeCaseId; }) || null;
 }
 
+// Convention Zernike d'un cas fichier (cf. creer-instrument.html) : en-tête Z0..Z36 = OSA ;
+// en-tête Z1..Z37 = Noll ou Fringe, à choisir (convention vide tant que ce n'est pas fait).
+function wfeCsvHeaderKind(csv){
+  var cols = (String(csv || "").split(/\r?\n/)[0] || "").split(";").map(function(c){ return c.trim(); });
+  var z = cols.filter(function(c){ return /^Z\d+$/.test(c); });
+  function exact(first){
+    if(z.length !== 37) return false;
+    for(var i = 0; i < 37; i++) if(cols.indexOf("Z" + (first + i)) < 0) return false;
+    return true;
+  }
+  return exact(0) ? "osa" : exact(1) ? "noll_fringe" : null;
+}
+// Copie du cas telle qu'elle part au serveur. Anciens cas OSA (convention OSA, en-tête Z1..Z37, qui voulait
+// déjà dire indices OSA 0..36) : en-tête renommé en Z0..Z36 sur la copie envoyée, le cas stocké n'est pas touché.
+function wfeCaseForSend(c){
+  var conv = c.convention || "";
+  var kind = wfeCsvHeaderKind(c.csv);
+  if(kind === "osa") conv = "osa";
+  var csv = c.csv;
+  if(kind === "noll_fringe" && conv === "osa"){
+    var nl = csv.search(/\r?\n/);
+    var head = nl < 0 ? csv : csv.slice(0, nl), rest = nl < 0 ? "" : csv.slice(nl);
+    csv = head.split(";").map(function(h){
+      var m = /^Z(\d+)$/.exec(h.trim());
+      return m ? "Z" + (Number(m[1]) - 1) : h;
+    }).join(";") + rest;
+  }
+  return { csv: csv, convention: conv };
+}
+// Message bloquant si le cas fichier choisi n'a pas de convention Zernike, ou a un en-tête illisible.
+function wfeCaseMessage(){
+  var c = selectedWfeCase();
+  if(!c || c.mode !== "file") return "";
+  if(!wfeCsvHeaderKind(c.csv)) return t("sim.wfe.bad_header");
+  return wfeCaseForSend(c).convention ? "" : t("sim.wfe.need_convention");
+}
+function paintWfeCase(){
+  var el = document.getElementById("errWfeCase");
+  if(!el) return;
+  var m = wfeCaseMessage();
+  el.textContent = m; el.hidden = !m;
+}
+
 document.getElementById("fWfeCase").addEventListener("change", function(){
   updateSummary();
+  updatePanelButton();
 });
 
 // ===================== Schéma des conditions d'acquisition =====================
@@ -1608,6 +1653,11 @@ function conditionsValid(){
   return CONDITION_RULES.every(function(r){ return ruleMessage(r) === ""; });
 }
 function validateConditions(show){
+  if(show) paintWfeCase();
+  if(wfeCaseMessage()){
+    if(show) document.getElementById("fWfeCase").focus();
+    return false;
+  }
   var firstBad = null;
   CONDITION_RULES.forEach(function(r){
     var m = ruleMessage(r);
@@ -1660,6 +1710,7 @@ async function loadQuota(){
 
 function updatePanelButton(){
   var btn = document.getElementById("panelActionBtn");
+  paintWfeCase();
   if(currentStep === 3){
     if(!hasSimAccess()){
       // Compte sans accès : le bouton ouvre la fenêtre d'abonnement.
@@ -1672,7 +1723,7 @@ function updatePanelButton(){
     btn.textContent = t("sim.btn.run");
     syncTimeField();
     var badRule = adminMode() ? null : CONDITION_RULES.filter(function(r){ return ruleMessage(r) !== ""; })[0];
-    btn.disabled = selectedInstIdx < 0 || !!badRule || quotaFull();
+    btn.disabled = selectedInstIdx < 0 || !!badRule || !!wfeCaseMessage() || quotaFull();
     btn.title = badRule ? ruleMessage(badRule) : (quotaFull() ? quotaMsg : "");
     btn.onclick = function(){ showStep(4); };
   } else {
@@ -1963,17 +2014,19 @@ async function launchSimulation(){
   //    par défaut si absent. perfoCsvConvention : convention
   //    d'indexation Zernike du cas — module_MTF.py en a besoin dès qu'un
   //    perfoCsv est fourni (paramFile.Telescope.WFE_convention, sans
-  //    valeur par défaut côté backend). Valeurs "OSA"/"Noll"/"Fringe"
-  //    supposées attendues par op.convert_WFE, non confirmées faute
-  //    d'accès à optics.py.
+  //    valeur par défaut côté backend). Valeurs "OSA"/"Noll"/"Fringe",
+  //    attendues par op.convert_WFE. Colonnes du CSV : Z0..Z36 en OSA,
+  //    Z1..Z37 en Noll et Fringe (lecture stricte côté serveur).
   var wfeCase = selectedWfeCase();
   if(wfeCase && wfeCase.mode === "rms"){
     payload.W = wfeCase.rms;
   } else if(wfeCase){
-    payload.perfoCsv = wfeCase.csv;
+    // Aucune convention par défaut : un cas sans convention est bloqué avant d'arriver ici (wfeCaseMessage).
+    var wfeSend = wfeCaseForSend(wfeCase);
+    payload.perfoCsv = wfeSend.csv;
     payload.perfoCsvAlign = wfeCase.align || "center";
-    payload.perfoCsvConvention = wfeCase.convention === "noll" ? "Noll"
-      : wfeCase.convention === "fringe" ? "Fringe" : "OSA";
+    payload.perfoCsvConvention = wfeSend.convention === "noll" ? "Noll"
+      : wfeSend.convention === "fringe" ? "Fringe" : "OSA";
   }
 
   // Courbe QE(λ) réelle (cf. creer-instrument.html, state.values.qeSpectral)

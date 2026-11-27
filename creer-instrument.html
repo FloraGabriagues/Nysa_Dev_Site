@@ -1357,7 +1357,8 @@ function renderPanel(){
 //
 // Format CSV attendu pour un cas "file" — même format que
 // module_MTF.load_zernike_csv côté backend : séparateur ";", décimales
-// ",", colonnes Detector_ID;Band;Column;Z1;Z2;...;Z37 (une ligne par
+// ",", colonnes Detector_ID;Band;Column;Z0;...;Z36 (OSA) ou
+// Z1;...;Z37 (Noll, Fringe), indices de la norme (une ligne par
 // colonne détecteur/bande). Le fichier est transmis TEL QUEL (texte brut)
 // au serveur.
 //
@@ -1389,13 +1390,15 @@ function renderWfeCasesHtml(){
     var alignOpts = ["center", "left", "right"].map(function(a){
       return "<option value='"+a+"'"+(c.align === a ? " selected" : "")+">"+tx(WFE_ALIGN_LABELS[a])+"</option>";
     }).join("");
-    var convOpts = ["osa", "noll", "fringe"].map(function(v){
-      return "<option value='"+v+"'"+((c.convention||"osa") === v ? " selected" : "")+">"+WFE_CONVENTION_LABELS[v]+"</option>";
+    // En-tête Z0..Z36 : OSA seulement. En-tête Z1..Z37 : Noll ou Fringe, à choisir.
+    var convList = csvHeaderKind(c.csv) === "osa" ? ["osa"] : ["", "noll", "fringe"];
+    var convOpts = convList.map(function(v){
+      return "<option value='"+v+"'"+((c.convention||"") === v ? " selected" : "")+">"+(v ? WFE_CONVENTION_LABELS[v] : tx("Choisir…"))+"</option>";
     }).join("");
     return "<div class='caserow' data-case-id='"+escH(c.id)+"'>"+
       "<span class='cname'>"+escH(c.name)+"</span>"+
       "<span class='cfile'>"+(c.rowCount != null ? tx("{n} lignes · {file}", { n: escH(c.rowCount), file: escH(c.filename) }) : "-")+"</span>"+
-      "<select class='calign' data-conv-case='"+escH(c.id)+"' title='"+txa("Convention Zernike")+"'>"+convOpts+"</select>"+
+      "<select class='calign' data-conv-case='"+escH(c.id)+"' title='"+txa("Convention Zernike")+"'"+(convList.length === 1 ? " disabled" : "")+">"+convOpts+"</select>"+
       "<select class='calign' data-align-case='"+c.id+"'>"+alignOpts+"</select>"+
       "<button type='button' class='cdel' data-del-case='"+escH(c.id)+"' aria-label='"+txa("Supprimer ce cas")+"'>×</button>"+
     "</div>";
@@ -1415,18 +1418,22 @@ function renderWfeCasesHtml(){
 // ===================== Détail Zernike par colonne =====================
 // Le CSV d'un cas WFE (cf. ci-dessus) est une ligne par couple
 // (Detector_ID, Band, Column) — chaque ligne porte 37 coefficients de
-// Zernike (Z1..Z37). Ajouté le 18/09/2026 : parse le CSV côté site pour
+// Zernike (OSA : Z0..Z36 ; Noll et Fringe : Z1..Z37). Ajouté le 18/09/2026 : parse le CSV côté site pour
 // afficher, pour une colonne choisie, le détail de ses 37 coefficients et
 // leur somme — jusqu'ici le CSV n'était que transmis brut, jamais
 // affiché.
-function parsePerfoCsvRows(text){
+// Colonnes du fichier : OSA Z0..Z36, Noll et Fringe Z1..Z37 (indices de chaque norme).
+// Lecture stricte, comme le backend : une colonne manquante rend le fichier illisible.
+function zFirstIndex(convention){ return convention === "osa" ? 0 : 1; }
+function parsePerfoCsvRows(text, convention){
   if(!text) return [];
   var lines = text.split(/\r?\n/).filter(function(l){ return l.trim(); });
   if(lines.length < 2) return [];
   var header = lines[0].split(";").map(function(h){ return h.trim(); });
   var detIdx = header.indexOf("Detector_ID"), bandIdx = header.indexOf("Band"), colIdx = header.indexOf("Column");
-  var zIdx = [];
-  for(var i = 1; i <= 37; i++) zIdx.push(header.indexOf("Z"+i));
+  var zIdx = [], first = zFirstIndex(convention);
+  for(var i = 0; i < 37; i++) zIdx.push(header.indexOf("Z"+(first+i)));
+  if(zIdx.some(function(idx){ return idx < 0; })) return [];
   var rows = [];
   for(var r = 1; r < lines.length; r++){
     var cells = lines[r].split(";");
@@ -1463,16 +1470,16 @@ function renderZernikeDetailHtml(cases){
 
 // ---- Maths Zernike (base orthonormée), convention paramétrable ----
 // Donnée par cas WFE (cf. select "convention" dans renderWfeCasesHtml),
-// pas supposée fixe pour tout le monde — deux conventions supportées :
-// OSA/ANSI (Z1..Z37 du fichier = indices OSA 0..36) et Noll (Z1..Z37 =
-// indices Noll 1..37 directement). Chacune donne un (n,m) — donc une
-// forme de carte et des noms de modes — DIFFÉRENTS pour les mêmes valeurs
-// brutes. N'affecte que cet aperçu, jamais le CSV envoyé au serveur.
+// pas supposée fixe pour tout le monde. Trois conventions, chacune avec les
+// indices de sa norme : OSA/ANSI (Z0..Z36), Noll (Z1..Z37) et Fringe
+// (Z1..Z37). Chacune donne un (n,m), donc une forme de carte et des noms de
+// modes, DIFFÉRENTS pour les mêmes valeurs brutes. N'affecte que cet aperçu, jamais le CSV envoyé au serveur.
+// Indices OSA propres à la norme : le piston est Z0.
 var ZERNIKE_NAMES_OSA = {
-  1:"piston", 2:"tilt (Y)", 3:"tilt (X)", 4:"astigmatisme oblique",
-  5:"défocalisation", 6:"astigmatisme", 7:"trefoil oblique", 8:"coma (Y)",
-  9:"coma (X)", 10:"trefoil", 11:"tétrafoil oblique", 12:"astigmatisme secondaire",
-  13:"sphérique", 14:"astigmatisme secondaire", 15:"tétrafoil"
+  0:"piston", 1:"tilt (Y)", 2:"tilt (X)", 3:"astigmatisme oblique",
+  4:"défocalisation", 5:"astigmatisme", 6:"trefoil oblique", 7:"coma (Y)",
+  8:"coma (X)", 9:"trefoil", 10:"tétrafoil oblique", 11:"astigmatisme secondaire",
+  12:"sphérique", 13:"astigmatisme secondaire", 14:"tétrafoil"
 };
 var ZERNIKE_NAMES_NOLL = {
   1:"piston", 2:"tilt (X)", 3:"tilt (Y)", 4:"défocalisation",
@@ -1516,6 +1523,8 @@ function zNollNM(j){ // j : indice Noll 1-indexé
 // point par point (piston..trefoil, sphérique en position 9) avant
 // intégration.
 function zFringeNM(k){ // k : indice Fringe 1-indexé
+  // Z37 : terme sphérique d'ordre 12, (n,m) = (12,0), hors de la règle des groupes.
+  if(k === 37) return { n: 12, m: 0 };
   var p = 0;
   while((p+1)*(p+1) < k) p++;
   var pos = k - p*p, m;
@@ -1526,10 +1535,10 @@ function zFringeNM(k){ // k : indice Fringe 1-indexé
   }
   return { n: 2*p - Math.abs(m), m: m };
 }
-function zNM(k, convention){ // k : indice 1-indexé tel que dans le fichier (Zk)
+function zNM(k, convention){ // k : indice de la norme (OSA depuis 0, Noll et Fringe depuis 1)
   if(convention === "noll") return zNollNM(k);
   if(convention === "fringe") return zFringeNM(k);
-  return zOsaNM(k-1);
+  return zOsaNM(k);
 }
 function zRadial(n, m, rho){
   m = Math.abs(m);
@@ -1541,7 +1550,7 @@ function zRadial(n, m, rho){
   }
   return sum;
 }
-function zValue(k, convention, rho, theta){ // k : indice 1-indexé du fichier (Zk), base orthonormée
+function zValue(k, convention, rho, theta){ // k : indice de la norme (Zk du fichier), base orthonormée
   var nm = zNM(k, convention), n = nm.n, m = nm.m;
   var R = zRadial(n, m, rho);
   var norm = m === 0 ? Math.sqrt(n+1) : Math.sqrt(2*(n+1));
@@ -1567,6 +1576,7 @@ function drawWavefrontMap(canvas, coeffs, convention){
   var img = ctx.createImageData(size, size);
   var R = size/2 - 1, cx = size/2, cy = size/2;
   var vals = new Float32Array(size*size);
+  var first = zFirstIndex(convention);   // indice de la norme de la première colonne (OSA 0, sinon 1)
   var vmin = Infinity, vmax = -Infinity;
   for(var y = 0; y < size; y++){
     for(var x = 0; x < size; x++){
@@ -1574,8 +1584,8 @@ function drawWavefrontMap(canvas, coeffs, convention){
       var idx = y*size+x;
       if(rho > 1){ vals[idx] = NaN; continue; }
       var theta = Math.atan2(dy, dx), w = 0;
-      for(var k = 1; k <= coeffs.length; k++){
-        if(coeffs[k-1]) w += coeffs[k-1] * zValue(k, convention, rho, theta);
+      for(var ci = 0; ci < coeffs.length; ci++){
+        if(coeffs[ci]) w += coeffs[ci] * zValue(first + ci, convention, rho, theta);
       }
       vals[idx] = w;
       if(w < vmin) vmin = w;
@@ -1606,7 +1616,14 @@ function renderZernikeDetail(){
   var selectedCase = cases.find(function(c){ return c.id === caseSel.value; }) || cases[0];
   if(!selectedCase){ out.innerHTML = ""; return; }
 
-  var rows = parsePerfoCsvRows(selectedCase.csv);
+  var convention = selectedCase.convention || "";
+  if(!convention){
+    // Z1..Z37 sans convention choisie : Noll ou Fringe, impossible à deviner.
+    colSel.innerHTML = "<option value=''>-</option>";
+    out.innerHTML = "<p class='empty'>"+tx("Choisissez la convention Zernike du cas (Noll ou Fringe) pour afficher le détail.")+"</p>";
+    return;
+  }
+  var rows = parsePerfoCsvRows(selectedCase.csv, convention);
   var prevCol = colSel.value;
   colSel.innerHTML = rows.map(function(r, i){
     return "<option value='"+i+"'>"+(r.band ? tx("Bande {b} · ", { b: tBand(r.band) }) : "")+tx("Colonne {c}", { c: escH(r.column) })+"</option>";
@@ -1619,14 +1636,14 @@ function renderZernikeDetail(){
     out.innerHTML = "<p class='empty'>"+tx("CSV illisible ou vide.")+"</p>";
     return;
   }
-  var convention = selectedCase.convention || "osa";
 
   // Les 5 modes dominants (hors piston), pour l'affichage façon "termes
   // nommés" — comme sur la référence partagée (spherical+defocus, etc.),
   // sans essayer de reproduire sa décomposition en 2 sous-cartes (choix
   // illustratif propre à cet exemple, pas un calcul déterministe).
-  var ranked = row.z.map(function(v, i){ return { k: i+1, v: v }; })
-    .filter(function(e){ return e.k !== 1; })
+  var firstIdx = zFirstIndex(convention);
+  var ranked = row.z.map(function(v, i){ return { k: firstIdx + i, v: v, pist: i === 0 }; })
+    .filter(function(e){ return !e.pist; })
     .sort(function(a, b){ return Math.abs(b.v) - Math.abs(a.v); })
     .slice(0, 5);
   var termsHtml = ranked.map(function(e){
@@ -1651,14 +1668,46 @@ function renderZernikeDetail(){
 // Validation légère — on ne parse pas vraiment le CSV (le serveur le fait
 // avec pandas/le vrai séparateur), on vérifie juste que l'en-tête a la
 // bonne forme pour attraper un fichier évidemment mauvais avant l'envoi.
-function validateWfeCsv(text){
-  var firstLine = (text.split(/\r?\n/)[0] || "").trim();
+// Seuls deux en-têtes sont valides (même règle stricte que le backend) :
+//   Z0..Z36 : OSA, convention connue d'office ;
+//   Z1..Z37 : Noll ou Fringe, convention à choisir (valeur "").
+function csvHeaderKind(text){
+  var firstLine = (String(text || "").split(/\r?\n/)[0] || "").trim();
   var cols = firstLine.split(";").map(function(c){ return c.trim(); });
   var hasCore = cols.indexOf("Detector_ID") >= 0 && cols.indexOf("Band") >= 0 && cols.indexOf("Column") >= 0;
-  var hasZ = cols.indexOf("Z1") >= 0;
-  if(!hasCore || !hasZ) return null;
+  if(!hasCore) return null;
+  var z = cols.filter(function(c){ return /^Z\d+$/.test(c); });
+  function exact(first){
+    if(z.length !== 37) return false;
+    for(var i = 0; i < 37; i++) if(cols.indexOf("Z"+(first+i)) < 0) return false;
+    return true;
+  }
+  if(exact(0)) return "osa";
+  if(exact(1)) return "noll_fringe";
+  return null;
+}
+function validateWfeCsv(text){
+  var kind = csvHeaderKind(text);
+  if(!kind) return null;
   var rowCount = text.split(/\r?\n/).filter(function(l){ return l.trim(); }).length - 1;
-  return { rowCount: Math.max(rowCount, 0) };
+  return { rowCount: Math.max(rowCount, 0), convention: kind === "osa" ? "osa" : "" };
+}
+// Cas enregistrés avant ce changement : convention OSA avec en-tête Z1..Z37 (qui voulait déjà dire
+// indices OSA 0..36). L'en-tête est renommé en Z0..Z36 ; aucune valeur ne change.
+function migrateWfeCases(){
+  (state.values.wfeCases || []).forEach(function(c){
+    if(c.mode !== "file" || !c.csv) return;
+    if(csvHeaderKind(c.csv) === "osa") c.convention = "osa";   // en-tête Z0..Z36 : OSA, sans ambiguïté
+    if((c.convention || "osa") !== "osa" || csvHeaderKind(c.csv) !== "noll_fringe") return;
+    var nl = c.csv.search(/\r?\n/);
+    var head = nl < 0 ? c.csv : c.csv.slice(0, nl), rest = nl < 0 ? "" : c.csv.slice(nl);
+    head = head.split(";").map(function(h){
+      var m = /^Z(\d+)$/.exec(h.trim());
+      return m ? "Z" + (Number(m[1]) - 1) : h;
+    }).join(";");
+    c.csv = head + rest;
+    c.convention = "osa";
+  });
 }
 
 function wireWfeCasesUI(){
@@ -1705,7 +1754,7 @@ function wireWfeCasesUI(){
     reader.onload = function(){
       var meta = validateWfeCsv(reader.result);
       if(!meta){
-        alert(tx("Fichier illisible : CSV attendu au format « Detector_ID;Band;Column;Z1;...;Z37 » (séparateur point-virgule)."));
+        alert(tx("Fichier illisible : CSV attendu au format « Detector_ID;Band;Column;Z0;...;Z36 » (OSA) ou « Detector_ID;Band;Column;Z1;...;Z37 » (Noll, Fringe), séparateur point-virgule."));
         return;
       }
       if(!state.values.wfeCases) state.values.wfeCases = [];
@@ -1717,7 +1766,7 @@ function wireWfeCasesUI(){
         csv: reader.result,
         rowCount: meta.rowCount,
         align: "center",
-        convention: "osa"
+        convention: meta.convention   // "osa" si l'en-tête est Z0..Z36, "" (à choisir) si Z1..Z37
       });
       pendingName = null;
       persist();
@@ -2685,7 +2734,7 @@ document.getElementById("fileInput").addEventListener("change", function(e){
         if(form.name) document.getElementById("instName").value = form.name;
         if(form.electronics_mode) state.values.electronics_mode = form.electronics_mode;
         if(form.WFE_RMS_nm != null) state.values.W = form.WFE_RMS_nm;
-        if(Array.isArray(form.wfeCases)) state.values.wfeCases = form.wfeCases;
+        if(Array.isArray(form.wfeCases)){ state.values.wfeCases = form.wfeCases; migrateWfeCases(); }
       } else {
         // Ancien format "plat" (clés directement D/I/E/T/W/PX/R/P/K/FW/QE/ADC)
         // — gardé pour compatibilité si un tel fichier existe déjà quelque part.
@@ -2787,6 +2836,7 @@ function setupGuestReadOnly(){
   }
 
   await loadInstrument(); // no-op si pas de ?id= dans l'URL (création)
+  migrateWfeCases();      // anciens cas OSA : en-tête Z1..Z37 renommé en Z0..Z36
   markSaved(); // référence pour détecter les modifications non enregistrées
   updateProgress();
   renderSchema();

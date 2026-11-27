@@ -464,6 +464,8 @@ var I18N = {
   "sim.view_angle":      { fr: "Angle de visée", en: "Viewing angle" },
   "sim.wfe.simplified":  { fr: "Simplifié (RMS)", en: "Simplified (RMS)" },
   "sim.wfe.file_suffix": { fr: " (fichier)", en: " (file)" },
+  "sim.wfe.need_convention": { fr: "Choisissez la convention Zernike de ce cas (Noll ou Fringe) dans l'instrument avant de lancer la simulation.", en: "Choose the Zernike convention of this case (Noll or Fringe) in the instrument before running the simulation." },
+  "sim.wfe.bad_header": { fr: "Les colonnes Zernike de ce cas ne sont pas valides : attendu Z0 à Z36 (OSA) ou Z1 à Z37 (Noll, Fringe).", en: "The Zernike columns of this case are not valid: expected Z0 to Z36 (OSA) or Z1 to Z37 (Noll, Fringe)." },
   "sim.atm.summary":     { fr: "Atmosphère (paramètres avancés)", en: "Atmosphere (advanced settings)" },
   "sim.atm.profile":     { fr: "Profil atmosphérique", en: "Atmospheric profile" },
   "sim.atm.p.tropical":  { fr: "Tropical", en: "Tropical" },
@@ -1029,8 +1031,10 @@ var I18N_TEXT = {
   "Nom du cas WFE (ex. « Cas chaud », « Cas froid en orbite ») :": "WFE case name (e.g. “Hot case”, “Cold case in orbit”):",
   "WFE RMS pour ce cas (nm) :": "WFE RMS for this case (nm):",
   "Valeur invalide : un nombre est attendu (chiffres, signe moins autorisé).": "Invalid value: a number is expected (digits, minus sign allowed).",
-  "Fichier illisible : CSV attendu au format « Detector_ID;Band;Column;Z1;...;Z37 » (séparateur point-virgule).":
-    "Unreadable file: CSV expected in the format “Detector_ID;Band;Column;Z1;...;Z37” (semicolon separator).",
+  "Fichier illisible : CSV attendu au format « Detector_ID;Band;Column;Z0;...;Z36 » (OSA) ou « Detector_ID;Band;Column;Z1;...;Z37 » (Noll, Fringe), séparateur point-virgule.":
+    "Unreadable file: CSV expected in the format “Detector_ID;Band;Column;Z0;...;Z36” (OSA) or “Detector_ID;Band;Column;Z1;...;Z37” (Noll, Fringe), semicolon separator.",
+  "Choisissez la convention Zernike du cas (Noll ou Fringe) pour afficher le détail.":
+    "Choose the Zernike convention of the case (Noll or Fringe) to display the detail.",
   "piston": "piston",
   "tilt (X)": "tilt (X)",
   "tilt (Y)": "tilt (Y)",
